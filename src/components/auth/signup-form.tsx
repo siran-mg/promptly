@@ -45,11 +45,14 @@ export function SignupForm() {
 
     try {
       // Step 1: Sign up the user with Supabase Auth
-      const { error: signUpError, data: authData } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            full_name: data.name,
+          },
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/auth/callback`,
         },
       });
 
@@ -58,22 +61,8 @@ export function SignupForm() {
         return;
       }
 
-      // Step 2: Create a profile in the profiles table
-      if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            full_name: data.name,
-            email: data.email,
-          });
-
-        if (profileError) {
-          console.error("Error creating profile:", profileError);
-          setError("Account created but profile setup failed. Please contact support.");
-          return;
-        }
-      }
+      // Profile will be created automatically via the database trigger
+      // when the user is created
 
       // Redirect to dashboard after successful signup
       router.push("/dashboard");
