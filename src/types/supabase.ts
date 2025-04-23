@@ -129,6 +129,34 @@ export interface Database {
           }
         ]
       }
+      form_share_tokens: {
+        Row: {
+          id: string
+          user_id: string
+          token: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          token: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          token?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_share_tokens_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

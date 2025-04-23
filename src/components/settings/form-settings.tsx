@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, Share, Copy, Check, ExternalLink } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FormPreview } from "@/components/settings/form-preview";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface FormSettings {
   id: string;
@@ -29,7 +38,10 @@ export function FormSettings() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [settings, setSettings] = useState<FormSettings | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [shareToken, setShareToken] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     form_title: "",
     form_description: "",
@@ -64,7 +76,6 @@ export function FormSettings() {
           return;
         }
 
-        setSettings(data);
         setFormData({
           form_title: data.form_title || "Book an Appointment",
           form_description: data.form_description || "Fill out the form below to schedule your appointment.",
@@ -207,14 +218,21 @@ export function FormSettings() {
         description: "Your form settings have been saved successfully.",
       });
 
-      // Refresh settings
+      // Refresh form data
       const { data } = await supabase
         .from("form_settings")
         .select("*")
         .eq("user_id", user.id)
         .single();
 
-      setSettings(data);
+      if (data) {
+        setFormData({
+          form_title: data.form_title || "Book an Appointment",
+          form_description: data.form_description || "Fill out the form below to schedule your appointment.",
+          logo_url: data.logo_url || "",
+          accent_color: data.accent_color || "#6366f1",
+        });
+      }
     } catch (err) {
       console.error("Error saving form settings:", err);
       toast({
@@ -235,16 +253,107 @@ export function FormSettings() {
     );
   }
 
+  // Generate or get share token
+  const generateShareToken = async () => {
+    setIsGenerating(true);
+    try {
+      // Get user ID
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Check if a token already exists
+      const { data: existingToken } = await supabase
+        .from("form_share_tokens")
+        .select("token")
+        .eq("user_id", user.id)
+        .single();
+
+      if (existingToken?.token) {
+        setShareToken(existingToken.token);
+        setIsGenerating(false);
+        return;
+      }
+
+      // If no token exists, create one via the API
+      const response = await fetch('/api/form/share-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error('API error:', result.error);
+        toast({
+          title: 'Error',
+          description: result.error || 'Could not generate share link. Please try again.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      setShareToken(result.shareToken.token);
+    } catch (err) {
+      console.error('Error generating share token:', err);
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Copy share link to clipboard
+  const copyToClipboard = () => {
+    if (shareToken) {
+      const link = `${window.location.origin}/book/${shareToken}`;
+      navigator.clipboard.writeText(link);
+      setCopied(true);
+      toast({
+        title: "Link copied",
+        description: "The booking form link has been copied to your clipboard.",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  // Open share dialog
+  const handleOpenShareDialog = async () => {
+    setIsShareDialogOpen(true);
+    if (!shareToken) {
+      await generateShareToken();
+    }
+  };
+
+  // Open form in new tab
+  const openFormInNewTab = () => {
+    if (shareToken) {
+      window.open(`${window.location.origin}/book/${shareToken}`, '_blank');
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Form Customization</CardTitle>
-        <CardDescription>
-          Customize how your appointment booking form appears to clients.
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-6">
+    <Tabs defaultValue="customize">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="customize">Customize Form</TabsTrigger>
+        <TabsTrigger value="preview">Preview & Share</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="customize" className="mt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Form Customization</CardTitle>
+            <CardDescription>
+              Customize how your appointment booking form appears to clients.
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="form_title">Form Title</Label>
             <Input
@@ -378,13 +487,87 @@ export function FormSettings() {
               This color will be used for buttons and highlights on your form.
             </p>
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button type="submit" disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+            </CardContent>
+            <CardFooter>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save Changes"}
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="preview" className="mt-6 space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Form Preview</CardTitle>
+            <CardDescription>
+              Preview how your booking form will appear to clients.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FormPreview
+              formTitle={formData.form_title}
+              formDescription={formData.form_description}
+              logoUrl={formData.logo_url}
+              accentColor={formData.accent_color}
+            />
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 items-start sm:items-center">
+            <Button
+              onClick={handleOpenShareDialog}
+              className="w-full sm:w-auto gap-2"
+            >
+              <Share className="h-4 w-4" />
+              Share Form Link
+            </Button>
+            <Button
+              variant="outline"
+              onClick={openFormInNewTab}
+              className="w-full sm:w-auto gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Open in New Tab
+            </Button>
+          </CardFooter>
+        </Card>
+      </TabsContent>
+
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Share Booking Form</DialogTitle>
+            <DialogDescription>
+              Share this link with your clients to let them book appointments with you.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="grid flex-1 gap-2">
+                <label htmlFor="link" className="sr-only">
+                  Link
+                </label>
+                <Input
+                  id="link"
+                  value={shareToken ? `${window.location.origin}/book/${shareToken}` : 'Generating link...'}
+                  readOnly
+                />
+              </div>
+              <Button
+                size="icon"
+                onClick={copyToClipboard}
+                disabled={!shareToken || isGenerating}
+              >
+                {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> :
+                 copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              This link allows clients to book appointments directly with you. You can share it on your website, social media, or via email.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </Tabs>
   );
 }
