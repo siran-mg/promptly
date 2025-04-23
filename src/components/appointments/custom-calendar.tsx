@@ -4,18 +4,18 @@ import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-
+import "@/styles/custom-calendar.css";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+export type CustomCalendarProps = React.ComponentProps<typeof DayPicker>;
 
-function Calendar({
+function CustomCalendar({
   className,
   classNames,
   showOutsideDays = true,
   ...props
-}: CalendarProps) {
+}: CustomCalendarProps) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -33,10 +33,9 @@ function Calendar({
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-y-1",
-        head_row: "flex w-full justify-between",
-        head_cell:
-          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] text-center",
-        row: "flex w-full justify-between mt-2",
+        head_row: "grid grid-cols-7 gap-1",
+        head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] text-center",
+        row: "grid grid-cols-7 gap-1",
         cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
@@ -62,6 +61,6 @@ function Calendar({
     />
   );
 }
-Calendar.displayName = "Calendar";
+CustomCalendar.displayName = "CustomCalendar";
 
-export { Calendar };
+export { CustomCalendar };

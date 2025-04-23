@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
+// Using a simple date picker component for better display
+import { SimpleDatePicker } from "./simple-date-picker";
 import {
   Popover,
   PopoverContent,
@@ -58,8 +59,12 @@ export function AppointmentForm({ userId }: AppointmentFormProps) {
   };
 
   const handleDateChange = (date: Date | undefined) => {
+    console.log('Date selected:', date);
     if (date) {
-      setFormData((prev) => ({ ...prev, date }));
+      setFormData((prev) => {
+        console.log('Updating form data with date:', date);
+        return { ...prev, date };
+      });
     }
   };
 
@@ -190,13 +195,12 @@ export function AppointmentForm({ userId }: AppointmentFormProps) {
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
+                <PopoverContent className="w-auto p-0" align="center" sideOffset={4}>
+                  <SimpleDatePicker
                     selected={formData.date}
                     onSelect={handleDateChange}
-                    initialFocus
-                    disabled={(date) => date < new Date()}
+                    disabled={(date: Date) => date < new Date()}
+                    className="rounded-md border"
                   />
                 </PopoverContent>
               </Popover>

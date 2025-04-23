@@ -1,0 +1,137 @@
+/* Custom calendar styles */
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: #0f172a;
+  --rdp-background-color: #e2e8f0;
+  margin: 0;
+}
+
+/* Month container */
+.rdp-months {
+  display: flex;
+  justify-content: center;
+}
+
+/* Table layout */
+.rdp-table {
+  width: 100%;
+  max-width: 300px;
+  border-collapse: collapse;
+}
+
+/* Header row */
+.rdp-head_row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8px;
+}
+
+/* Header cells */
+.rdp-head_cell {
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: #6b7280;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Day rows */
+.rdp-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-top: 4px;
+}
+
+/* Day cells */
+.rdp-cell {
+  text-align: center;
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+/* Day buttons */
+.rdp-day {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: #1f2937;
+}
+
+/* Selected day */
+.rdp-day_selected {
+  background-color: #6366f1;
+  color: white;
+}
+
+/* Today */
+.rdp-day_today {
+  font-weight: bold;
+  border: 1px solid #6366f1;
+}
+
+/* Hover effect */
+.rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_disabled) {
+  background-color: #f3f4f6;
+}
+
+/* Disabled days */
+.rdp-day_disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Caption (month/year) */
+.rdp-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  margin-bottom: 8px;
+}
+
+.rdp-caption_label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Navigation buttons */
+.rdp-nav {
+  display: flex;
+  align-items: center;
+}
+
+.rdp-nav_button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rdp-nav_button:hover {
+  background-color: #f3f4f6;
+}
+
+/* Footer */
+.rdp-footer {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
