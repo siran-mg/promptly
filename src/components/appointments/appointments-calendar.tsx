@@ -27,6 +27,9 @@ import {
 // Import the CSS for react-big-calendar
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
+// Add custom styles for the calendar
+import "@/styles/calendar.css";
+
 // Create a date localizer for the calendar
 const locales = {
   "en-US": enUS,
@@ -145,7 +148,14 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
 
   return (
     <>
-      <div className="h-[700px] bg-white rounded-md border">
+      <div className="space-y-2">
+        <div className="flex items-center text-sm text-muted-foreground">
+          <div className="flex items-center mr-4">
+            <div className="w-3 h-3 rounded-full bg-primary mr-1.5 opacity-60"></div>
+            <span>Click any date to create a new appointment</span>
+          </div>
+        </div>
+        <div className="h-[700px] bg-white rounded-md border">
         <Calendar
           localizer={localizer}
           events={events}
@@ -184,6 +194,7 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
           };
         }}
       />
+        </div>
       </div>
 
       {/* Create Appointment Dialog */}

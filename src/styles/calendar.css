@@ -1,0 +1,87 @@
+/* Custom styles for react-big-calendar */
+
+/* Make date cells clickable with hover effect */
+.rbc-day-bg {
+  cursor: pointer !important;
+  transition: background-color 0.2s ease;
+}
+
+/* Add hover effect to date cells */
+.rbc-day-bg:hover {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Add hover effect to month view date cells */
+.rbc-month-view .rbc-day-bg:hover {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Add hover effect to week view date cells */
+.rbc-time-view .rbc-day-slot:hover {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Add hover effect to day headers */
+.rbc-header:hover {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+  cursor: pointer;
+}
+
+/* Make today's date more prominent */
+.rbc-today {
+  background-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Add hover effect to today's date */
+.rbc-today:hover {
+  background-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Style for the time slots in week/day view */
+.rbc-time-slot {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.rbc-time-slot:hover {
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+/* Make the events slightly transparent on hover to show they're interactive */
+.rbc-event {
+  transition: opacity 0.2s ease;
+}
+
+.rbc-event:hover {
+  opacity: 0.9;
+}
+
+/* Add a subtle border to the calendar */
+.rbc-calendar {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Style the toolbar buttons */
+.rbc-toolbar button {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.rbc-toolbar button:hover {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: rgb(99, 102, 241);
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: rgb(99, 102, 241) !important;
+  color: white !important;
+}
+
+.rbc-toolbar button.rbc-active:hover {
+  background-color: rgb(79, 82, 221) !important;
+}
+
+/* Add a subtle shadow to the events */
+.rbc-event {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
