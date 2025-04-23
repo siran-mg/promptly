@@ -1,8 +1,7 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { CalendarClock, Mail, Phone, FileText } from "lucide-react";
+import { headers } from "next/headers";
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -15,20 +14,6 @@ export default async function AppointmentPage({
   params: { token: string };
 }) {
   const { token } = params;
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore });
-
-  // Fetch appointment by share_token
-  const { data: appointment, error } = await supabase
-    .from("appointments")
-    .select("*")
-    .eq("share_token", token)
-    .single();
-
-  if (error || !appointment) {
-    console.error("Error fetching appointment:", error);
-    return notFound();
-  }
 
   // Validate that the token is a valid UUID
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -37,6 +22,38 @@ export default async function AppointmentPage({
     return notFound();
   }
 
+  try {
+    // Get the host from headers
+    const headersList = headers();
+    const host = headersList.get('host') || 'localhost:3000';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+
+    // Use our API endpoint to fetch the appointment
+    const response = await fetch(`${protocol}://${host}/api/appointments/view/${token}`, {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error('API response error:', response.status, response.statusText);
+      return notFound();
+    }
+
+    const data = await response.json();
+
+    if (!data.appointment) {
+      console.error('No appointment data returned from API');
+      return notFound();
+    }
+
+    return renderAppointment(data.appointment);
+  } catch (error) {
+    console.error('Error fetching appointment:', error);
+    return notFound();
+  }
+}
+
+// Helper function to render the appointment details
+function renderAppointment(appointment: any) {
   return (
     <>
       <Header />
@@ -56,7 +73,7 @@ export default async function AppointmentPage({
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Appointment Information</CardTitle>
-                  <AppointmentStatusBadge status={appointment.status} />
+                  <AppointmentStatusBadge status={appointment.status || 'scheduled'} />
                 </div>
                 <CardDescription>
                   Please review your appointment details below.

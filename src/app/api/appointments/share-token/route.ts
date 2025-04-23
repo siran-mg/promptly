@@ -30,30 +30,25 @@ export async function POST(request: Request) {
     // Generate a new share token (UUID)
     const shareToken = randomUUID();
 
-    // Use raw SQL to update the appointment
-    // This bypasses the schema cache issue completely
-    const { data, error } = await supabase.from('appointments')
-      .select('*')
+    // Update the appointment with the new share token
+    const { data, error } = await supabase
+      .from('appointments')
+      .update({ share_token: shareToken })
       .eq('id', appointmentId)
       .eq('user_id', session.user.id)
+      .select()
       .single();
 
     if (error) {
-      console.error('Error fetching appointment:', error);
+      console.error('Error updating appointment:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch appointment' },
+        { error: 'Could not generate share link. Please try again.' },
         { status: 500 }
       );
     }
 
-    // Manually update the appointment with the share token
-    const updatedAppointment = {
-      ...data,
-      share_token: shareToken
-    };
-
-    // Return the updated appointment with the new share token
-    return NextResponse.json({ appointment: updatedAppointment });
+    // Return the updated appointment with the share token
+    return NextResponse.json({ appointment: data });
   } catch (error) {
     console.error('Error in share token API:', error);
     return NextResponse.json(
