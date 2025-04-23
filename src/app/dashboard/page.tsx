@@ -6,6 +6,7 @@ import { UserProfile } from "@/components/auth/user-profile";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { ShareFormButton } from "@/components/dashboard/share-form-button";
+import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function DashboardPage() {
@@ -18,13 +19,29 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  // Fetch appointments for the current user
+  const { data: appointments, error } = await supabase
+    .from("appointments")
+    .select("*")
+    .eq("user_id", session.user.id)
+    .order("date", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching appointments:", error);
+  }
+
   return (
     <DashboardShell>
       <DashboardHeader
         heading="Dashboard"
         text="Welcome to your Promptly dashboard."
       />
-      <div className="grid gap-6 md:grid-cols-2">
+
+      {/* Dashboard Overview with Charts */}
+      <DashboardOverview appointments={appointments || []} />
+
+      {/* Profile and Booking Cards */}
+      <div className="grid gap-6 md:grid-cols-2 mt-6">
         <Card>
           <CardHeader>
             <CardTitle>Your Profile</CardTitle>
