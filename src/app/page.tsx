@@ -29,11 +29,6 @@ export default function Home() {
                       Get Started
                     </Button>
                   </Link>
-                  <Link href="/demo">
-                    <Button size="lg" variant="outline" className="w-full min-[400px]:w-auto">
-                      View Demo
-                    </Button>
-                  </Link>
                 </div>
               </div>
               <div className="flex items-center justify-center">
