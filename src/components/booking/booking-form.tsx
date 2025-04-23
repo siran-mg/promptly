@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarClock, Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase";
+import { useToast } from "@/components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +28,8 @@ export default function BookingForm() {
   const [date, setDate] = useState<Date | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const supabase = createClient();
+  const { toast } = useToast();
 
   const {
     register,
@@ -44,20 +48,50 @@ export default function BookingForm() {
     setIsSubmitting(true);
 
     try {
-      // In a real app, you would submit this data to your API
-      console.log({
-        ...data,
-        date,
-      });
+      // Get the current user session
+      const { data: { session } } = await supabase.auth.getSession();
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Prepare appointment data
+      const appointmentData = {
+        user_id: session?.user?.id || '95b66ca9-217e-464c-884d-d92debbf886a', // Fallback to a default user ID if not logged in
+        client_name: data.name,
+        client_email: data.email,
+        client_phone: data.phone,
+        date: date.toISOString(),
+        notes: data.notes || null,
+        status: 'scheduled'
+      };
+
+      // Insert the appointment into the database
+      const { error: insertError } = await supabase
+        .from('appointments')
+        .insert(appointmentData);
+
+      if (insertError) {
+        console.error('Error inserting appointment:', insertError);
+        toast({
+          title: 'Error',
+          description: 'There was a problem saving your appointment. Please try again.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      toast({
+        title: 'Appointment Booked',
+        description: 'Your appointment has been successfully scheduled.',
+      });
 
       setIsSuccess(true);
       reset();
       setDate(null);
     } catch (error) {
       console.error("Error submitting form:", error);
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setIsSubmitting(false);
     }

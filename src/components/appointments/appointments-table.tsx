@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { CalendarClock, MoreHorizontal, Search } from "lucide-react";
+import { CalendarClock, MoreHorizontal, Search, Share, Copy, Check } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Database } from "@/types/supabase";
 
 import {
@@ -34,7 +36,11 @@ interface AppointmentsTableProps {
 
 export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
+
   // Filter appointments based on search query
   const filteredAppointments = appointments.filter((appointment) => {
     const searchLower = searchQuery.toLowerCase();
@@ -77,7 +83,7 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
           />
         </div>
       </div>
-      
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -125,6 +131,16 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem>View details</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setCurrentAppointment(appointment);
+                            setShareDialogOpen(true);
+                            setCopied(false);
+                          }}
+                        >
+                          <Share className="mr-2 h-4 w-4" />
+                          Share with client
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>Mark as completed</DropdownMenuItem>
                         <DropdownMenuItem>Cancel appointment</DropdownMenuItem>
@@ -137,6 +153,56 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Share Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Share Appointment</DialogTitle>
+            <DialogDescription>
+              Share this link with your client to let them view their appointment details.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="grid flex-1 gap-2">
+                <label htmlFor="link" className="sr-only">
+                  Link
+                </label>
+                <Input
+                  id="link"
+                  defaultValue={currentAppointment ? `${window.location.origin}/appointment/${currentAppointment.share_token}` : ''}
+                  readOnly
+                />
+              </div>
+              <Button
+                size="icon"
+                onClick={() => {
+                  if (currentAppointment) {
+                    const link = `${window.location.origin}/appointment/${currentAppointment.share_token}`;
+                    navigator.clipboard.writeText(link);
+                    setCopied(true);
+                    toast({
+                      title: "Link copied",
+                      description: "The appointment link has been copied to your clipboard.",
+                    });
+                    setTimeout(() => setCopied(false), 2000);
+                  }
+                }}
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+            <div className="flex flex-col space-y-2">
+              <h3 className="text-sm font-medium">Appointment for</h3>
+              <p className="text-sm">{currentAppointment?.client_name}</p>
+              <p className="text-xs text-muted-foreground">
+                {currentAppointment ? format(new Date(currentAppointment.date), "PPP p") : ''}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

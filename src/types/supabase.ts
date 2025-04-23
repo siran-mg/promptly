@@ -52,6 +52,7 @@ export interface Database {
           date: string
           notes: string | null
           status: string
+          share_token: string
         }
         Insert: {
           id?: string
@@ -64,6 +65,7 @@ export interface Database {
           date: string
           notes?: string | null
           status?: string
+          share_token?: string
         }
         Update: {
           id?: string
@@ -76,6 +78,7 @@ export interface Database {
           date?: string
           notes?: string | null
           status?: string
+          share_token?: string
         }
         Relationships: [
           {
