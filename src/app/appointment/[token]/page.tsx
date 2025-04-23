@@ -26,6 +26,14 @@ export default async function AppointmentPage({
     .single();
 
   if (error || !appointment) {
+    console.error("Error fetching appointment:", error);
+    return notFound();
+  }
+
+  // Validate that the token is a valid UUID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(token)) {
+    console.error("Invalid token format:", token);
     return notFound();
   }
 

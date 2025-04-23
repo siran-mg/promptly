@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { CalendarClock, MoreHorizontal, Search, Share, Copy, Check } from "lucide-react";
+import { CalendarClock, MoreHorizontal, Search, Share, Copy, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+// No longer need supabase client as we're using the API endpoint
 import { Database } from "@/types/supabase";
 
 import {
@@ -38,6 +39,7 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
+  const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
@@ -132,10 +134,65 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem>View details</DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => {
-                            setCurrentAppointment(appointment);
-                            setShareDialogOpen(true);
-                            setCopied(false);
+                          onClick={async () => {
+                            // First, check if the appointment has a share token
+                            if (!appointment.share_token) {
+                              // Generate a share token before opening the dialog
+                              setIsGeneratingToken(true);
+                              try {
+                                // Use the server-side API to generate a share token
+                                const response = await fetch('/api/appointments/share-token', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({ appointmentId: appointment.id }),
+                                });
+
+                                const result = await response.json();
+
+                                if (!response.ok) {
+                                  console.error('API error:', result.error);
+                                  toast({
+                                    title: 'Error',
+                                    description: result.error || 'Could not generate share link. Please try again.',
+                                    variant: 'destructive',
+                                  });
+                                  setIsGeneratingToken(false);
+                                  return;
+                                }
+
+                                console.log('Share token generated successfully:', result.appointment);
+
+                                // Set the updated appointment with the share token
+                                if (result.appointment) {
+                                  setCurrentAppointment(result.appointment);
+                                  setShareDialogOpen(true);
+                                  setCopied(false);
+                                } else {
+                                  console.error('No appointment data returned from API');
+                                  toast({
+                                    title: 'Error',
+                                    description: 'Could not retrieve updated appointment data.',
+                                    variant: 'destructive',
+                                  });
+                                }
+                              } catch (err) {
+                                console.error('Error calling share token API:', err);
+                                toast({
+                                  title: 'Error',
+                                  description: 'An unexpected error occurred. Please try again.',
+                                  variant: 'destructive',
+                                });
+                              } finally {
+                                setIsGeneratingToken(false);
+                              }
+                            } else {
+                              // If share token already exists, just open the dialog
+                              setCurrentAppointment(appointment);
+                              setShareDialogOpen(true);
+                              setCopied(false);
+                            }
                           }}
                         >
                           <Share className="mr-2 h-4 w-4" />
@@ -171,14 +228,17 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
                 </label>
                 <Input
                   id="link"
-                  defaultValue={currentAppointment ? `${window.location.origin}/appointment/${currentAppointment.share_token}` : ''}
+                  value={currentAppointment && currentAppointment.share_token ?
+                    `${window.location.origin}/appointment/${currentAppointment.share_token}` :
+                    'No share link available'}
                   readOnly
                 />
               </div>
               <Button
                 size="icon"
-                onClick={() => {
-                  if (currentAppointment) {
+                onClick={async () => {
+                  if (currentAppointment && currentAppointment.share_token) {
+                    // We already have a valid share token, just copy it
                     const link = `${window.location.origin}/appointment/${currentAppointment.share_token}`;
                     navigator.clipboard.writeText(link);
                     setCopied(true);
@@ -190,7 +250,8 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
                   }
                 }}
               >
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {isGeneratingToken ? <Loader2 className="h-4 w-4 animate-spin" /> :
+                 copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
             </div>
             <div className="flex flex-col space-y-2">
