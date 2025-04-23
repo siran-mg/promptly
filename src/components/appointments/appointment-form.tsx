@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
+import { AppointmentTypeSelector } from "./appointment-type-selector";
+import { CustomFields } from "./custom-fields";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +43,10 @@ export function AppointmentForm({ userId, accentColor = "#6366f1" }: Appointment
     date: new Date(),
     time: "09:00",
     notes: "",
+    appointmentTypeId: "",
   });
+
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
 
   // Time slots are now handled by the TimePicker component
 
@@ -62,6 +67,20 @@ export function AppointmentForm({ userId, accentColor = "#6366f1" }: Appointment
 
   const handleTimeChange = (time: string) => {
     setFormData((prev) => ({ ...prev, time }));
+  };
+
+  // Fetch appointment type details when the type changes
+  useEffect(() => {
+    if (!formData.appointmentTypeId) return;
+
+    // You could fetch additional details about the appointment type here if needed
+  }, [formData.appointmentTypeId]);
+
+  const handleCustomFieldChange = (fieldId: string, value: string) => {
+    setCustomFieldValues(prev => ({
+      ...prev,
+      [fieldId]: value
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,6 +104,8 @@ export function AppointmentForm({ userId, accentColor = "#6366f1" }: Appointment
           date: appointmentDate.toISOString(),
           notes: formData.notes,
           status: "scheduled",
+          appointment_type_id: formData.appointmentTypeId || null,
+          metadata: Object.keys(customFieldValues).length > 0 ? customFieldValues : null,
         })
         .select()
         .single();
@@ -104,6 +125,24 @@ export function AppointmentForm({ userId, accentColor = "#6366f1" }: Appointment
         description: "Your appointment has been scheduled.",
       });
 
+      // If we have custom fields, save them
+      if (Object.keys(customFieldValues).length > 0 && data) {
+        const fieldValues = Object.entries(customFieldValues).map(([fieldId, value]) => ({
+          appointment_id: data.id,
+          field_id: fieldId,
+          value: value
+        }));
+
+        const { error: fieldError } = await supabase
+          .from("appointment_field_values")
+          .insert(fieldValues);
+
+        if (fieldError) {
+          console.error("Error saving custom field values:", fieldError);
+          // Continue anyway as the main appointment was created
+        }
+      }
+
       // Reset form
       setFormData({
         clientName: "",
@@ -112,7 +151,9 @@ export function AppointmentForm({ userId, accentColor = "#6366f1" }: Appointment
         date: new Date(),
         time: "09:00",
         notes: "",
+        appointmentTypeId: "",
       });
+      setCustomFieldValues({});
 
       // Redirect to confirmation page
       router.push(`/book/confirmation/${data.id}`);
@@ -206,6 +247,24 @@ export function AppointmentForm({ userId, accentColor = "#6366f1" }: Appointment
               />
             </div>
           </div>
+
+          <div className="space-y-2">
+            <Label>Appointment Type</Label>
+            <AppointmentTypeSelector
+              value={formData.appointmentTypeId}
+              onChange={(value) => setFormData(prev => ({ ...prev, appointmentTypeId: value }))}
+              userId={userId}
+            />
+          </div>
+
+          {/* Custom fields based on appointment type */}
+          {formData.appointmentTypeId && (
+            <CustomFields
+              appointmentTypeId={formData.appointmentTypeId}
+              values={customFieldValues}
+              onChange={handleCustomFieldChange}
+            />
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="notes">Notes (Optional)</Label>
