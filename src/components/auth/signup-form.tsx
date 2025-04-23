@@ -5,11 +5,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase";
 
 const signupSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -25,6 +27,9 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 export function SignupForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
   const {
     register,
@@ -36,18 +41,46 @@ export function SignupForm() {
 
   const onSubmit = async (data: SignupFormValues) => {
     setIsSubmitting(true);
+    setError(null);
 
     try {
-      // In a real app, you would submit this data to your API
-      console.log(data);
+      // Step 1: Sign up the user with Supabase Auth
+      const { error: signUpError, data: authData } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (signUpError) {
+        setError(signUpError.message);
+        return;
+      }
+
+      // Step 2: Create a profile in the profiles table
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            full_name: data.name,
+            email: data.email,
+          });
+
+        if (profileError) {
+          console.error("Error creating profile:", profileError);
+          setError("Account created but profile setup failed. Please contact support.");
+          return;
+        }
+      }
 
       // Redirect to dashboard after successful signup
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
+      router.refresh();
     } catch (error) {
       console.error("Error signing up:", error);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -57,6 +90,11 @@ export function SignupForm() {
     <Card className="w-full">
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4 pt-6">
+          {error && (
+            <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              {error}
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
             <Input id="name" {...register("name")} />
