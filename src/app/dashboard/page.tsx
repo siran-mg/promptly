@@ -6,6 +6,7 @@ import Link from "next/link";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
+import { SmartShareButton } from "@/components/dashboard/smart-share-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarClock, Plus, Share } from "lucide-react";
@@ -57,15 +58,19 @@ export default async function DashboardPage() {
               </div>
             </Link>
           </Button>
-          <Button variant="outline" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-white shadow-sm" asChild>
-            <Link href="/dashboard/settings?tab=form">
-              <Share className="h-6 w-6 mb-1 text-indigo-600" />
-              <div className="text-center">
-                <div className="font-medium text-base">Share Booking Form</div>
-                <div className="text-xs text-muted-foreground">Let clients book with you</div>
-              </div>
-            </Link>
-          </Button>
+          <div className="relative h-24 flex flex-col items-center justify-center gap-2 bg-white shadow-sm rounded-md border hover:bg-gray-50 transition-colors cursor-pointer group">
+            {/* Invisible button that covers the entire card for accessibility */}
+            <div className="absolute inset-0 w-full h-full">
+              <SmartShareButton variant="ghost" className="w-full h-full opacity-0" />
+            </div>
+
+            {/* Visual content */}
+            <Share className="h-6 w-6 mb-1 text-indigo-600 group-hover:text-indigo-700" />
+            <div className="text-center mt-1">
+              <div className="font-medium text-base">Share Booking Form</div>
+              <div className="text-xs text-muted-foreground">Let clients book with you</div>
+            </div>
+          </div>
         </div>
       </div>
 
