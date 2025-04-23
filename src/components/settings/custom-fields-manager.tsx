@@ -44,6 +44,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type AppointmentType = Database["public"]["Tables"]["appointment_types"]["Row"];
 type CustomField = Database["public"]["Tables"]["appointment_custom_fields"]["Row"];
@@ -95,7 +96,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
 
       try {
         setIsLoading(true);
-        
+
         // Fetch appointment type
         const { data: typeData, error: typeError } = await supabase
           .from("appointment_types")
@@ -173,7 +174,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
       required: field.required,
       placeholder: field.placeholder || "",
       default_value: field.default_value || "",
-      options: field.options ? 
+      options: field.options ?
         (Array.isArray(field.options) ? field.options.join("\n") : JSON.stringify(field.options)) : "",
     });
     setEditingField(field);
@@ -189,35 +190,35 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
   // Move a field up in the order
   const handleMoveUp = async (index: number) => {
     if (index <= 0) return;
-    
+
     try {
       const newFields = [...customFields];
       const field = newFields[index];
       const prevField = newFields[index - 1];
-      
+
       // Swap order_index values
       const tempIndex = field.order_index;
       field.order_index = prevField.order_index;
       prevField.order_index = tempIndex;
-      
+
       // Swap positions in array
       newFields[index] = prevField;
       newFields[index - 1] = field;
-      
+
       setCustomFields(newFields);
-      
+
       // Update in database
       const updates = [
         { id: field.id, order_index: field.order_index },
         { id: prevField.id, order_index: prevField.order_index }
       ];
-      
+
       for (const update of updates) {
         const { error } = await supabase
           .from("appointment_custom_fields")
           .update({ order_index: update.order_index })
           .eq("id", update.id);
-          
+
         if (error) {
           console.error("Error updating field order:", error);
         }
@@ -230,35 +231,35 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
   // Move a field down in the order
   const handleMoveDown = async (index: number) => {
     if (index >= customFields.length - 1) return;
-    
+
     try {
       const newFields = [...customFields];
       const field = newFields[index];
       const nextField = newFields[index + 1];
-      
+
       // Swap order_index values
       const tempIndex = field.order_index;
       field.order_index = nextField.order_index;
       nextField.order_index = tempIndex;
-      
+
       // Swap positions in array
       newFields[index] = nextField;
       newFields[index + 1] = field;
-      
+
       setCustomFields(newFields);
-      
+
       // Update in database
       const updates = [
         { id: field.id, order_index: field.order_index },
         { id: nextField.id, order_index: nextField.order_index }
       ];
-      
+
       for (const update of updates) {
         const { error } = await supabase
           .from("appointment_custom_fields")
           .update({ order_index: update.order_index })
           .eq("id", update.id);
-          
+
         if (error) {
           console.error("Error updating field order:", error);
         }
@@ -366,7 +367,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
         }
 
         // Update local state
-        setCustomFields(prev => 
+        setCustomFields(prev =>
           prev.map(field => field.id === editingField.id ? data : field)
         );
 
@@ -461,8 +462,8 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
           <CardContent className="p-4">
             <div className="space-y-4">
               {customFields.map((field, index) => (
-                <div 
-                  key={field.id} 
+                <div
+                  key={field.id}
                   className="flex items-center justify-between p-3 border rounded-md bg-background"
                 >
                   <div className="flex items-center">
@@ -541,84 +542,192 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
-            <div className="space-y-4 py-2">
-              <div className="space-y-2">
-                <Label htmlFor="label">Field Label</Label>
-                <Input
-                  id="label"
-                  name="label"
-                  value={formData.label}
-                  onChange={handleChange}
-                  placeholder="e.g., Medical History"
-                  required
-                />
-              </div>
+            <div className="space-y-6 py-2">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="label">Field Label</Label>
+                    <Input
+                      id="label"
+                      name="label"
+                      value={formData.label}
+                      onChange={handleChange}
+                      placeholder="e.g., Medical History"
+                      required
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="type">Field Type</Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value) => handleSelectChange("type", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select field type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {fieldTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="type">Field Type</Label>
+                    <Select
+                      value={formData.type}
+                      onValueChange={(value) => handleSelectChange("type", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select field type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fieldTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              {formData.type === "select" && (
-                <div className="space-y-2">
-                  <Label htmlFor="options">Options (one per line)</Label>
-                  <Textarea
-                    id="options"
-                    name="options"
-                    value={formData.options}
-                    onChange={handleChange}
-                    placeholder="Option 1&#10;Option 2&#10;Option 3"
-                    rows={4}
-                    required
-                  />
+                  {formData.type === "select" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="options">Options (one per line)</Label>
+                      <Textarea
+                        id="options"
+                        name="options"
+                        value={formData.options}
+                        onChange={handleChange}
+                        placeholder="Option 1&#10;Option 2&#10;Option 3"
+                        rows={4}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="placeholder">Placeholder (Optional)</Label>
+                    <Input
+                      id="placeholder"
+                      name="placeholder"
+                      value={formData.placeholder}
+                      onChange={handleChange}
+                      placeholder="e.g., Enter your medical history"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="default_value">Default Value (Optional)</Label>
+                    <Input
+                      id="default_value"
+                      name="default_value"
+                      value={formData.default_value}
+                      onChange={handleChange}
+                      placeholder="e.g., None"
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2 pt-2">
+                    <Switch
+                      id="required"
+                      checked={formData.required}
+                      onCheckedChange={(checked) => handleSwitchChange("required", checked)}
+                    />
+                    <Label htmlFor="required" className="text-sm font-medium">
+                      Required field
+                    </Label>
+                  </div>
                 </div>
-              )}
 
-              <div className="space-y-2">
-                <Label htmlFor="placeholder">Placeholder (Optional)</Label>
-                <Input
-                  id="placeholder"
-                  name="placeholder"
-                  value={formData.placeholder}
-                  onChange={handleChange}
-                  placeholder="e.g., Enter your medical history"
-                />
-              </div>
+                {/* Preview section */}
+                <div className="border rounded-md p-4 space-y-4">
+                  <h4 className="text-sm font-medium">Field Preview</h4>
+                  <div className="border rounded-md p-4 bg-card space-y-2">
+                    <Label htmlFor="preview-field">
+                      {formData.label || "Field Label"}
+                      {formData.required && <span className="text-destructive ml-1">*</span>}
+                    </Label>
 
-              <div className="space-y-2">
-                <Label htmlFor="default_value">Default Value (Optional)</Label>
-                <Input
-                  id="default_value"
-                  name="default_value"
-                  value={formData.default_value}
-                  onChange={handleChange}
-                  placeholder="e.g., None"
-                />
-              </div>
+                    {formData.type === "text" && (
+                      <Input
+                        id="preview-field"
+                        placeholder={formData.placeholder || ""}
+                        value={formData.default_value || ""}
+                        readOnly
+                      />
+                    )}
 
-              <div className="flex items-center space-x-2 pt-2">
-                <Switch
-                  id="required"
-                  checked={formData.required}
-                  onCheckedChange={(checked) => handleSwitchChange("required", checked)}
-                />
-                <Label htmlFor="required" className="text-sm font-medium">
-                  Required field
-                </Label>
+                    {formData.type === "textarea" && (
+                      <Textarea
+                        id="preview-field"
+                        placeholder={formData.placeholder || ""}
+                        value={formData.default_value || ""}
+                        readOnly
+                        rows={3}
+                      />
+                    )}
+
+                    {formData.type === "number" && (
+                      <Input
+                        id="preview-field"
+                        type="number"
+                        placeholder={formData.placeholder || ""}
+                        value={formData.default_value || ""}
+                        readOnly
+                      />
+                    )}
+
+                    {formData.type === "email" && (
+                      <Input
+                        id="preview-field"
+                        type="email"
+                        placeholder={formData.placeholder || ""}
+                        value={formData.default_value || ""}
+                        readOnly
+                      />
+                    )}
+
+                    {formData.type === "phone" && (
+                      <Input
+                        id="preview-field"
+                        type="tel"
+                        placeholder={formData.placeholder || ""}
+                        value={formData.default_value || ""}
+                        readOnly
+                      />
+                    )}
+
+                    {formData.type === "select" && (
+                      <Select defaultValue={formData.default_value || (formData.options ? formData.options.split("\n")[0]?.trim() : "preview-value")}>
+                        <SelectTrigger>
+                          <SelectValue placeholder={formData.placeholder || "Select an option"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {formData.options && formData.options.trim() !== "" ?
+                            formData.options.split("\n").filter(opt => opt.trim() !== "").map((option, index) => (
+                              <SelectItem key={index} value={option.trim() || `option-${index}`}>
+                                {option.trim() || `Option ${index + 1}`}
+                              </SelectItem>
+                            ))
+                          : [
+                              <SelectItem key="default-1" value="preview-option-1">Option 1</SelectItem>,
+                              <SelectItem key="default-2" value="preview-option-2">Option 2</SelectItem>,
+                              <SelectItem key="default-3" value="preview-option-3">Option 3</SelectItem>
+                            ]
+                          }
+                        </SelectContent>
+                      </Select>
+                    )}
+
+                    {formData.type === "checkbox" && (
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="preview-field" />
+                        <label htmlFor="preview-field" className="text-sm">
+                          {formData.placeholder || "Yes"}
+                        </label>
+                      </div>
+                    )}
+
+                    {(formData.type === "date" || formData.type === "time") && (
+                      <Input
+                        id="preview-field"
+                        placeholder={formData.placeholder || formData.type === "date" ? "Select a date" : "Select a time"}
+                        value={formData.default_value || ""}
+                        readOnly
+                      />
+                    )}
+                  </div>
+
+                  <div className="text-xs text-muted-foreground mt-2">
+                    This is how your custom field will appear to clients in the booking form.
+                  </div>
+                </div>
               </div>
             </div>
             <DialogFooter className="pt-4">

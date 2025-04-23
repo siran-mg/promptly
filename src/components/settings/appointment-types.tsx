@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Plus, Pencil, Trash2, Check, X, Star, StarOff } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Check, X, Star, StarOff, Clock } from "lucide-react";
 import { Database } from "@/types/supabase";
 
 import { Button } from "@/components/ui/button";
@@ -145,6 +145,9 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
         title: "Default appointment type created",
         description: "A standard appointment type has been created for you.",
       });
+
+      // Open the edit dialog for the newly created default type
+      handleEdit(data);
     } catch (err) {
       console.error("Error in createDefaultAppointmentType:", err);
     } finally {
@@ -479,8 +482,9 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                 {appointmentTypes.map((type) => (
                   <TableRow
                     key={type.id}
-                    className={onSelectType ? "cursor-pointer hover:bg-muted/50" : ""}
-                    onClick={() => onSelectType && onSelectType(type.id)}
+                    className="cursor-pointer hover:bg-muted/50 group relative transition-colors"
+                    onClick={() => onSelectType ? onSelectType(type.id) : router.push(`/dashboard/settings/appointment-types/${type.id}/fields`)}
+                    title="Click to manage custom fields"
                   >
                     <TableCell className="font-medium">
                       <div className="flex items-center">
@@ -490,7 +494,17 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                             style={{ backgroundColor: type.color }}
                           />
                         )}
-                        {type.name}
+                        <div>
+                          <div className="flex items-center">
+                            {type.name}
+                            <span className="ml-2 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              (Click to manage custom fields)
+                            </span>
+                          </div>
+                          {type.description && (
+                            <div className="text-xs text-muted-foreground">{type.description}</div>
+                          )}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>{type.duration} minutes</TableCell>
@@ -504,7 +518,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleSetDefault(type)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent row click event
+                            handleSetDefault(type);
+                          }}
                           className="h-7 text-xs"
                         >
                           <Star className="h-3 w-3 mr-1" />
@@ -517,8 +534,12 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEdit(type)}
-                          className="h-8 w-8 p-0"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent row click event
+                            handleEdit(type);
+                          }}
+                          className="h-8 w-8 p-0 relative group"
+                          title="Edit appointment type"
                         >
                           <Pencil className="h-4 w-4" />
                           <span className="sr-only">Edit</span>
@@ -526,9 +547,13 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeleteClick(type)}
-                          className="h-8 w-8 p-0"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent row click event
+                            handleDeleteClick(type);
+                          }}
+                          className="h-8 w-8 p-0 relative group"
                           disabled={type.is_default}
+                          title={type.is_default ? "Cannot delete default type" : "Delete appointment type"}
                         >
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">Delete</span>
@@ -548,89 +573,135 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingType ? "Edit Appointment Type" : "Add Appointment Type"}
+              {editingType
+                ? editingType.is_default
+                  ? "Edit Default Appointment Type"
+                  : "Edit Appointment Type"
+                : "Add Appointment Type"}
             </DialogTitle>
             <DialogDescription>
               {editingType
-                ? "Update the details of this appointment type."
+                ? editingType.is_default
+                  ? "Customize your default appointment type. This is the type that will be selected automatically when creating new appointments."
+                  : "Update the details of this appointment type."
                 : "Create a new type of appointment with custom duration."}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
-            <div className="space-y-4 py-2">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="e.g., Initial Consultation"
-                  required
-                />
-              </div>
+            <div className="space-y-6 py-2">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="e.g., Initial Consultation"
+                      required
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Description (Optional)</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Describe what this appointment type is for"
-                  rows={3}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      placeholder="Describe what this appointment type is for"
+                      rows={3}
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duration (minutes)</Label>
-                <Input
-                  id="duration"
-                  name="duration"
-                  type="number"
-                  min="5"
-                  max="480"
-                  step="5"
-                  value={formData.duration}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="duration">Duration (minutes)</Label>
+                    <Input
+                      id="duration"
+                      name="duration"
+                      type="number"
+                      min="5"
+                      max="480"
+                      step="5"
+                      value={formData.duration}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="color">Color</Label>
-                <div className="flex items-center gap-4">
-                  <Input
-                    id="color"
-                    name="color"
-                    type="color"
-                    value={formData.color}
-                    onChange={handleChange}
-                    className="w-16 h-10 p-1 cursor-pointer"
-                  />
-                  <Input
-                    id="color_text"
-                    name="color"
-                    type="text"
-                    value={formData.color}
-                    onChange={handleChange}
-                    placeholder="#6366f1"
-                    className="flex-1"
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="color">Color</Label>
+                    <div className="flex items-center gap-4">
+                      <Input
+                        id="color"
+                        name="color"
+                        type="color"
+                        value={formData.color}
+                        onChange={handleChange}
+                        className="w-16 h-10 p-1 cursor-pointer"
+                      />
+                      <Input
+                        id="color_text"
+                        name="color"
+                        type="text"
+                        value={formData.color}
+                        onChange={handleChange}
+                        placeholder="#6366f1"
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2 pt-2">
+                    <input
+                      type="checkbox"
+                      id="is_default"
+                      checked={formData.is_default}
+                      onChange={(e) => handleCheckboxChange("is_default", e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="is_default" className="text-sm font-medium">
+                      Set as default appointment type
+                    </Label>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center space-x-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="is_default"
-                  checked={formData.is_default}
-                  onChange={(e) => handleCheckboxChange("is_default", e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                />
-                <Label htmlFor="is_default" className="text-sm font-medium">
-                  Set as default appointment type
-                </Label>
+                {/* Preview section */}
+                <div className="border rounded-md p-4 space-y-4">
+                  <h4 className="text-sm font-medium">Preview</h4>
+                  <div className="border rounded-md p-3 bg-card">
+                    <div className="flex items-center space-x-3">
+                      {formData.color && (
+                        <div
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: formData.color }}
+                        />
+                      )}
+                      <div>
+                        <div className="font-medium">{formData.name || "Appointment Type"}</div>
+                        {formData.description && (
+                          <div className="text-sm text-muted-foreground">{formData.description}</div>
+                        )}
+                        <div className="text-xs text-muted-foreground flex items-center mt-1">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {formData.duration || 60} minutes
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground mt-2">
+                    This is how your appointment type will appear to clients in the booking form.
+                  </div>
+
+                  {formData.is_default && (
+                    <div className="mt-4 text-xs bg-primary/10 text-primary p-2 rounded-md">
+                      <div className="font-medium">Default Appointment Type</div>
+                      <p>This type will be pre-selected when clients book appointments.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <DialogFooter className="pt-4">
