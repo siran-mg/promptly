@@ -1,0 +1,142 @@
+"use client";
+
+import { useState } from "react";
+import { format } from "date-fns";
+import { CalendarClock, MoreHorizontal, Search } from "lucide-react";
+import { Database } from "@/types/supabase";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { AppointmentStatusBadge } from "./appointment-status-badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
+
+interface AppointmentsTableProps {
+  appointments: Appointment[];
+}
+
+export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Filter appointments based on search query
+  const filteredAppointments = appointments.filter((appointment) => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      appointment.client_name.toLowerCase().includes(searchLower) ||
+      appointment.client_email.toLowerCase().includes(searchLower) ||
+      appointment.client_phone.toLowerCase().includes(searchLower) ||
+      appointment.status.toLowerCase().includes(searchLower)
+    );
+  });
+
+  // If no appointments, show empty state
+  if (appointments.length === 0) {
+    return (
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle>No appointments yet</CardTitle>
+          <CardDescription>
+            When you book appointments, they will appear here.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-center pb-6">
+          <CalendarClock className="h-16 w-16 text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search appointments..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+      
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Client</TableHead>
+              <TableHead>Date & Time</TableHead>
+              <TableHead>Contact</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="w-[80px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredAppointments.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  No appointments found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredAppointments.map((appointment) => (
+                <TableRow key={appointment.id}>
+                  <TableCell className="font-medium">
+                    {appointment.client_name}
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(appointment.date), "PPP p")}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="text-sm">{appointment.client_email}</span>
+                      <span className="text-xs text-muted-foreground">{appointment.client_phone}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <AppointmentStatusBadge status={appointment.status} />
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem>View details</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>Mark as completed</DropdownMenuItem>
+                        <DropdownMenuItem>Cancel appointment</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
