@@ -14,18 +14,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 // Using a simple date picker component for better display
 import { SimpleDatePicker } from "./simple-date-picker";
+import { TimePicker } from "./time-picker";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// Select components removed as we're now using TimePicker
 import { cn } from "@/lib/utils";
 
 interface AppointmentFormProps {
@@ -47,11 +42,7 @@ export function AppointmentForm({ userId }: AppointmentFormProps) {
     notes: "",
   });
 
-  const timeSlots = [
-    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-    "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
-    "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"
-  ];
+  // Time slots are now handled by the TimePicker component
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -208,21 +199,10 @@ export function AppointmentForm({ userId }: AppointmentFormProps) {
 
             <div className="space-y-2">
               <Label>Time</Label>
-              <Select
+              <TimePicker
                 value={formData.time}
-                onValueChange={handleTimeChange}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a time" />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeSlots.map((time) => (
-                    <SelectItem key={time} value={time}>
-                      {time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={handleTimeChange}
+              />
             </div>
           </div>
 
