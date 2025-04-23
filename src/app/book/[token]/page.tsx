@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
+// Removed header and footer imports for public form
 import { AppointmentForm } from "@/components/appointments/appointment-form";
 
 export default async function BookAppointmentPage({
@@ -55,26 +54,26 @@ export default async function BookAppointmentPage({
     console.log('Found profile:', profile);
 
     return (
-      <>
-        <Header />
-        <main className="flex-1 py-12">
-          <div className="container max-w-3xl px-4 md:px-6">
-            <div className="space-y-6">
-              <div className="space-y-2 text-center">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Book an Appointment with {profile.full_name}
-                </h1>
-                <p className="text-gray-500 md:text-xl dark:text-gray-400">
-                  Fill out the form below to schedule your appointment.
-                </p>
-              </div>
+      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="px-6 py-8 sm:p-10">
+              <div className="space-y-6">
+                <div className="space-y-2 text-center">
+                  <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+                    Book an Appointment with {profile.full_name}
+                  </h1>
+                  <p className="text-gray-500 md:text-lg">
+                    Fill out the form below to schedule your appointment.
+                  </p>
+                </div>
 
-              <AppointmentForm userId={shareToken.user_id} />
+                <AppointmentForm userId={shareToken.user_id} />
+              </div>
             </div>
           </div>
-        </main>
-        <Footer />
-      </>
+        </div>
+      </div>
     );
   } catch (error) {
     console.error("Error in book appointment page:", error);
