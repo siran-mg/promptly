@@ -1,13 +1,14 @@
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
-import { UserProfile } from "@/components/auth/user-profile";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { ShareFormButton } from "@/components/dashboard/share-form-button";
 import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CalendarClock, Plus, Share } from "lucide-react";
 
 export default async function DashboardPage() {
   const cookieStore = cookies();
@@ -40,33 +41,36 @@ export default async function DashboardPage() {
       {/* Dashboard Overview with Charts */}
       <DashboardOverview appointments={appointments || []} />
 
-      {/* Profile and Booking Cards */}
-      <div className="grid gap-6 md:grid-cols-2 mt-6">
+      {/* Quick Actions Card */}
+      <div className="mt-6">
         <Card>
           <CardHeader>
-            <CardTitle>Your Profile</CardTitle>
+            <CardTitle>Quick Actions</CardTitle>
             <CardDescription>
-              Manage your profile information.
+              Common tasks and shortcuts
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <UserProfile />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Appointment Booking</CardTitle>
-            <CardDescription>
-              Share your booking form with clients.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Generate a unique link that clients can use to book appointments with you.
-              Share this link on your website, social media, or via email.
-            </p>
-            <ShareFormButton userId={session.user.id} />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <Button variant="outline" className="h-24 flex flex-col items-center justify-center gap-2" asChild>
+                <Link href="/dashboard/appointments">
+                  <CalendarClock className="h-6 w-6" />
+                  <span>View Appointments</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-24 flex flex-col items-center justify-center gap-2" asChild>
+                <Link href="/booking">
+                  <Plus className="h-6 w-6" />
+                  <span>New Appointment</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-24 flex flex-col items-center justify-center gap-2" asChild>
+                <Link href="/dashboard/settings?tab=form">
+                  <Share className="h-6 w-6" />
+                  <span>Share Booking Form</span>
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

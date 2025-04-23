@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { FormSettings } from "@/components/settings/form-settings";
+import { ProfileSettings } from "@/components/settings/profile-settings";
+import { SettingsTabs } from "@/components/settings/settings-tabs";
 
 export const metadata: Metadata = {
   title: "Settings | Promptly",
@@ -29,13 +31,10 @@ export default async function SettingsPage() {
         text="Manage your account settings and preferences."
       />
       <div className="mt-6 space-y-6">
-        <div>
-          <h3 className="text-lg font-medium">Form Customization</h3>
-          <p className="text-sm text-muted-foreground">
-            Customize how your appointment booking form appears to clients.
-          </p>
-        </div>
-        <FormSettings />
+        <SettingsTabs
+          profileSettings={<ProfileSettings />}
+          formSettings={<FormSettings />}
+        />
       </div>
     </DashboardShell>
   );
