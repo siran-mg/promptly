@@ -1,18 +1,28 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Calendar, Views, DateLocalizer } from "react-big-calendar";
+import { Calendar, Views, DateLocalizer, SlotInfo } from "react-big-calendar";
 import { dateFnsLocalizer } from "react-big-calendar";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
+import { useRouter } from "next/navigation";
 import { Database } from "@/types/supabase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarClock } from "lucide-react";
+import { CalendarClock, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 // Import the CSS for react-big-calendar
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -47,9 +57,12 @@ interface CalendarEvent {
 }
 
 export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const [view, setView] = useState<string>(Views.MONTH);
   const [date, setDate] = useState(new Date());
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
 
   // Convert appointments to calendar events
   const events: CalendarEvent[] = appointments.map((appointment) => {
@@ -74,6 +87,21 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
       description: `${format(event.start, "PPP 'at' p")} - Status: ${event.status}`,
     });
   }, [toast]);
+
+  // Handle slot selection (clicking on a date)
+  const handleSelectSlot = useCallback((slotInfo: SlotInfo) => {
+    setSelectedSlot(slotInfo.start);
+    setIsCreateDialogOpen(true);
+  }, []);
+
+  // Navigate to booking page with pre-filled date
+  const handleCreateAppointment = useCallback(() => {
+    if (selectedSlot) {
+      const formattedDate = format(selectedSlot, "yyyy-MM-dd'T'HH:mm");
+      router.push(`/booking?date=${encodeURIComponent(formattedDate)}`);
+    }
+    setIsCreateDialogOpen(false);
+  }, [selectedSlot, router]);
 
   // If no appointments, show empty state
   if (appointments.length === 0) {
@@ -116,22 +144,25 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
   );
 
   return (
-    <div className="h-[700px] bg-white rounded-md border">
-      <Calendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: "100%" }}
-        views={["month", "week", "day"]}
-        view={view as any}
-        onView={(newView) => setView(newView)}
-        date={date}
-        onNavigate={setDate}
-        onSelectEvent={handleSelectEvent}
-        components={{
-          event: EventComponent,
-        }}
+    <>
+      <div className="h-[700px] bg-white rounded-md border">
+        <Calendar
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: "100%" }}
+          views={["month", "week", "day"]}
+          view={view as any}
+          onView={(newView) => setView(newView)}
+          date={date}
+          onNavigate={setDate}
+          onSelectEvent={handleSelectEvent}
+          onSelectSlot={handleSelectSlot}
+          selectable={true}
+          components={{
+            event: EventComponent,
+          }}
         eventPropGetter={(event) => {
           const backgroundColor =
             event.status === "scheduled" ? "#6366f1" :
@@ -153,6 +184,30 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
           };
         }}
       />
-    </div>
+      </div>
+
+      {/* Create Appointment Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Appointment</DialogTitle>
+            <DialogDescription>
+              {selectedSlot && (
+                <span>Create an appointment for {format(selectedSlot, "PPP")}?</span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateAppointment} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create Appointment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

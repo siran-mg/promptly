@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarClock, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
+import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,23 @@ export default function BookingForm() {
   const [isSuccess, setIsSuccess] = useState(false);
   const supabase = createClient();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+
+  // Check for date parameter in URL
+  useEffect(() => {
+    const dateParam = searchParams.get('date');
+    if (dateParam) {
+      try {
+        const parsedDate = new Date(dateParam);
+        // Check if the date is valid
+        if (!isNaN(parsedDate.getTime())) {
+          setDate(parsedDate);
+        }
+      } catch (error) {
+        console.error('Error parsing date from URL:', error);
+      }
+    }
+  }, [searchParams]);
 
   const {
     register,
