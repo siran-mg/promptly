@@ -121,22 +121,46 @@ export function FormSettings() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Instead of uploading to Supabase Storage, we'll use a data URL for simplicity
-      const reader = new FileReader();
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          if (typeof reader.result === 'string') {
-            resolve(reader.result);
-          } else {
-            reject(new Error('Failed to convert file to data URL'));
-          }
-        };
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-      });
+      // If there's an existing logo, try to delete it
+      if (formData.logo_url) {
+        try {
+          // Extract the file path from the URL
+          const url = new URL(formData.logo_url);
+          const pathParts = url.pathname.split('/');
+          const filePath = pathParts[pathParts.length - 1];
 
-      // Update form data with the data URL
-      setFormData((prev) => ({ ...prev, logo_url: dataUrl }));
+          if (filePath && filePath.startsWith('logo-')) {
+            await supabase.storage
+              .from("logos")
+              .remove([filePath]);
+            console.log("Deleted old logo:", filePath);
+          }
+        } catch (deleteErr) {
+          // Just log the error but continue with the upload
+          console.error("Error deleting old logo:", deleteErr);
+        }
+      }
+
+      // Upload file to Supabase Storage
+      const fileName = `logo-${user.id}-${Date.now()}.${file.name.split('.').pop()}`;
+      const { data, error } = await supabase.storage
+        .from("logos")
+        .upload(fileName, file, {
+          cacheControl: "3600",
+          upsert: true,
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from("logos")
+        .getPublicUrl(data.path);
+
+      // Update form data with the public URL
+      setFormData((prev) => ({ ...prev, logo_url: publicUrl }));
 
       toast({
         title: "Logo uploaded",
@@ -264,13 +288,56 @@ export function FormSettings() {
                 </div>
               )}
               <div className="flex-1">
-                <Label
-                  htmlFor="logo_upload"
-                  className="flex items-center justify-center w-full h-10 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 cursor-pointer"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  {isUploading ? "Uploading..." : "Upload Logo"}
-                </Label>
+                <div className="flex gap-2">
+                  <Label
+                    htmlFor="logo_upload"
+                    className="flex items-center justify-center flex-1 h-10 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 cursor-pointer"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {isUploading ? "Uploading..." : "Upload Logo"}
+                  </Label>
+                  {formData.logo_url && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-10"
+                      onClick={async () => {
+                        try {
+                          if (formData.logo_url) {
+                            // Extract the file path from the URL
+                            const url = new URL(formData.logo_url);
+                            const pathParts = url.pathname.split('/');
+                            const filePath = pathParts[pathParts.length - 1];
+
+                            if (filePath && filePath.startsWith('logo-')) {
+                              await supabase.storage
+                                .from("logos")
+                                .remove([filePath]);
+                              console.log("Deleted logo:", filePath);
+                            }
+                          }
+
+                          // Update form data to remove logo URL
+                          setFormData((prev) => ({ ...prev, logo_url: "" }));
+
+                          toast({
+                            title: "Logo removed",
+                            description: "Your logo has been removed successfully.",
+                          });
+                        } catch (err) {
+                          console.error("Error removing logo:", err);
+                          toast({
+                            title: "Error",
+                            description: "Could not remove logo. Please try again.",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
                 <input
                   id="logo_upload"
                   type="file"
