@@ -19,11 +19,14 @@ export default async function AppointmentConfirmationPage({
     const cookieStore = cookies();
     const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
+    // Fetch the appointment without trying to join with profiles
     const { data: appointment, error } = await supabase
       .from("appointments")
-      .select("*, profiles:user_id(full_name)")
+      .select("*")
       .eq("id", id)
       .single();
+
+    console.log('Fetched appointment:', appointment);
 
     if (error || !appointment) {
       console.error("Error fetching appointment:", error);
