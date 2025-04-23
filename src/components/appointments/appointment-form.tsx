@@ -25,9 +25,10 @@ import { cn } from "@/lib/utils";
 
 interface AppointmentFormProps {
   userId: string;
+  accentColor?: string;
 }
 
-export function AppointmentForm({ userId }: AppointmentFormProps) {
+export function AppointmentForm({ userId, accentColor = "#6366f1" }: AppointmentFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
@@ -219,7 +220,12 @@ export function AppointmentForm({ userId }: AppointmentFormProps) {
         </CardContent>
 
         <CardFooter>
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isSubmitting}
+            style={{ backgroundColor: accentColor }}
+          >
             {isSubmitting ? "Scheduling..." : "Schedule Appointment"}
           </Button>
         </CardFooter>

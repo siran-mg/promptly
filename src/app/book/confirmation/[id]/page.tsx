@@ -33,10 +33,40 @@ export default async function AppointmentConfirmationPage({
       return notFound();
     }
 
+    // Get the form settings for the user who owns this appointment
+    const { data: formSettings } = await supabase
+      .from("form_settings")
+      .select("*")
+      .eq("user_id", appointment.user_id)
+      .single();
+
+    // Use default settings if none found
+    const settings = formSettings || {
+      logo_url: null,
+      accent_color: "#6366f1"
+    };
+
+    console.log('Form settings:', settings);
+
+    // Create a style object for the accent color
+    const accentColorStyle = {
+      "--accent-color": settings.accent_color,
+      "--accent-color-foreground": "white",
+    } as React.CSSProperties;
+
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={accentColorStyle}>
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            {settings.logo_url && (
+              <div className="flex justify-center pt-8">
+                <img
+                  src={settings.logo_url}
+                  alt="Logo"
+                  className="h-16 w-auto object-contain"
+                />
+              </div>
+            )}
             <div className="px-6 py-8 sm:p-10">
               <div className="space-y-6">
                 <div className="flex flex-col items-center space-y-4 text-center">

@@ -89,6 +89,46 @@ export interface Database {
           }
         ]
       }
+      form_settings: {
+        Row: {
+          id: string
+          user_id: string
+          form_title: string
+          form_description: string
+          logo_url: string | null
+          accent_color: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          form_title?: string
+          form_description?: string
+          logo_url?: string | null
+          accent_color?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          form_title?: string
+          form_description?: string
+          logo_url?: string | null
+          accent_color?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_settings_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
