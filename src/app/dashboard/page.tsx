@@ -33,46 +33,86 @@ export default async function DashboardPage() {
 
   return (
     <DashboardShell>
+      {/* Hero Section with Quick Actions */}
+      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 -mx-6 px-6 py-8 mb-8 border-b">
+        <h1 className="text-2xl font-bold tracking-tight mb-1">Welcome to your Dashboard</h1>
+        <p className="text-muted-foreground mb-6">Manage your appointments and booking settings</p>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <Button variant="default" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md" asChild>
+            <Link href="/booking">
+              <Plus className="h-6 w-6 mb-1" />
+              <div className="text-center">
+                <div className="font-medium text-base">New Appointment</div>
+                <div className="text-xs opacity-90">Schedule a new appointment</div>
+              </div>
+            </Link>
+          </Button>
+          <Button variant="outline" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-white shadow-sm" asChild>
+            <Link href="/dashboard/appointments">
+              <CalendarClock className="h-6 w-6 mb-1 text-indigo-600" />
+              <div className="text-center">
+                <div className="font-medium text-base">View Appointments</div>
+                <div className="text-xs text-muted-foreground">Manage your schedule</div>
+              </div>
+            </Link>
+          </Button>
+          <Button variant="outline" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-white shadow-sm" asChild>
+            <Link href="/dashboard/settings?tab=form">
+              <Share className="h-6 w-6 mb-1 text-indigo-600" />
+              <div className="text-center">
+                <div className="font-medium text-base">Share Booking Form</div>
+                <div className="text-xs text-muted-foreground">Let clients book with you</div>
+              </div>
+            </Link>
+          </Button>
+        </div>
+      </div>
+
       <DashboardHeader
-        heading="Dashboard"
-        text="Welcome to your Promptly dashboard."
+        heading="Dashboard Overview"
+        text="Track your appointments and performance."
       />
 
-      {/* Dashboard Overview with Charts */}
-      <DashboardOverview appointments={appointments || []} />
+      {/* Main Content */}
+      <div className="space-y-6">
 
-      {/* Quick Actions Card */}
-      <div className="mt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>
-              Common tasks and shortcuts
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Button variant="outline" className="h-24 flex flex-col items-center justify-center gap-2" asChild>
-                <Link href="/dashboard/appointments">
-                  <CalendarClock className="h-6 w-6" />
-                  <span>View Appointments</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-24 flex flex-col items-center justify-center gap-2" asChild>
-                <Link href="/booking">
-                  <Plus className="h-6 w-6" />
-                  <span>New Appointment</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-24 flex flex-col items-center justify-center gap-2" asChild>
-                <Link href="/dashboard/settings?tab=form">
-                  <Share className="h-6 w-6" />
-                  <span>Share Booking Form</span>
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Dashboard Overview with Charts */}
+        <DashboardOverview appointments={appointments || []} />
+
+        {/* Additional Resources */}
+        <div className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Help & Resources</CardTitle>
+              <CardDescription>
+                Learn more about using Promptly
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <CalendarClock className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Managing Your Schedule</h3>
+                    <p className="text-sm text-muted-foreground">Learn how to effectively manage your appointments and client bookings.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <Share className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Customizing Your Booking Form</h3>
+                    <p className="text-sm text-muted-foreground">Personalize your booking form to match your brand and collect the information you need.</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardShell>
   );
