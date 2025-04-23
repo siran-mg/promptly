@@ -214,11 +214,11 @@ export function SmartShareButton({
     }
   };
 
+  // Button rendering
   if (isLoading) {
     return (
       <Button variant={variant} size={size} className={className} disabled>
-        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-        {!iconOnly && "Loading..."}
+        <Loader2 className="h-5 w-5 animate-spin" />
       </Button>
     );
   }
