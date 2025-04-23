@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+
 interface FormSettings {
   id: string;
   user_id: string;
@@ -98,6 +99,9 @@ export function FormSettings() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Use the logos bucket for storing form logos
+  const STORAGE_BUCKET_NAME = "logos";
+
   // Handle logo upload
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -130,7 +134,14 @@ export function FormSettings() {
 
       // Get user ID
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        toast({
+          title: "Authentication error",
+          description: "Please log in again to upload a logo.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       // If there's an existing logo, try to delete it
       if (formData.logo_url) {
@@ -141,10 +152,15 @@ export function FormSettings() {
           const filePath = pathParts[pathParts.length - 1];
 
           if (filePath && filePath.startsWith('logo-')) {
-            await supabase.storage
-              .from("logos")
+            const { error: removeError } = await supabase.storage
+              .from(STORAGE_BUCKET_NAME)
               .remove([filePath]);
-            console.log("Deleted old logo:", filePath);
+
+            if (removeError) {
+              console.warn("Could not remove old logo, but continuing:", removeError);
+            } else {
+              console.log("Deleted old logo:", filePath);
+            }
           }
         } catch (deleteErr) {
           // Just log the error but continue with the upload
@@ -152,11 +168,14 @@ export function FormSettings() {
         }
       }
 
+      // Create a safe filename - remove special characters and spaces
+      const fileExt = file.name.split('.').pop();
+      const safeFileName = `logo-${user.id}-${Date.now()}.${fileExt}`;
+
       // Upload file to Supabase Storage
-      const fileName = `logo-${user.id}-${Date.now()}.${file.name.split('.').pop()}`;
       const { data, error } = await supabase.storage
-        .from("logos")
-        .upload(fileName, file, {
+        .from(STORAGE_BUCKET_NAME)
+        .upload(safeFileName, file, {
           cacheControl: "3600",
           upsert: true,
         });
@@ -167,7 +186,7 @@ export function FormSettings() {
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from("logos")
+        .from(STORAGE_BUCKET_NAME)
         .getPublicUrl(data.path);
 
       // Update form data with the public URL
@@ -177,11 +196,11 @@ export function FormSettings() {
         title: "Logo uploaded",
         description: "Your logo has been uploaded successfully.",
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error uploading logo:", err);
       toast({
         title: "Upload failed",
-        description: "Could not upload logo. Please try again.",
+        description: err?.message || "Could not upload logo. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -419,9 +438,14 @@ export function FormSettings() {
                             const filePath = pathParts[pathParts.length - 1];
 
                             if (filePath && filePath.startsWith('logo-')) {
-                              await supabase.storage
-                                .from("logos")
+                              const { error } = await supabase.storage
+                                .from(STORAGE_BUCKET_NAME)
                                 .remove([filePath]);
+
+                              if (error) {
+                                throw error;
+                              }
+
                               console.log("Deleted logo:", filePath);
                             }
                           }
@@ -433,11 +457,11 @@ export function FormSettings() {
                             title: "Logo removed",
                             description: "Your logo has been removed successfully.",
                           });
-                        } catch (err) {
+                        } catch (err: any) {
                           console.error("Error removing logo:", err);
                           toast({
                             title: "Error",
-                            description: "Could not remove logo. Please try again.",
+                            description: err?.message || "Could not remove logo. Please try again.",
                             variant: "destructive",
                           });
                         }
