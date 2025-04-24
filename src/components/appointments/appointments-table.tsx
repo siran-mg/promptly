@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { CalendarClock, MoreHorizontal, Search, Share, Copy, Check, Loader2, Trash2 } from "lucide-react";
+import { CalendarClock, MoreHorizontal, Search, Share, Copy, Check, Loader2, Trash2, Eye } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 // No longer need supabase client as we're using the API endpoint
@@ -268,6 +268,7 @@ export function AppointmentsTable({
                             setIsDetailsDialogOpen(true);
                           }}
                         >
+                          <Eye className="mr-2 h-4 w-4" />
                           View details
                         </DropdownMenuItem>
                         <DropdownMenuItem
