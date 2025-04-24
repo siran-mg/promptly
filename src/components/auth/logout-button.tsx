@@ -8,16 +8,17 @@ import { createClient } from "@/lib/supabase";
 
 interface LogoutButtonProps {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  className?: string;
 }
 
-export function LogoutButton({ variant = "ghost" }: LogoutButtonProps) {
+export function LogoutButton({ variant = "ghost", className }: LogoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
   const handleLogout = async () => {
     setIsLoading(true);
-    
+
     try {
       await supabase.auth.signOut();
       router.push("/");
@@ -30,15 +31,16 @@ export function LogoutButton({ variant = "ghost" }: LogoutButtonProps) {
   };
 
   return (
-    <Button 
-      variant={variant} 
-      onClick={handleLogout} 
+    <Button
+      variant={variant}
+      onClick={handleLogout}
       disabled={isLoading}
       size="sm"
+      className={className}
     >
       {isLoading ? "Logging out..." : (
         <>
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="h-4 w-4 mr-1" />
           Logout
         </>
       )}

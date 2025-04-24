@@ -7,8 +7,8 @@ interface DashboardShellProps {
 export function DashboardShell({ children }: DashboardShellProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10">
-        <aside className="fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 overflow-y-auto border-r md:sticky md:block">
+      <div className="container flex-1 items-start md:grid md:grid-cols-[260px_1fr] md:gap-6 lg:grid-cols-[280px_1fr] lg:gap-10">
+        <aside className="fixed top-0 z-30 hidden h-screen w-full shrink-0 overflow-y-auto border-r border-indigo-100 bg-white/80 backdrop-blur-sm md:sticky md:block">
           <DashboardNav />
         </aside>
         <main className="flex w-full flex-col overflow-hidden p-4 md:py-8">
