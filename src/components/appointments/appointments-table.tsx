@@ -336,8 +336,6 @@ export function AppointmentsTable({
                           Share with client
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Mark as completed</DropdownMenuItem>
-                        <DropdownMenuItem>Cancel appointment</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
