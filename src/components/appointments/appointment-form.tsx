@@ -45,6 +45,7 @@ export function AppointmentForm({
   console.log('AppointmentForm initialized with:', { userId, accentColor, defaultTypeId });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasAppointmentTypes, setHasAppointmentTypes] = useState(false);
   const [formData, setFormData] = useState({
     clientName: "",
     clientEmail: "",
@@ -54,6 +55,30 @@ export function AppointmentForm({
     notes: "",
     appointmentTypeId: "",
   });
+
+  // Check if user has any appointment types
+  useEffect(() => {
+    const checkAppointmentTypes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("appointment_types")
+          .select("id")
+          .eq("user_id", userId)
+          .limit(1);
+
+        if (error) {
+          console.error('Error checking appointment types:', error);
+          return;
+        }
+
+        setHasAppointmentTypes(data && data.length > 0);
+      } catch (err) {
+        console.error('Error checking appointment types:', err);
+      }
+    };
+
+    checkAppointmentTypes();
+  }, [userId, supabase]);
 
   // Set appointment type from defaultTypeId or URL parameter
   useEffect(() => {
@@ -303,32 +328,35 @@ export function AppointmentForm({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Appointment Type</Label>
-            <AppointmentTypeSelector
-              value={formData.appointmentTypeId}
-              onChange={(value) => {
-                setFormData(prev => ({ ...prev, appointmentTypeId: value }));
+          {/* Only show appointment type selector if there are appointment types */}
+          {hasAppointmentTypes && (
+            <div className="space-y-2">
+              <Label>Appointment Type</Label>
+              <AppointmentTypeSelector
+                value={formData.appointmentTypeId}
+                onChange={(value) => {
+                  setFormData(prev => ({ ...prev, appointmentTypeId: value }));
 
-                // Call the callback if provided
-                if (onAppointmentTypeChange) {
-                  onAppointmentTypeChange(value);
-                }
+                  // Call the callback if provided
+                  if (onAppointmentTypeChange) {
+                    onAppointmentTypeChange(value);
+                  }
 
-                // Also dispatch a custom event for other components to listen to
-                if (typeof window !== 'undefined') {
-                  const event = new CustomEvent('appointmentTypeChanged', {
-                    detail: { typeId: value }
-                  });
-                  window.dispatchEvent(event);
-                }
-              }}
-              userId={userId}
-            />
-          </div>
+                  // Also dispatch a custom event for other components to listen to
+                  if (typeof window !== 'undefined') {
+                    const event = new CustomEvent('appointmentTypeChanged', {
+                      detail: { typeId: value }
+                    });
+                    window.dispatchEvent(event);
+                  }
+                }}
+                userId={userId}
+              />
+            </div>
+          )}
 
           {/* Custom fields based on appointment type */}
-          {formData.appointmentTypeId && (
+          {hasAppointmentTypes && formData.appointmentTypeId && (
             <CustomFields
               appointmentTypeId={formData.appointmentTypeId}
               values={customFieldValues}

@@ -90,12 +90,9 @@ export function AppointmentTypeSelector({
     return <Skeleton className="h-10 w-full" />;
   }
 
+  // If no appointment types, don't show anything
   if (appointmentTypes.length === 0) {
-    return (
-      <div className="text-sm text-muted-foreground">
-        No appointment types found. Default settings will be used.
-      </div>
-    );
+    return null;
   }
 
   return (
