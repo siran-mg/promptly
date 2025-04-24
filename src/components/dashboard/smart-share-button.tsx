@@ -68,7 +68,7 @@ export function SmartShareButton({
 
   // Handle customize form button
   const handleCustomizeForm = () => {
-    router.push('/dashboard/settings?tab=customize');
+    router.push('/dashboard/settings?tab=form');
     setIsShareDialogOpen(false);
   };
 

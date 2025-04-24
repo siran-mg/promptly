@@ -45,7 +45,7 @@ export function ShareFormButton({ userId, className }: ShareFormButtonProps) {
   };
 
   const handleCustomizeForm = () => {
-    router.push('/dashboard/settings?tab=customize');
+    router.push('/dashboard/settings?tab=form');
     setIsOpen(false);
   };
 

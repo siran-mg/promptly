@@ -445,7 +445,7 @@ export function ShareDialog({
     if (onCustomizeForm) {
       onCustomizeForm();
     } else {
-      router.push('/dashboard/settings?tab=customize');
+      router.push('/dashboard/settings?tab=form');
       onOpenChange(false);
     }
   };
