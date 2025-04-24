@@ -105,11 +105,6 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
         }
 
         setAppointmentTypes(data || []);
-
-        // If no appointment types exist, create a default one
-        if (data.length === 0) {
-          createDefaultAppointmentType(user.id);
-        }
       } catch (err) {
         console.error("Error in fetchAppointmentTypes:", err);
       } finally {
@@ -555,10 +550,22 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
         <Card>
           <CardContent className="flex flex-col items-center justify-center h-40">
             <p className="text-muted-foreground mb-4">No appointment types found.</p>
-            <Button onClick={handleAddNew}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Your First Appointment Type
-            </Button>
+            <div className="flex gap-3">
+              <Button onClick={handleAddNew}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Custom Appointment Type
+              </Button>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (user) createDefaultAppointmentType(user.id);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Use Standard Template
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (
