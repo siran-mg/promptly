@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { Calendar, Views, DateLocalizer, SlotInfo } from "react-big-calendar";
+import { Calendar, Views, SlotInfo } from "react-big-calendar";
 import { dateFnsLocalizer } from "react-big-calendar";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
@@ -13,9 +13,7 @@ import { Database } from "@/types/supabase";
 import { Plus, CalendarClock } from "lucide-react";
 import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
 import { AppointmentDetailsDialog } from "./appointment-details-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
 import { EmptyAppointmentsState } from "./empty-appointments-state";
 import {
   Dialog,
@@ -83,9 +81,8 @@ interface CalendarEvent {
   typeName: string;
 }
 
-export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: AppointmentsCalendarProps) {
+export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [view, setView] = useState<string>(Views.MONTH);
   const [date, setDate] = useState(new Date());
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -157,34 +154,38 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
   // Custom event component to show status and type
   const EventComponent = ({ event }: { event: CalendarEvent }) => (
     <div className="flex flex-col h-full">
-      <div className="text-sm font-medium">{event.title}</div>
-      <div className="text-xs mt-1 flex items-center gap-1">
+      <div className="text-sm font-semibold text-white">{event.title}</div>
+      <div className="text-xs mt-1 flex items-center gap-1 text-white/90">
         <span className="font-medium">{format(event.start, "h:mm a")}</span>
         {event.typeColor && (
           <div className="flex items-center gap-1 ml-1">
             <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: event.typeColor }}
+              className="w-3 h-3 rounded-full bg-white/30"
             />
             <span className="text-xs font-medium">{event.typeName}</span>
           </div>
         )}
       </div>
-      <div className="mt-auto">
-        <Badge
-          variant={
-            event.status === "scheduled" ? "default" :
-            event.status === "completed" ? "success" :
-            event.status === "cancelled" ? "destructive" :
-            "outline"
-          }
-          className="text-xs font-medium"
+      <div className="mt-auto pt-1">
+        <div
+          className={`text-xs font-medium px-1.5 py-0.5 rounded-sm inline-flex items-center ${
+            event.status === "scheduled" ? "bg-white/20 text-white" :
+            event.status === "completed" ? "bg-emerald-200 text-emerald-800" :
+            event.status === "cancelled" ? "bg-red-200 text-red-800" :
+            "bg-white/20 text-white"
+          }`}
         >
+          <span className={`w-1.5 h-1.5 rounded-full mr-1 ${
+            event.status === "scheduled" ? "bg-white" :
+            event.status === "completed" ? "bg-emerald-500" :
+            event.status === "cancelled" ? "bg-red-500" :
+            "bg-white"
+          }`}></span>
           {event.status === "scheduled" ? "Upcoming" :
            event.status === "completed" ? "Completed" :
            event.status === "cancelled" ? "Cancelled" :
            event.status}
-        </Badge>
+        </div>
       </div>
     </div>
   );
@@ -200,38 +201,55 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
             <span className="text-indigo-700 font-medium">Click any date to create a new appointment</span>
           </div>
         </div>
-        <div className="h-[700px] bg-white rounded-md border border-indigo-100 shadow-sm overflow-hidden">
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: "100%" }}
-          views={["month", "week", "day"]}
-          view={view as any}
-          onView={(newView) => setView(newView)}
-          date={date}
-          onNavigate={setDate}
-          onSelectEvent={handleSelectEvent}
-          onSelectSlot={handleSelectSlot}
-          selectable={true}
-          components={{
-            event: EventComponent,
-          }}
-          dayPropGetter={(date) => {
-            const today = new Date();
-            const isToday =
-              date.getDate() === today.getDate() &&
-              date.getMonth() === today.getMonth() &&
-              date.getFullYear() === today.getFullYear();
-
-            return {
-              style: isToday ? {
-                backgroundColor: 'rgba(99, 102, 241, 0.05)',
-                borderTop: '2px solid #6366f1'
-              } : {}
-            };
-          }}
+        <div className="h-[700px] bg-white rounded-md overflow-hidden">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: "100%" }}
+            views={["month", "week", "day"]}
+            view={view as any}
+            onView={(newView) => setView(newView)}
+            date={date}
+            onNavigate={setDate}
+            onSelectEvent={handleSelectEvent}
+            onSelectSlot={handleSelectSlot}
+            selectable={true}
+            components={{
+              event: EventComponent,
+              toolbar: (toolbarProps) => {
+                const viewNames = ['month', 'week', 'day'] as const;
+                return (
+                  <div className="rbc-toolbar">
+                    <span className="rbc-btn-group">
+                      <button type="button" onClick={() => toolbarProps.onNavigate('TODAY')}>
+                        Today
+                      </button>
+                      <button type="button" onClick={() => toolbarProps.onNavigate('PREV')}>
+                        <span className="mr-1">←</span> Prev
+                      </button>
+                      <button type="button" onClick={() => toolbarProps.onNavigate('NEXT')}>
+                        Next <span className="ml-1">→</span>
+                      </button>
+                    </span>
+                    <span className="rbc-toolbar-label">{toolbarProps.label}</span>
+                    <span className="rbc-btn-group">
+                      {viewNames.map((name) => (
+                        <button
+                          key={name}
+                          type="button"
+                          onClick={() => toolbarProps.onView(name)}
+                          className={view === name ? 'rbc-active' : ''}
+                        >
+                          {name.charAt(0).toUpperCase() + name.slice(1)}
+                        </button>
+                      ))}
+                    </span>
+                  </div>
+                );
+              }
+            }}
         eventPropGetter={(event) => {
           // Use appointment type color if available, otherwise use status-based colors
           let backgroundColor = event.typeColor || null;
@@ -239,7 +257,7 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
           // If no type color, fall back to status-based colors
           if (!backgroundColor) {
             backgroundColor =
-              event.status === "scheduled" ? "#6366f1" :
+              event.status === "scheduled" ? "#4f46e5" :
               event.status === "completed" ? "#10b981" :
               event.status === "cancelled" ? "#ef4444" :
               "#6b7280";
@@ -249,21 +267,24 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
           const textDecoration = event.status === "cancelled" ? "line-through" : "none";
 
           // Adjust opacity based on status
-          const opacity = event.status === "cancelled" ? 0.6 :
-                         event.status === "completed" ? 0.75 : 0.85;
+          const opacity = event.status === "cancelled" ? 0.7 :
+                         event.status === "completed" ? 0.85 : 1;
 
           return {
             style: {
               backgroundColor,
-              borderRadius: "4px",
+              borderRadius: "6px",
               opacity,
               color: "#fff",
               border: "0px",
               display: "block",
-              padding: "4px",
+              padding: "6px",
               height: "100%",
               textDecoration,
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
             },
+            className: "hover:translate-y-[-1px] hover:shadow-md"
           };
         }}
       />
