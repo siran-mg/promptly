@@ -12,7 +12,9 @@ import {
   User,
   Tag,
   Trash2,
-  Share
+  Share,
+  CheckCircle2,
+  FileText
 } from "lucide-react";
 import { Database } from "@/types/supabase";
 
@@ -26,7 +28,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -126,165 +127,183 @@ export function AppointmentDetailsDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
-            <User className="h-5 w-5 text-primary" />
+          <DialogTitle className="flex items-center justify-center text-xl font-bold">
+            <User className="h-5 w-5 mr-2 text-primary" />
             {appointment.client_name}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-center pt-2">
             Appointment details
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* Appointment type */}
-          <div className="flex items-center gap-2">
-            <Tag className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Type:</span>
-            <div className="flex items-center">
-              {appointment.appointment_type?.color && (
-                <div
-                  className="w-3 h-3 rounded-full mr-2"
-                  style={{ backgroundColor: appointment.appointment_type.color }}
-                />
-              )}
-              <span>{appointment.appointment_type?.name || "Not specified"}</span>
+          {/* Appointment details card */}
+          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+            <h3 className="text-sm font-medium mb-3 flex items-center">
+              <Calendar className="h-4 w-4 mr-2 text-primary" />
+              Appointment Details
+            </h3>
+
+            <div className="space-y-3">
+              {/* Type */}
+              <div className="flex items-center">
+                <Tag className="h-4 w-4 text-muted-foreground mr-2" />
+                <span className="text-sm font-medium w-16">Type:</span>
+                <div className="flex items-center">
+                  {appointment.appointment_type?.color && (
+                    <div
+                      className="w-3 h-3 rounded-full mr-2"
+                      style={{ backgroundColor: appointment.appointment_type.color }}
+                    />
+                  )}
+                  <span className="text-sm">{appointment.appointment_type?.name || "Not specified"}</span>
+                </div>
+              </div>
+
+              {/* Date */}
+              <div className="flex items-center">
+                <Calendar className="h-4 w-4 text-muted-foreground mr-2" />
+                <span className="text-sm font-medium w-16">Date:</span>
+                <span className="text-sm">{formattedDate}</span>
+              </div>
+
+              {/* Time */}
+              <div className="flex items-center">
+                <Clock className="h-4 w-4 text-muted-foreground mr-2" />
+                <span className="text-sm font-medium w-16">Time:</span>
+                <span className="text-sm">{formattedTime}</span>
+                {appointment.appointment_type?.duration && (
+                  <span className="text-muted-foreground text-sm ml-1">
+                    ({appointment.appointment_type.duration} minutes)
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Date and time */}
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Date:</span>
-            <span className="text-sm">{formattedDate}</span>
+          {/* Contact information card */}
+          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+            <h3 className="text-sm font-medium mb-3 flex items-center">
+              <User className="h-4 w-4 mr-2 text-primary" />
+              Contact Information
+            </h3>
+
+            <div className="space-y-3">
+              {appointment.client_email && (
+                <div className="flex items-center">
+                  <Mail className="h-4 w-4 text-muted-foreground mr-2" />
+                  <span className="text-sm font-medium w-16">Email:</span>
+                  <a
+                    href={`mailto:${appointment.client_email}`}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {appointment.client_email}
+                  </a>
+                </div>
+              )}
+
+              {appointment.client_phone && (
+                <div className="flex items-center">
+                  <Phone className="h-4 w-4 text-muted-foreground mr-2" />
+                  <span className="text-sm font-medium w-16">Phone:</span>
+                  <a
+                    href={`tel:${appointment.client_phone}`}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {appointment.client_phone}
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Time:</span>
-            <span>{formattedTime}</span>
-            {appointment.appointment_type?.duration && (
-              <span className="text-muted-foreground text-sm">
-                ({appointment.appointment_type.duration} minutes)
-              </span>
-            )}
-          </div>
+          {/* Status card */}
+          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+            <h3 className="text-sm font-medium mb-3 flex items-center">
+              <CheckCircle2 className="h-4 w-4 mr-2 text-primary" />
+              Appointment Status
+            </h3>
 
-          {/* Contact information */}
-          <Separator />
-          <div>
-            <h3 className="text-sm font-medium mb-2">Contact Information</h3>
-
-            {appointment.client_email && (
-              <div className="flex items-center gap-2 mb-1">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <a
-                  href={`mailto:${appointment.client_email}`}
-                  className="text-sm text-primary hover:underline"
+            <div className="flex items-center">
+              <span className="text-sm font-medium w-16">Status:</span>
+              <div className="flex-1">
+                <Select
+                  value={status}
+                  onValueChange={handleStatusChange}
+                  disabled={isUpdating}
                 >
-                  {appointment.client_email}
-                </a>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue>
+                      <div className="flex items-center">
+                        <Badge
+                          variant={
+                            status === "scheduled" ? "default" :
+                            status === "completed" ? "success" :
+                            status === "cancelled" ? "destructive" :
+                            "outline"
+                          }
+                        >
+                          {status}
+                        </Badge>
+                      </div>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="scheduled">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="default">scheduled</Badge>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="completed">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="success">completed</Badge>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="cancelled">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="destructive">cancelled</Badge>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-
-            {appointment.client_phone && (
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-muted-foreground" />
-                <a
-                  href={`tel:${appointment.client_phone}`}
-                  className="text-sm text-primary hover:underline"
-                >
-                  {appointment.client_phone}
-                </a>
-              </div>
-            )}
-          </div>
-
-          {/* Status */}
-          <Separator />
-          <div>
-            <h3 className="text-sm font-medium mb-2">Status</h3>
-            <div className="flex items-center gap-2">
-              <span className="text-sm">Current status:</span>
-              <Select
-                value={status}
-                onValueChange={handleStatusChange}
-                disabled={isUpdating}
-              >
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue>
-                    <div className="flex items-center">
-                      <Badge
-                        variant={
-                          status === "scheduled" ? "default" :
-                          status === "completed" ? "success" :
-                          status === "cancelled" ? "destructive" :
-                          "outline"
-                        }
-                      >
-                        {status}
-                      </Badge>
-                    </div>
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="scheduled">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="default">scheduled</Badge>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="completed">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="success">completed</Badge>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="cancelled">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="destructive">cancelled</Badge>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
           {/* Notes if available */}
           {appointment.notes && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="text-sm font-medium mb-2">Notes</h3>
-                <p className="text-sm whitespace-pre-wrap">{appointment.notes}</p>
-              </div>
-            </>
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+              <h3 className="text-sm font-medium mb-3 flex items-center">
+                <FileText className="h-4 w-4 mr-2 text-primary" />
+                Notes
+              </h3>
+              <p className="text-sm whitespace-pre-wrap pl-6">{appointment.notes}</p>
+            </div>
           )}
         </div>
 
-        <DialogFooter className="flex justify-between sm:justify-between">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-destructive border-destructive/30 hover:bg-destructive/10"
-              onClick={onDelete}
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Delete
-            </Button>
-          </div>
+        <DialogFooter className="flex justify-between mt-4">
+          <Button
+            variant="outline"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10"
+            onClick={onDelete}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete Appointment
+          </Button>
+
           <div className="flex gap-2">
             {onShare && (
               <Button
                 variant="outline"
-                size="sm"
                 onClick={onShare}
               >
-                <Share className="h-4 w-4 mr-1" />
+                <Share className="h-4 w-4 mr-2" />
                 Share
               </Button>
             )}
             <Button
-              variant="outline"
-              size="sm"
+              variant="default"
               onClick={() => onOpenChange(false)}
             >
               Close
