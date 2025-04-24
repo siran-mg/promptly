@@ -16,6 +16,7 @@ export interface Database {
           updated_at: string
           full_name: string | null
           email: string
+          avatar_url: string | null
         }
         Insert: {
           id: string
@@ -23,6 +24,7 @@ export interface Database {
           updated_at?: string
           full_name?: string | null
           email: string
+          avatar_url?: string | null
         }
         Update: {
           id?: string
@@ -30,6 +32,7 @@ export interface Database {
           updated_at?: string
           full_name?: string | null
           email?: string
+          avatar_url?: string | null
         }
         Relationships: [
           {

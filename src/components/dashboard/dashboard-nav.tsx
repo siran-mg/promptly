@@ -67,7 +67,7 @@ export function DashboardNav() {
         setUserProfile({
           full_name: data?.full_name || user.user_metadata?.full_name,
           email: user.email,
-          avatar_url: data?.avatar_url
+          avatar_url: data?.avatar_url ?? user.user_metadata?.avatar_url,
         });
       }
     };
