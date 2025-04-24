@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Plus, Pencil, Trash2, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
@@ -55,6 +56,7 @@ interface CustomFieldsManagerProps {
 
 export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const supabase = createClient();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -294,7 +296,8 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
               <div className="flex gap-2 mt-2">
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="secondary"
+                  className="bg-white text-destructive hover:bg-gray-100 border border-destructive/20 font-medium"
                   onClick={() => {
                     router.push(`/dashboard/appointments?field=${fieldToDelete.name}`);
                   }}

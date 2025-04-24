@@ -459,7 +459,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                 <div className="flex gap-2 mt-2">
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="secondary"
+                    className="bg-white text-destructive hover:bg-gray-100 border border-destructive/20 font-medium"
                     onClick={() => {
                       router.push(`/dashboard/appointments?type=${typeToDelete.id}`);
                       setIsDeleteDialogOpen(false);
@@ -469,7 +470,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                   </Button>
                   <Button
                     size="sm"
-                    variant="default"
+                    variant="secondary"
+                    className="bg-white text-primary hover:bg-gray-100 border border-primary/20 font-medium"
                     onClick={() => {
                       setIsReassignDialogOpen(true);
                       setIsDeleteDialogOpen(false);
