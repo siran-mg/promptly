@@ -7,7 +7,8 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   Loader2, Plus, Pencil, Trash2, GripVertical, ArrowUp, ArrowDown,
   FormInput, Check, AlertTriangle, FileText, Calendar, Clock, List,
-  ToggleLeft, Mail, Phone, Hash, Eye
+  ToggleLeft, Mail, Phone, Hash, Eye,
+  ArrowLeft
 } from "lucide-react";
 import { Database } from "@/types/supabase";
 import { PrimaryActionButton } from "@/components/ui/primary-action-button";

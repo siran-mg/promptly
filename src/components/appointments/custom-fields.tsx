@@ -198,9 +198,9 @@ export function CustomFields({
               </SelectTrigger>
               <SelectContent>
                 {(typeof field.options === "object" && field.options !== null && Array.isArray(field.options)) &&
-                  field.options.map((option: string, index: number) => (
-                    <SelectItem key={index} value={option}>
-                      {option}
+                  field.options.map((option, index) => (
+                    <SelectItem key={index} value={String(option)}>
+                      {String(option)}
                     </SelectItem>
                   ))}
               </SelectContent>

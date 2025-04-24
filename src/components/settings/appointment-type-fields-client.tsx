@@ -43,7 +43,7 @@ export function AppointmentTypeFieldsClient({
           </Button>
 
           <PrimaryActionButton
-            variant="outline"
+            variant="default"
             onClick={() => router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${appointmentTypeId}&view=form`)}
             icon={Palette}
           >

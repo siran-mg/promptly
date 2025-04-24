@@ -748,10 +748,10 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
               <div className="flex items-center gap-2 text-sm">
                 <div
                   className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: appointmentType.color || '#6366f1' }}
+                  style={{ backgroundColor: appointmentType?.color || '#6366f1' }}
                 ></div>
-                <span className="font-medium">{appointmentType.name}</span>
-                <span className="text-muted-foreground">• {appointmentType.duration} minutes</span>
+                <span className="font-medium">{appointmentType?.name}</span>
+                <span className="text-muted-foreground">• {appointmentType?.duration || 60} minutes</span>
               </div>
             </div>
           </CardFooter>
