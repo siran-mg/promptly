@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 // No longer need supabase client as we're using the API endpoint
 import { Database } from "@/types/supabase";
 import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
+import { AppointmentDetailsDialog } from "./appointment-details-dialog";
 
 import {
   Table,
@@ -70,6 +71,8 @@ export function AppointmentsTable({
   const [copied, setCopied] = useState(false);
   const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
   // Filter appointments based on search query
   const filteredAppointments = appointments.filter((appointment) => {
@@ -200,7 +203,14 @@ export function AppointmentsTable({
               </TableRow>
             ) : (
               filteredAppointments.map((appointment) => (
-                <TableRow key={appointment.id}>
+                <TableRow
+                  key={appointment.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    setSelectedAppointment(appointment);
+                    setIsDetailsDialogOpen(true);
+                  }}
+                >
                   <TableCell className="font-medium">
                     {appointment.client_name}
                   </TableCell>
@@ -234,14 +244,26 @@ export function AppointmentsTable({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>View details</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedAppointment(appointment);
+                            setIsDetailsDialogOpen(true);
+                          }}
+                        >
+                          View details
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={async () => {
                             // First, check if the appointment has a share token
@@ -313,7 +335,8 @@ export function AppointmentsTable({
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setAppointmentToDelete(appointment);
                             setIsDeleteDialogOpen(true);
                           }}
@@ -394,6 +417,26 @@ export function AppointmentsTable({
           // We don't need to update the local state here as the page will refresh
           // when navigating back to it, fetching the latest data from the server
           window.location.reload();
+        }}
+      />
+
+      {/* Appointment Details Dialog */}
+      <AppointmentDetailsDialog
+        appointment={selectedAppointment}
+        isOpen={isDetailsDialogOpen}
+        onOpenChange={setIsDetailsDialogOpen}
+        onDelete={() => {
+          // Set the appointment to delete and open the delete dialog
+          setAppointmentToDelete(selectedAppointment);
+          setIsDetailsDialogOpen(false);
+          setIsDeleteDialogOpen(true);
+        }}
+        onShare={() => {
+          if (selectedAppointment) {
+            setCurrentAppointment(selectedAppointment);
+            setIsDetailsDialogOpen(false);
+            setShareDialogOpen(true);
+          }
         }}
       />
     </div>
