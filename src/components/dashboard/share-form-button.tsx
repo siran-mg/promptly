@@ -9,9 +9,10 @@ import { useRouter } from "next/navigation";
 
 interface ShareFormButtonProps {
   userId: string;
+  className?: string;
 }
 
-export function ShareFormButton({ userId }: ShareFormButtonProps) {
+export function ShareFormButton({ userId, className }: ShareFormButtonProps) {
   const router = useRouter();
   const supabase = createClient();
   const [isOpen, setIsOpen] = useState(false);
@@ -50,7 +51,11 @@ export function ShareFormButton({ userId }: ShareFormButtonProps) {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} variant="outline" className="gap-2">
+      <Button
+        onClick={() => setIsOpen(true)}
+        variant="outline"
+        className={`gap-2 text-white ${className || ''}`}
+      >
         <Share className="h-4 w-4" />
         Share Booking Form
       </Button>

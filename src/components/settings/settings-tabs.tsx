@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Settings, Calendar, ArrowLeft } from "lucide-react";
+import { User, Settings, Calendar, ArrowLeft, Share } from "lucide-react";
 import { ShareFormButton } from "@/components/dashboard/share-form-button";
 import { createClient } from "@/lib/supabase";
 import { useEffect, useState } from "react";
@@ -121,21 +121,17 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
       </TabsContent>
 
       <TabsContent value="form" className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 p-4 bg-muted rounded-lg">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 p-6 bg-indigo-50/50 rounded-lg border border-indigo-100">
           <div>
-            <h3 className="text-lg font-medium">Share Your Booking Form</h3>
+            <h3 className="text-lg font-medium flex items-center gap-2">
+              <Share className="h-5 w-5 text-indigo-600" />
+              Share Your Booking Form
+            </h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Generate a unique link that clients can use to book appointments with you.
+              Generate a unique link that clients can use to book appointments with you
             </p>
           </div>
-          {userId && <ShareFormButton userId={userId} />}
-        </div>
-
-        <div>
-          <h3 className="text-lg font-medium">Form Customization</h3>
-          <p className="text-sm text-muted-foreground mb-6">
-            Customize how your appointment booking form appears to clients.
-          </p>
+          {userId && <ShareFormButton userId={userId} className="bg-indigo-600 hover:bg-indigo-700 transition-colors" />}
         </div>
 
         {formSettings}
