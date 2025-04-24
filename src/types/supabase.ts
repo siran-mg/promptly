@@ -147,18 +147,30 @@ export interface Database {
           user_id: string
           token: string
           created_at: string
+          selected_types: string[] | null
+          default_type: string | null
+          updated_at: string
+          name: string
         }
         Insert: {
           id?: string
           user_id: string
           token: string
           created_at?: string
+          selected_types?: string[] | null
+          default_type?: string | null
+          updated_at?: string
+          name?: string
         }
         Update: {
           id?: string
           user_id?: string
           token?: string
           created_at?: string
+          selected_types?: string[] | null
+          default_type?: string | null
+          updated_at?: string
+          name?: string
         }
         Relationships: [
           {

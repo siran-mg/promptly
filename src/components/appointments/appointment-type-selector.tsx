@@ -27,19 +27,21 @@ interface AppointmentTypeSelectorProps {
   value: string | null;
   onChange: (value: string) => void;
   userId: string;
+  allowedTypes?: string[];
 }
 
 export function AppointmentTypeSelector({
   value,
   onChange,
   userId,
+  allowedTypes,
 }: AppointmentTypeSelectorProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
   const supabase = createClient();
 
-  console.log('AppointmentTypeSelector initialized with:', { value, userId });
+  // Initialize the appointment type selector
 
   useEffect(() => {
     const fetchAppointmentTypes = async () => {
@@ -57,21 +59,34 @@ export function AppointmentTypeSelector({
           return;
         }
 
-        setAppointmentTypes(data || []);
+        let typesToUse = data || [];
 
-        console.log('Fetched appointment types:', data);
-        console.log('Current value:', value);
+        // Filter by allowed types if provided
+        if (allowedTypes && allowedTypes.length > 0) {
+          const filteredTypes = typesToUse.filter(type => allowedTypes.includes(type.id));
+
+          // If we have filtered types, use them
+          if (filteredTypes.length > 0) {
+            typesToUse = filteredTypes;
+          }
+        }
+
+        setAppointmentTypes(typesToUse);
 
         // If no value is selected and we have types, select the default one
         if (!value && data && data.length > 0) {
           const defaultType = data.find(type => type.is_default) || data[0];
-          console.log('Setting default appointment type:', defaultType);
           onChange(defaultType.id);
         } else if (value) {
-          console.log('Using provided appointment type value:', value);
           // Verify that the value exists in the fetched types
           const typeExists = data?.some(type => type.id === value);
-          console.log('Type exists in fetched data:', typeExists);
+          if (!typeExists) {
+            // If the selected type doesn't exist in the fetched data, select the default
+            const defaultType = data?.find(type => type.is_default) || data?.[0];
+            if (defaultType) {
+              onChange(defaultType.id);
+            }
+          }
         }
       } catch (err) {
         console.error("Error in fetchAppointmentTypes:", err);
@@ -81,7 +96,7 @@ export function AppointmentTypeSelector({
     };
 
     fetchAppointmentTypes();
-  }, [supabase, userId, value, onChange]);
+  }, [supabase, userId, value, onChange, allowedTypes]);
 
   // Find the selected appointment type
   const selectedType = appointmentTypes.find(type => type.id === value);

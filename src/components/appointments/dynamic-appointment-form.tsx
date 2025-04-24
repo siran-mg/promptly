@@ -13,12 +13,16 @@ interface DynamicAppointmentFormProps {
     logo_url: string | null;
     accent_color: string;
   };
+  selectedTypes?: string[];
+  hideAppointmentTypes?: boolean;
 }
 
 export function DynamicAppointmentForm({
   userId,
   defaultTypeId,
-  initialSettings
+  initialSettings,
+  selectedTypes = [],
+  hideAppointmentTypes = false
 }: DynamicAppointmentFormProps) {
   const supabase = createClient();
   const [settings, setSettings] = useState(initialSettings);
@@ -159,6 +163,8 @@ export function DynamicAppointmentForm({
         defaultTypeId={currentTypeId}
         onAppointmentTypeChange={handleAppointmentTypeChange}
         initialDate={initialDate}
+        selectedTypes={selectedTypes}
+        hideAppointmentTypes={hideAppointmentTypes}
       />
     </div>
   );

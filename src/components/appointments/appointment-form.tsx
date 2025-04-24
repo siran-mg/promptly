@@ -31,6 +31,8 @@ interface AppointmentFormProps {
   defaultTypeId?: string | null;
   onAppointmentTypeChange?: (typeId: string) => void;
   initialDate?: Date | null;
+  selectedTypes?: string[];
+  hideAppointmentTypes?: boolean;
 }
 
 export function AppointmentForm({
@@ -38,7 +40,9 @@ export function AppointmentForm({
   accentColor = "#6366f1",
   defaultTypeId = null,
   onAppointmentTypeChange,
-  initialDate = null
+  initialDate = null,
+  selectedTypes = [],
+  hideAppointmentTypes = false
 }: AppointmentFormProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -330,8 +334,8 @@ export function AppointmentForm({
             </div>
           </div>
 
-          {/* Only show appointment type selector if there are appointment types */}
-          {hasAppointmentTypes && (
+          {/* Only show appointment type selector if there are appointment types and it's not hidden */}
+          {hasAppointmentTypes && !hideAppointmentTypes && (
             <div className="space-y-2">
               <Label>Appointment Type</Label>
               <AppointmentTypeSelector
@@ -353,6 +357,7 @@ export function AppointmentForm({
                   }
                 }}
                 userId={userId}
+                allowedTypes={selectedTypes}
               />
             </div>
           )}

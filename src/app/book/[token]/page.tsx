@@ -27,7 +27,7 @@ export default async function BookAppointmentPage({
     console.log('Fetching share token with token:', token);
     const { data: shareToken, error } = await supabase
       .from("form_share_tokens")
-      .select("user_id")
+      .select("*")
       .eq("token", token)
       .single();
 
@@ -211,8 +211,10 @@ export default async function BookAppointmentPage({
               <div className="space-y-6">
                 <DynamicAppointmentForm
                   userId={shareToken.user_id}
-                  defaultTypeId={typeId}
+                  defaultTypeId={typeId || (shareToken.selected_types && shareToken.selected_types.length > 0 ? shareToken.default_type : null)}
                   initialSettings={settings}
+                  selectedTypes={shareToken.selected_types || []}
+                  hideAppointmentTypes={Array.isArray(shareToken.selected_types) && shareToken.selected_types.length === 0}
                 />
               </div>
             </div>

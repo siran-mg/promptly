@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Share, Loader2, Settings, ExternalLink, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
 import { createClient } from "@/lib/supabase";
 import { ShareDialog } from "@/components/share/share-dialog";
 import {
@@ -28,91 +27,10 @@ export function SmartShareButton({
   className = "",
   iconOnly = false
 }: SmartShareButtonProps) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFormCustomized, setIsFormCustomized] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [appointmentTypes, setAppointmentTypes] = useState<any[]>([]);
   const router = useRouter();
-  const { toast } = useToast();
   const supabase = createClient();
-
-  // Check if form has been customized
-  useEffect(() => {
-    const checkFormCustomization = async () => {
-      try {
-        setIsLoading(true);
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-          setIsLoading(false);
-          return;
-        }
-
-        // Check if form settings exist and have been customized
-        const { data, error } = await supabase
-          .from("form_settings")
-          .select("*")
-          .eq("user_id", user.id)
-          .single();
-
-        if (error) {
-          // If the error is because no settings exist yet, create default settings
-          if (error.code === 'PGRST116') { // PostgreSQL error for 'no rows returned'
-            try {
-              // Create default form settings
-              const { error: insertError } = await supabase
-                .from("form_settings")
-                .insert({
-                  user_id: user.id,
-                  form_title: "Book an Appointment",
-                  form_description: "Fill out the form below to schedule your appointment.",
-                  logo_url: "",
-                  accent_color: "#6366f1",
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString()
-                });
-
-              if (insertError) {
-                console.error("Error creating default form settings:", insertError);
-                toast({
-                  title: "Error",
-                  description: "Could not create default form settings. Please try again.",
-                  variant: "destructive",
-                });
-              }
-            } catch (insertErr) {
-              console.error("Error in creating default settings:", insertErr);
-            }
-          } else {
-            console.error("Error checking form settings:", error);
-            toast({
-              title: "Error",
-              description: "Could not load form settings. Please try again.",
-              variant: "destructive",
-            });
-          }
-          setIsFormCustomized(false);
-        } else {
-          // Consider form customized if title or description has been changed from default
-          // or if a logo has been uploaded
-          const isCustomized = Boolean(
-            (data.form_title && data.form_title !== "Book an Appointment") ||
-            (data.form_description && data.form_description !== "Fill out the form below to schedule your appointment.") ||
-            (data.logo_url && data.logo_url !== "")
-          );
-
-          setIsFormCustomized(isCustomized);
-        }
-      } catch (err) {
-        console.error("Error in checkFormCustomization:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkFormCustomization();
-  }, [supabase, toast]);
 
   // Fetch appointment types when the dialog opens
   useEffect(() => {
@@ -145,12 +63,7 @@ export function SmartShareButton({
 
   // Handle button click
   const handleClick = async () => {
-    if (isFormCustomized) {
       setIsShareDialogOpen(true);
-    } else {
-      // Open a dialog with more information before redirecting
-      setIsDialogOpen(true);
-    }
   };
 
   // Handle customize form button
@@ -158,15 +71,6 @@ export function SmartShareButton({
     router.push('/dashboard/settings?tab=customize');
     setIsShareDialogOpen(false);
   };
-
-  // Button rendering
-  if (isLoading) {
-    return (
-      <Button variant={variant} size={size} className={className} disabled>
-        <Loader2 className="h-5 w-5 animate-spin" />
-      </Button>
-    );
-  }
 
   return (
     <>
@@ -179,65 +83,6 @@ export function SmartShareButton({
         <Share className={`h-5 w-5 ${!iconOnly ? "mr-2" : ""}`} />
         {!iconOnly && "Share Booking Form"}
       </Button>
-
-      {/* Form not customized dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-center text-xl font-bold text-amber-600">
-              <Settings className="h-5 w-5 mr-2 text-amber-600" />
-              Form Not Customized
-            </DialogTitle>
-            <DialogDescription className="text-center pt-2">
-              Your booking form needs to be customized before sharing.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 my-4">
-            <div className="flex items-start">
-              <div className="bg-amber-100 p-2 rounded-full mr-3">
-                <ExternalLink className="h-5 w-5 text-amber-600" />
-              </div>
-              <div>
-                <h3 className="font-medium text-amber-800">Why customize your form?</h3>
-                <p className="text-sm text-amber-700 mt-1">
-                  A personalized booking form creates a better experience for your clients and helps establish your brand identity.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center">
-                <Check className="h-4 w-4 text-amber-600 mr-2" />
-                <span className="text-sm text-amber-700">Add your business name and description</span>
-              </div>
-              <div className="flex items-center">
-                <Check className="h-4 w-4 text-amber-600 mr-2" />
-                <span className="text-sm text-amber-700">Upload your logo for brand recognition</span>
-              </div>
-              <div className="flex items-center">
-                <Check className="h-4 w-4 text-amber-600 mr-2" />
-                <span className="text-sm text-amber-700">Choose colors that match your brand</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center mt-6">
-            <Button
-              variant="default"
-              size="lg"
-              className="bg-amber-600 hover:bg-amber-700 text-white w-full"
-              onClick={() => {
-                setIsDialogOpen(false);
-                router.push("/dashboard/settings?tab=form");
-              }}
-            >
-              <Settings className="h-5 w-5 mr-2" />
-              Customize Form Now
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Share dialog for customized forms */}
       <ShareDialog
