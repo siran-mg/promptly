@@ -9,7 +9,7 @@ import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { SmartShareButton } from "@/components/dashboard/smart-share-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarClock, Plus, Share } from "lucide-react";
+import { CalendarClock, Plus, Share, Settings } from "lucide-react";
 
 export default async function DashboardPage() {
   const cookieStore = cookies();
@@ -39,7 +39,7 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-bold tracking-tight mb-1">Welcome to your Dashboard</h1>
         <p className="text-muted-foreground mb-6">Manage your appointments and booking settings</p>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Button variant="default" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md" asChild>
             <Link href="/dashboard/appointments/new">
               <Plus className="h-6 w-6 mb-1" />
@@ -71,6 +71,15 @@ export default async function DashboardPage() {
               <div className="text-xs text-muted-foreground">Let clients book with you</div>
             </div>
           </div>
+          <Button variant="outline" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-white shadow-sm" asChild>
+            <Link href="/dashboard/settings?tab=form">
+              <Settings className="h-6 w-6 mb-1 text-indigo-600" />
+              <div className="text-center">
+                <div className="font-medium text-base">Customize Form</div>
+                <div className="text-xs text-muted-foreground">Personalize your booking form</div>
+              </div>
+            </Link>
+          </Button>
         </div>
       </div>
 
