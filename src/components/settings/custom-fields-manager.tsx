@@ -4,8 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Plus, Pencil, Trash2, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Loader2, Plus, Pencil, Trash2, GripVertical, ArrowUp, ArrowDown,
+  FormInput, Check, AlertTriangle, FileText, Calendar, Clock, List,
+  ToggleLeft, Mail, Phone, Hash, Eye
+} from "lucide-react";
 import { Database } from "@/types/supabase";
+import { PrimaryActionButton } from "@/components/ui/primary-action-button";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -436,111 +441,176 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex flex-col justify-center items-center h-64 gap-4 p-6 bg-indigo-50/30 rounded-lg border border-indigo-100">
+        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+        <p className="text-sm text-indigo-700 font-medium">Loading custom fields...</p>
       </div>
     );
   }
 
   if (!appointmentType) {
     return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">Appointment type not found.</p>
+      <div className="flex flex-col justify-center items-center h-64 gap-4 p-6 bg-red-50/30 rounded-lg border border-red-100">
+        <AlertTriangle className="h-10 w-10 text-red-500" />
+        <div className="text-center">
+          <p className="font-medium text-red-700">Appointment type not found</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            The appointment type you're trying to manage may have been deleted or doesn't exist
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          className="mt-2 border-red-200 text-red-700 hover:bg-red-50"
+          onClick={() => router.push("/dashboard/settings?tab=appointment-types")}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Return to Appointment Types
+        </Button>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 className="text-lg font-medium">Custom Fields for {appointmentType.name}</h3>
+          <p className="text-sm text-indigo-600 font-medium">
+            {customFields.length} {customFields.length === 1 ? 'field' : 'fields'} configured
+          </p>
           <p className="text-sm text-muted-foreground">
-            Add custom fields to collect additional information for this appointment type.
+            Add custom fields to collect additional information from clients
           </p>
         </div>
-        <Button onClick={handleAddNew}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Field
-        </Button>
+        <PrimaryActionButton
+          onClick={handleAddNew}
+          icon={Plus}
+          variant="indigo"
+        >
+          Add New Field
+        </PrimaryActionButton>
       </div>
 
       {customFields.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center h-40">
-            <p className="text-muted-foreground mb-4">No custom fields found for this appointment type.</p>
-            <Button onClick={handleAddNew}>
-              <Plus className="h-4 w-4 mr-2" />
+        <Card className="border-indigo-100 overflow-hidden">
+          <div className="h-1 bg-indigo-600"></div>
+          <CardContent className="flex flex-col items-center justify-center py-12 px-6 text-center">
+            <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
+              <FormInput className="h-8 w-8 text-indigo-600" />
+            </div>
+            <h3 className="text-lg font-medium mb-2">No custom fields yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md">
+              Custom fields allow you to collect specific information from clients when they book this appointment type
+            </p>
+            <PrimaryActionButton
+              onClick={handleAddNew}
+              icon={Plus}
+              variant="indigo"
+            >
               Create Your First Custom Field
-            </Button>
+            </PrimaryActionButton>
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="border-indigo-100 overflow-hidden">
+          <div className="h-1 bg-indigo-600"></div>
+          <CardHeader className="pb-0">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <FormInput className="h-5 w-5 text-indigo-600" />
+              Custom Fields
+            </CardTitle>
+            <CardDescription>
+              Fields will appear in this order on the booking form
+            </CardDescription>
+          </CardHeader>
           <CardContent className="p-4">
-            <div className="space-y-4">
-              {customFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="flex items-center justify-between p-3 border rounded-md bg-background"
-                >
-                  <div className="flex items-center">
-                    <div className="flex flex-col items-center mr-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleMoveUp(index)}
-                        disabled={index === 0}
-                        className="h-6 w-6 p-0"
-                      >
-                        <ArrowUp className="h-4 w-4" />
-                        <span className="sr-only">Move up</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleMoveDown(index)}
-                        disabled={index === customFields.length - 1}
-                        className="h-6 w-6 p-0"
-                      >
-                        <ArrowDown className="h-4 w-4" />
-                        <span className="sr-only">Move down</span>
-                      </Button>
-                    </div>
-                    <div>
-                      <div className="font-medium">{field.label}</div>
-                      <div className="text-sm text-muted-foreground flex items-center">
-                        <span className="capitalize">{field.type}</span>
-                        {field.required && (
-                          <span className="ml-2 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                            Required
-                          </span>
-                        )}
+            <div className="space-y-3">
+              {customFields.map((field, index) => {
+                // Get the appropriate icon based on field type
+                let FieldIcon = FormInput;
+                switch(field.type) {
+                  case 'text': FieldIcon = FormInput; break;
+                  case 'textarea': FieldIcon = FileText; break;
+                  case 'number': FieldIcon = Hash; break;
+                  case 'email': FieldIcon = Mail; break;
+                  case 'phone': FieldIcon = Phone; break;
+                  case 'date': FieldIcon = Calendar; break;
+                  case 'time': FieldIcon = Clock; break;
+                  case 'select': FieldIcon = List; break;
+                  case 'checkbox': FieldIcon = ToggleLeft; break;
+                  default: FieldIcon = FormInput;
+                }
+
+                return (
+                  <div
+                    key={field.id}
+                    className="flex items-center justify-between p-4 border rounded-lg bg-white hover:bg-indigo-50/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col items-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleMoveUp(index)}
+                          disabled={index === 0}
+                          className="h-6 w-6 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100"
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                          <span className="sr-only">Move up</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleMoveDown(index)}
+                          disabled={index === customFields.length - 1}
+                          className="h-6 w-6 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100"
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                          <span className="sr-only">Move down</span>
+                        </Button>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                          <FieldIcon className="h-4 w-4 text-indigo-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">{field.label}</div>
+                          <div className="text-sm text-muted-foreground flex items-center gap-2">
+                            <span className="capitalize">{field.type}</span>
+                            {field.required && (
+                              <span className="inline-flex items-center text-xs bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full">
+                                <Check className="h-3 w-3 mr-1" />
+                                Required
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
+
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(field)}
+                        className="h-8 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                      >
+                        <Pencil className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteClick(field)}
+                        className="h-8 border-red-200 text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(field)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Pencil className="h-4 w-4" />
-                      <span className="sr-only">Edit</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteClick(field)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -548,106 +618,170 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
 
       {/* Dialog for adding/editing custom fields */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>
-              {editingField ? "Edit Custom Field" : "Add Custom Field"}
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              {editingField ? (
+                <>
+                  <Pencil className="h-5 w-5 text-indigo-600" />
+                  Edit Custom Field
+                </>
+              ) : (
+                <>
+                  <Plus className="h-5 w-5 text-indigo-600" />
+                  Add Custom Field
+                </>
+              )}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-base">
               {editingField
-                ? "Update the details of this custom field."
-                : "Create a new custom field to collect additional information."}
+                ? "Update the details of this custom field"
+                : "Create a new custom field to collect additional information from clients"}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="space-y-6 py-2">
               <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="label">Field Label</Label>
-                    <Input
-                      id="label"
-                      name="label"
-                      value={formData.label}
-                      onChange={handleChange}
-                      placeholder="e.g., Medical History"
-                      required
-                    />
+                    <Label htmlFor="label" className="text-sm font-medium">Field Label</Label>
+                    <div className="relative">
+                      <FormInput className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
+                      <Input
+                        id="label"
+                        name="label"
+                        value={formData.label}
+                        onChange={handleChange}
+                        placeholder="e.g., Medical History"
+                        className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
+                        required
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      This is the label clients will see on the booking form
+                    </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="type">Field Type</Label>
+                    <Label htmlFor="type" className="text-sm font-medium">Field Type</Label>
                     <Select
                       value={formData.type}
                       onValueChange={(value) => handleSelectChange("type", value)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="border-indigo-200 focus:ring-indigo-500">
                         <SelectValue placeholder="Select field type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {fieldTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
+                        {fieldTypes.map((type) => {
+                          // Get the appropriate icon based on field type
+                          let TypeIcon = FormInput;
+                          switch(type.value) {
+                            case 'text': TypeIcon = FormInput; break;
+                            case 'textarea': TypeIcon = FileText; break;
+                            case 'number': TypeIcon = Hash; break;
+                            case 'email': TypeIcon = Mail; break;
+                            case 'phone': TypeIcon = Phone; break;
+                            case 'date': TypeIcon = Calendar; break;
+                            case 'time': TypeIcon = Clock; break;
+                            case 'select': TypeIcon = List; break;
+                            case 'checkbox': TypeIcon = ToggleLeft; break;
+                            default: TypeIcon = FormInput;
+                          }
+
+                          return (
+                            <SelectItem key={type.value} value={type.value} className="flex items-center gap-2">
+                              <div className="flex items-center gap-2">
+                                <TypeIcon className="h-4 w-4 text-indigo-600" />
+                                {type.label}
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Choose the type of input field that best suits your needs
+                    </p>
                   </div>
 
                   {formData.type === "select" && (
                     <div className="space-y-2">
-                      <Label htmlFor="options">Options (one per line)</Label>
-                      <Textarea
-                        id="options"
-                        name="options"
-                        value={formData.options}
-                        onChange={handleChange}
-                        placeholder="Option 1&#10;Option 2&#10;Option 3"
-                        rows={4}
-                        required
-                      />
+                      <Label htmlFor="options" className="text-sm font-medium">Options (one per line)</Label>
+                      <div className="relative">
+                        <List className="absolute left-3 top-3 h-4 w-4 text-indigo-600" />
+                        <Textarea
+                          id="options"
+                          name="options"
+                          value={formData.options}
+                          onChange={handleChange}
+                          placeholder="Option 1&#10;Option 2&#10;Option 3"
+                          rows={4}
+                          className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
+                          required
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Enter each option on a new line
+                      </p>
                     </div>
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="placeholder">Placeholder (Optional)</Label>
+                    <Label htmlFor="placeholder" className="text-sm font-medium">Placeholder Text (Optional)</Label>
                     <Input
                       id="placeholder"
                       name="placeholder"
                       value={formData.placeholder}
                       onChange={handleChange}
                       placeholder="e.g., Enter your medical history"
+                      className="border-indigo-200 focus-visible:ring-indigo-500"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Text that appears in the field before the client enters a value
+                    </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="default_value">Default Value (Optional)</Label>
+                    <Label htmlFor="default_value" className="text-sm font-medium">Default Value (Optional)</Label>
                     <Input
                       id="default_value"
                       name="default_value"
                       value={formData.default_value}
                       onChange={handleChange}
                       placeholder="e.g., None"
+                      className="border-indigo-200 focus-visible:ring-indigo-500"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Pre-filled value that will appear in the field
+                    </p>
                   </div>
 
-                  <div className="flex items-center space-x-2 pt-2">
+                  <div className="flex items-center space-x-3 pt-2 p-3 bg-indigo-50/50 rounded-lg border border-indigo-100">
                     <Switch
                       id="required"
                       checked={formData.required}
                       onCheckedChange={(checked) => handleSwitchChange("required", checked)}
+                      className="data-[state=checked]:bg-indigo-600"
                     />
-                    <Label htmlFor="required" className="text-sm font-medium">
-                      Required field
-                    </Label>
+                    <div>
+                      <Label htmlFor="required" className="text-sm font-medium">
+                        Required field
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Clients must complete this field to submit the form
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 {/* Preview section */}
-                <div className="border rounded-md p-4 space-y-4">
-                  <h4 className="text-sm font-medium">Field Preview</h4>
-                  <div className="border rounded-md p-4 bg-card space-y-2">
-                    <Label htmlFor="preview-field">
+                <div className="border rounded-lg p-5 space-y-4 bg-indigo-50/30 border-indigo-100">
+                  <h4 className="text-sm font-medium flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-indigo-600" />
+                    Field Preview
+                  </h4>
+                  <div className="border rounded-lg p-5 bg-white space-y-3 shadow-sm">
+                    <Label htmlFor="preview-field" className="text-sm font-medium">
                       {formData.label || "Field Label"}
                       {formData.required && <span className="text-destructive ml-1">*</span>}
                     </Label>
@@ -658,6 +792,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         placeholder={formData.placeholder || ""}
                         value={formData.default_value || ""}
                         readOnly
+                        className="border-indigo-200"
                       />
                     )}
 
@@ -668,6 +803,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         value={formData.default_value || ""}
                         readOnly
                         rows={3}
+                        className="border-indigo-200"
                       />
                     )}
 
@@ -678,6 +814,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         placeholder={formData.placeholder || ""}
                         value={formData.default_value || ""}
                         readOnly
+                        className="border-indigo-200"
                       />
                     )}
 
@@ -688,6 +825,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         placeholder={formData.placeholder || ""}
                         value={formData.default_value || ""}
                         readOnly
+                        className="border-indigo-200"
                       />
                     )}
 
@@ -698,12 +836,13 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         placeholder={formData.placeholder || ""}
                         value={formData.default_value || ""}
                         readOnly
+                        className="border-indigo-200"
                       />
                     )}
 
                     {formData.type === "select" && (
                       <Select defaultValue={formData.default_value || (formData.options ? formData.options.split("\n")[0]?.trim() : "preview-value")}>
-                        <SelectTrigger>
+                        <SelectTrigger className="border-indigo-200">
                           <SelectValue placeholder={formData.placeholder || "Select an option"} />
                         </SelectTrigger>
                         <SelectContent>
@@ -725,7 +864,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
 
                     {formData.type === "checkbox" && (
                       <div className="flex items-center space-x-2">
-                        <Checkbox id="preview-field" />
+                        <Checkbox id="preview-field" className="border-indigo-200 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600" />
                         <label htmlFor="preview-field" className="text-sm">
                           {formData.placeholder || "Yes"}
                         </label>
@@ -738,37 +877,47 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         placeholder={formData.placeholder || formData.type === "date" ? "Select a date" : "Select a time"}
                         value={formData.default_value || ""}
                         readOnly
+                        className="border-indigo-200"
                       />
                     )}
                   </div>
 
-                  <div className="text-xs text-muted-foreground mt-2">
-                    This is how your custom field will appear to clients in the booking form.
+                  <div className="bg-white p-4 rounded-lg border border-indigo-100">
+                    <div className="flex items-start gap-2">
+                      <div className="p-1 rounded-full bg-indigo-100">
+                        <Check className="h-3 w-3 text-indigo-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium">Client Experience</p>
+                        <p className="text-xs text-muted-foreground">
+                          This is how your custom field will appear to clients in the booking form
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <DialogFooter className="pt-4">
+            <DialogFooter className="pt-4 gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsDialogOpen(false)}
                 disabled={isSaving}
+                className="border-gray-200"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Saving...
-                  </>
-                ) : editingField ? (
-                  "Update"
-                ) : (
-                  "Create"
-                )}
-              </Button>
+              <PrimaryActionButton
+                type="submit"
+                disabled={isSaving}
+                isLoading={isSaving}
+                loadingText="Saving..."
+                icon={editingField ? Pencil : Plus}
+                variant="indigo"
+              >
+                {editingField ? "Update Field" : "Create Field"}
+              </PrimaryActionButton>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -778,18 +927,41 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the custom field
-              {fieldToDelete && <strong> "{fieldToDelete.label}"</strong>}.
-              This action cannot be undone.
+            <AlertDialogTitle className="flex items-center gap-2 text-xl">
+              <Trash2 className="h-5 w-5 text-red-600" />
+              Delete Custom Field
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              Are you sure you want to delete this custom field?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
-            </AlertDialogAction>
+
+          {fieldToDelete && (
+            <div className="my-6 p-4 border border-red-100 bg-red-50/50 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+                <div>
+                  <p className="font-medium text-red-700">
+                    You're about to delete: <span className="font-bold">{fieldToDelete.label}</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    This will permanently remove this field and any data collected through it. This action cannot be undone.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel className="border-gray-200">Cancel</AlertDialogCancel>
+            <Button
+              onClick={handleDelete}
+              variant="destructive"
+              className="gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Field
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -2,8 +2,9 @@
 
 import { CustomFieldsManager } from "@/components/settings/custom-fields-manager";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText, FormInput, Palette } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { PrimaryActionButton } from "@/components/ui/primary-action-button";
 
 interface AppointmentTypeFieldsClientProps {
   appointmentTypeId: string;
@@ -31,30 +32,36 @@ export function AppointmentTypeFieldsClient({
   return (
     <div className="space-y-6">
       {showBackButton && (
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <Button
             variant="outline"
             onClick={handleBack}
+            className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Types
+            <ArrowLeft className="h-4 w-4" />
+            Back to Appointment Types
           </Button>
 
-          <Button
-            variant="ghost"
+          <PrimaryActionButton
+            variant="outline"
             onClick={() => router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${appointmentTypeId}&view=form`)}
+            icon={Palette}
           >
-            Form Settings
-          </Button>
+            Form Appearance Settings
+          </PrimaryActionButton>
         </div>
       )}
 
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Custom Fields for {appointmentTypeName}</h2>
-        <p className="text-muted-foreground">
-          Create and manage custom fields that clients will fill out when booking this appointment type.
-          These fields allow you to collect specific information needed for this type of appointment.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-indigo-50/50 rounded-lg border border-indigo-100 mb-6">
+        <div>
+          <h2 className="text-xl font-medium flex items-center gap-2">
+            <FormInput className="h-5 w-5 text-indigo-600" />
+            Custom Fields for {appointmentTypeName}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Create and manage custom fields that clients will fill out when booking this appointment type
+          </p>
+        </div>
       </div>
 
       <CustomFieldsManager appointmentTypeId={appointmentTypeId} />
