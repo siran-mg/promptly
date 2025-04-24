@@ -6,6 +6,13 @@ import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Plus, Pencil, Trash2, Check, X, Star, StarOff, Clock } from "lucide-react";
 import { Database } from "@/types/supabase";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +71,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [editingType, setEditingType] = useState<AppointmentType | null>(null);
   const [typeToDelete, setTypeToDelete] = useState<AppointmentType | null>(null);
+  const [appointmentsUsingType, setAppointmentsUsingType] = useState<any[]>([]);
+  const [isReassignDialogOpen, setIsReassignDialogOpen] = useState(false);
+  const [reassignTargetTypeId, setReassignTargetTypeId] = useState<string>("");
+  const [isReassigning, setIsReassigning] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -190,6 +201,15 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
     });
     setEditingType(type);
     setIsDialogOpen(true);
+
+    // Show a notification if this is the default appointment type with the generic name
+    if (type.is_default && type.name === "Standard Appointment") {
+      toast({
+        title: "Personalize your appointment type",
+        description: "We recommend renaming the default appointment type to match your business needs.",
+        variant: "default",
+      });
+    }
   };
 
   // Open dialog to confirm deletion
@@ -240,13 +260,168 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
     }
   };
 
+  // Helper function to delete an appointment type
+  const deleteAppointmentType = async () => {
+    if (!typeToDelete) {
+      console.log("No typeToDelete found");
+      return false;
+    }
+
+    console.log("Attempting to delete appointment type:", typeToDelete.id, typeToDelete.name);
+
+    try {
+      // Delete custom fields associated with this type
+      console.log("Deleting custom fields for type:", typeToDelete.id);
+      const { error: fieldsError } = await supabase
+        .from("appointment_custom_fields")
+        .delete()
+        .eq("appointment_type_id", typeToDelete.id);
+
+      if (fieldsError) {
+        console.error("Error deleting custom fields:", fieldsError);
+        // Continue anyway
+      } else {
+        console.log("Custom fields deleted successfully");
+      }
+
+      // Delete the appointment type
+      console.log("Now deleting the appointment type itself:", typeToDelete.id);
+
+      // First check if there are any appointment field values that reference custom fields for this type
+      console.log("Checking for appointment field values that might be blocking deletion...");
+      const { data: customFields } = await supabase
+        .from("appointment_custom_fields")
+        .select("id")
+        .eq("appointment_type_id", typeToDelete.id);
+
+      if (customFields && customFields.length > 0) {
+        const fieldIds = customFields.map(field => field.id);
+        console.log("Found custom fields:", fieldIds);
+
+        // Delete any field values that reference these custom fields
+        if (fieldIds.length > 0) {
+          console.log("Deleting field values for these custom fields");
+          const { error: fieldValuesError } = await supabase
+            .from("appointment_field_values")
+            .delete()
+            .in("field_id", fieldIds);
+
+          if (fieldValuesError) {
+            console.error("Error deleting field values:", fieldValuesError);
+          } else {
+            console.log("Field values deleted successfully");
+          }
+        }
+      }
+
+      // Now try to delete the appointment type
+      const { data, error } = await supabase
+        .from("appointment_types")
+        .delete()
+        .eq("id", typeToDelete.id)
+        .select();
+
+      if (error) {
+        console.error("Error deleting appointment type:", error);
+        toast({
+          title: "Error",
+          description: "Could not delete appointment type. Please try again.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      console.log("Deletion response:", data);
+
+      // Update local state
+      setAppointmentTypes(prev => {
+        const filtered = prev.filter(t => t.id !== typeToDelete.id);
+        console.log("Updated appointment types:", filtered.length, "(was", prev.length, ")");
+        return filtered;
+      });
+
+      // Reset typeToDelete state
+      setTimeout(() => {
+        setTypeToDelete(null);
+        console.log("Reset typeToDelete state");
+      }, 100);
+
+      toast({
+        title: "Appointment type deleted",
+        description: "The appointment type has been deleted successfully.",
+      });
+
+      return true;
+    } catch (err) {
+      console.error("Error in deleteAppointmentType:", err);
+      return false;
+    }
+  };
+
+  // Reassign appointments and then delete the appointment type
+  const handleReassignAndDelete = async () => {
+    if (!typeToDelete || !reassignTargetTypeId || appointmentsUsingType.length === 0) return;
+
+    setIsReassigning(true);
+
+    try {
+      // Get the appointment IDs
+      const appointmentIds = appointmentsUsingType.map(app => app.id);
+
+      // Update all appointments to use the new type
+      const { error: updateError } = await supabase
+        .from("appointments")
+        .update({ appointment_type_id: reassignTargetTypeId })
+        .in("id", appointmentIds);
+
+      if (updateError) {
+        console.error("Error reassigning appointments:", updateError);
+        toast({
+          title: "Error",
+          description: "Could not reassign appointments. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Now delete the appointment type
+      await deleteAppointmentType();
+
+      // Show success message
+      const targetType = appointmentTypes.find(t => t.id === reassignTargetTypeId);
+      toast({
+        title: "Appointments reassigned",
+        description: `${appointmentsUsingType.length} appointment(s) reassigned to "${targetType?.name}" and the original type was deleted.`,
+      });
+    } catch (err) {
+      console.error("Error in handleReassignAndDelete:", err);
+    } finally {
+      setIsReassigning(false);
+      setIsReassignDialogOpen(false);
+      setAppointmentsUsingType([]);
+      setReassignTargetTypeId("");
+
+      // Make sure to reset typeToDelete as well
+      setTimeout(() => {
+        setTypeToDelete(null);
+        console.log("Reset typeToDelete state after reassign");
+      }, 100);
+    }
+  };
+
   // Delete an appointment type
   const handleDelete = async () => {
-    if (!typeToDelete) return;
+    if (!typeToDelete) {
+      console.log("handleDelete: No typeToDelete found");
+      return;
+    }
+
+    console.log("handleDelete: Starting deletion process for", typeToDelete.id, typeToDelete.name);
 
     try {
       // Check if this is the default type
       if (typeToDelete.is_default) {
+        console.log("handleDelete: Cannot delete default type");
         toast({
           title: "Cannot delete default type",
           description: "Please set another type as default before deleting this one.",
@@ -257,60 +432,70 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       }
 
       // Check if this type is used by any appointments
-      const { count, error: countError } = await supabase
+      console.log("handleDelete: Checking if type is used by appointments");
+      const { data: appointmentsData, error: appointmentsError } = await supabase
         .from("appointments")
-        .select("*", { count: "exact", head: true })
+        .select("id, title, scheduled_for, client_name")
         .eq("appointment_type_id", typeToDelete.id);
 
-      if (countError) {
-        console.error("Error checking appointments:", countError);
+      if (appointmentsError) {
+        console.error("Error checking appointments:", appointmentsError);
         return;
       }
 
-      if (count && count > 0) {
-        toast({
-          title: "Cannot delete",
-          description: `This appointment type is used by ${count} appointment(s). Please reassign them first.`,
-          variant: "destructive",
-        });
+      console.log("handleDelete: Found", appointmentsData?.length || 0, "appointments using this type");
+
+      if (appointmentsData && appointmentsData.length > 0) {
+        console.log("handleDelete: Opening reassign dialog");
+        setAppointmentsUsingType(appointmentsData);
+
+        // Check if we have a lot of appointments - if so, offer a direct link instead of showing them all
+        if (appointmentsData.length > 10) {
+          toast({
+            title: "Multiple appointments found",
+            description: (
+              <div className="space-y-2">
+                <p>This appointment type is used by {appointmentsData.length} appointments.</p>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      router.push(`/dashboard/appointments?type=${typeToDelete.id}`);
+                      setIsDeleteDialogOpen(false);
+                    }}
+                  >
+                    View All Appointments
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => {
+                      setIsReassignDialogOpen(true);
+                      setIsDeleteDialogOpen(false);
+                    }}
+                  >
+                    Reassign & Delete
+                  </Button>
+                </div>
+              </div>
+            ),
+            variant: "destructive",
+          });
+          setIsDeleteDialogOpen(false);
+          return;
+        }
+
+        // For fewer appointments, show the reassign dialog
+        setIsReassignDialogOpen(true);
         setIsDeleteDialogOpen(false);
         return;
       }
 
-      // Delete custom fields associated with this type
-      const { error: fieldsError } = await supabase
-        .from("appointment_custom_fields")
-        .delete()
-        .eq("appointment_type_id", typeToDelete.id);
-
-      if (fieldsError) {
-        console.error("Error deleting custom fields:", fieldsError);
-        // Continue anyway
-      }
-
-      // Delete the appointment type
-      const { error } = await supabase
-        .from("appointment_types")
-        .delete()
-        .eq("id", typeToDelete.id);
-
-      if (error) {
-        console.error("Error deleting appointment type:", error);
-        toast({
-          title: "Error",
-          description: "Could not delete appointment type. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Update local state
-      setAppointmentTypes(prev => prev.filter(t => t.id !== typeToDelete.id));
-
-      toast({
-        title: "Appointment type deleted",
-        description: "The appointment type has been deleted successfully.",
-      });
+      // Now that we've confirmed it's safe to delete, proceed with deletion
+      console.log("handleDelete: Proceeding with deletion");
+      const result = await deleteAppointmentType();
+      console.log("handleDelete: Deletion result:", result);
     } catch (err) {
       console.error("Error in handleDelete:", err);
     } finally {
@@ -321,6 +506,17 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
   // Save a new or edited appointment type
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if the user is trying to save the default appointment type without renaming it
+    if (editingType?.is_default && formData.name === "Standard Appointment") {
+      toast({
+        title: "Personalization required",
+        description: "Please rename the default appointment type to something more specific for your business.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
 
     try {
@@ -600,7 +796,13 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                       onChange={handleChange}
                       placeholder="e.g., Initial Consultation"
                       required
+                      className={editingType?.is_default && formData.name === "Standard Appointment" ? "border-destructive" : ""}
                     />
+                    {editingType?.is_default && formData.name === "Standard Appointment" && (
+                      <p className="text-xs text-destructive mt-1">
+                        Please personalize the default appointment type name for your business.
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -749,6 +951,86 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Dialog for reassigning appointments */}
+      <Dialog open={isReassignDialogOpen} onOpenChange={setIsReassignDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Reassign Appointments</DialogTitle>
+            <DialogDescription>
+              This appointment type is used by {appointmentsUsingType.length} appointment(s).
+              Please select another appointment type to reassign them to before deleting.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 my-4">
+            <div className="bg-destructive/10 p-4 rounded-md border border-destructive">
+              <h4 className="font-medium text-destructive mb-2">Appointments using this type:</h4>
+              <div className="max-h-48 overflow-y-auto">
+                <ul className="space-y-2">
+                  {appointmentsUsingType.map(appointment => (
+                    <li key={appointment.id} className="text-sm border-b pb-2">
+                      <div className="font-medium">{appointment.title || "Untitled Appointment"}</div>
+                      <div className="text-muted-foreground">
+                        {new Date(appointment.scheduled_for).toLocaleString()} •
+                        {appointment.client_name || "No client name"}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reassignType">Select a new appointment type:</Label>
+              <Select
+                value={reassignTargetTypeId}
+                onValueChange={setReassignTargetTypeId}
+              >
+                <SelectTrigger id="reassignType" className="w-full">
+                  <SelectValue placeholder="Select an appointment type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {appointmentTypes
+                    .filter(type => type.id !== typeToDelete?.id)
+                    .map(type => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {type.name} ({type.duration} min)
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsReassignDialogOpen(false);
+                setAppointmentsUsingType([]);
+                setReassignTargetTypeId("");
+              }}
+              disabled={isReassigning}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleReassignAndDelete}
+              disabled={!reassignTargetTypeId || isReassigning}
+            >
+              {isReassigning ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Reassigning...
+                </>
+              ) : (
+                "Reassign and Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

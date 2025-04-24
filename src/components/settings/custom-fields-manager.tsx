@@ -288,7 +288,22 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
       if (count && count > 0) {
         toast({
           title: "Cannot delete",
-          description: `This field is used by ${count} appointment(s). Please remove the data first.`,
+          description: (
+            <div className="space-y-2">
+              <p>This field is used by {count} appointment(s). Please remove the data first.</p>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    router.push(`/dashboard/appointments?field=${fieldToDelete.name}`);
+                  }}
+                >
+                  View Appointments
+                </Button>
+              </div>
+            </div>
+          ),
           variant: "destructive",
         });
         setIsDeleteDialogOpen(false);

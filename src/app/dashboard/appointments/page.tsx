@@ -11,7 +11,11 @@ import { Plus, List, Calendar } from "lucide-react";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default async function AppointmentsPage() {
+export default async function AppointmentsPage({
+  searchParams
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
@@ -21,14 +25,42 @@ export default async function AppointmentsPage() {
     redirect("/login");
   }
 
-  // Fetch appointments for the current user
-  const { data: appointments, error } = await supabase
+  // Extract filter parameters
+  const typeId = searchParams.type as string;
+  const fieldName = searchParams.field as string;
+
+  // Build the query
+  let query = supabase
     .from("appointments")
-    .select("*")
-    .order("date", { ascending: false });
+    .select(`
+      *,
+      appointment_type:appointment_type_id(id, name, color),
+      field_values:appointment_field_values(id, field_id, value)
+    `);
+
+  // Apply filters if provided
+  if (typeId) {
+    query = query.eq('appointment_type_id', typeId);
+  }
+
+  // Order by date
+  query = query.order("date", { ascending: false });
+
+  // Execute the query
+  const { data: appointments, error } = await query;
 
   if (error) {
     console.error("Error fetching appointments:", error);
+  }
+
+  // Fetch appointment types for filtering
+  const { data: appointmentTypes, error: typesError } = await supabase
+    .from("appointment_types")
+    .select("id, name, color")
+    .order("name");
+
+  if (typesError) {
+    console.error("Error fetching appointment types:", typesError);
   }
 
   return (
@@ -57,10 +89,20 @@ export default async function AppointmentsPage() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="calendar" className="space-y-4">
-            <AppointmentsCalendarClient appointments={appointments || []} />
+            <AppointmentsCalendarClient
+              appointments={appointments || []}
+              appointmentTypes={appointmentTypes || []}
+              activeTypeId={typeId}
+              activeFieldName={fieldName}
+            />
           </TabsContent>
           <TabsContent value="list" className="space-y-4">
-            <AppointmentsTable appointments={appointments || []} />
+            <AppointmentsTable
+              appointments={appointments || []}
+              appointmentTypes={appointmentTypes || []}
+              activeTypeId={typeId}
+              activeFieldName={fieldName}
+            />
           </TabsContent>
         </Tabs>
       </div>

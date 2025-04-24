@@ -43,10 +43,28 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
+type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
+  appointment_type?: {
+    id: string;
+    name: string;
+    color: string | null;
+  } | null;
+  field_values?: {
+    id: string;
+    field_id: string;
+    value: string | null;
+  }[] | null;
+};
+
+type AppointmentType = {
+  id: string;
+  name: string;
+  color: string | null;
+};
 
 interface AppointmentsCalendarProps {
   appointments: Appointment[];
+  appointmentTypes?: AppointmentType[];
 }
 
 // Define the event type for the calendar
@@ -59,7 +77,7 @@ interface CalendarEvent {
   resource: Appointment;
 }
 
-export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps) {
+export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: AppointmentsCalendarProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [view, setView] = useState<string>(Views.MONTH);

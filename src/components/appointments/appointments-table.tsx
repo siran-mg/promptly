@@ -29,13 +29,38 @@ import { Input } from "@/components/ui/input";
 import { AppointmentStatusBadge } from "./appointment-status-badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
+type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
+  appointment_type?: {
+    id: string;
+    name: string;
+    color: string | null;
+  } | null;
+  field_values?: {
+    id: string;
+    field_id: string;
+    value: string | null;
+  }[] | null;
+};
+
+type AppointmentType = {
+  id: string;
+  name: string;
+  color: string | null;
+};
 
 interface AppointmentsTableProps {
   appointments: Appointment[];
+  appointmentTypes?: AppointmentType[];
+  activeTypeId?: string;
+  activeFieldName?: string;
 }
 
-export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
+export function AppointmentsTable({
+  appointments,
+  appointmentTypes = [],
+  activeTypeId,
+  activeFieldName
+}: AppointmentsTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
@@ -73,7 +98,40 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center">
+      {/* Active filters display */}
+      {(activeTypeId || activeFieldName) && (
+        <div className="bg-muted/50 p-3 rounded-md flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Active filters:</span>
+            {activeTypeId && (
+              <div className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full flex items-center">
+                <span className="mr-1">Type:</span>
+                <span className="font-medium">
+                  {appointmentTypes.find(t => t.id === activeTypeId)?.name || 'Unknown Type'}
+                </span>
+              </div>
+            )}
+            {activeFieldName && (
+              <div className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full flex items-center">
+                <span className="mr-1">Field:</span>
+                <span className="font-medium">{activeFieldName}</span>
+              </div>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              // Use client-side navigation to clear filters
+              window.location.href = '/dashboard/appointments';
+            }}
+          >
+            Clear Filters
+          </Button>
+        </div>
+      )}
+
+      <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -84,6 +142,38 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+
+        {appointmentTypes.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Filter by Type
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Appointment Types</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {appointmentTypes.map((type) => (
+                <DropdownMenuItem
+                  key={type.id}
+                  onClick={() => {
+                    window.location.href = `/dashboard/appointments?type=${type.id}`;
+                  }}
+                >
+                  <div className="flex items-center w-full">
+                    {type.color && (
+                      <div
+                        className="w-3 h-3 rounded-full mr-2"
+                        style={{ backgroundColor: type.color }}
+                      />
+                    )}
+                    <span>{type.name}</span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       <div className="rounded-md border">
@@ -93,6 +183,7 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
               <TableHead>Client</TableHead>
               <TableHead>Date & Time</TableHead>
               <TableHead>Contact</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="w-[80px]">Actions</TableHead>
             </TableRow>
@@ -100,7 +191,7 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
           <TableBody>
             {filteredAppointments.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   No appointments found.
                 </TableCell>
               </TableRow>
@@ -118,6 +209,21 @@ export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
                       <span className="text-sm">{appointment.client_email}</span>
                       <span className="text-xs text-muted-foreground">{appointment.client_phone}</span>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {appointment.appointment_type ? (
+                      <div className="flex items-center">
+                        {appointment.appointment_type.color && (
+                          <div
+                            className="w-2 h-2 rounded-full mr-2"
+                            style={{ backgroundColor: appointment.appointment_type.color }}
+                          />
+                        )}
+                        <span className="text-sm">{appointment.appointment_type.name}</span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Not specified</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <AppointmentStatusBadge status={appointment.status} />
