@@ -76,91 +76,100 @@ export function AppointmentsCalendarClient({
 
   return (
     <>
-      {/* Active filters display */}
-      {(activeTypeId || activeFieldName) && (
-        <div className="bg-muted/50 p-3 rounded-md flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Active filters:</span>
-            {activeTypeId && (
-              <div className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full flex items-center">
-                <span className="mr-1">Type:</span>
-                <span className="font-medium">
-                  {appointmentTypes.find(t => t.id === activeTypeId)?.name || 'Unknown Type'}
-                </span>
+      {/* Only show filters and search if there are appointments */}
+      {appointments.length > 0 ? (
+        <>
+          {/* Active filters display */}
+          {(activeTypeId || activeFieldName) && (
+            <div className="bg-indigo-50 p-4 rounded-md flex items-center justify-between mb-4 border border-indigo-100">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-indigo-700">Active filters:</span>
+                {activeTypeId && (
+                  <div className="bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-full flex items-center shadow-sm">
+                    <span className="mr-1">Type:</span>
+                    <span className="font-medium">
+                      {appointmentTypes.find(t => t.id === activeTypeId)?.name || 'Unknown Type'}
+                    </span>
+                  </div>
+                )}
+                {activeFieldName && (
+                  <div className="bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-full flex items-center shadow-sm">
+                    <span className="mr-1">Field:</span>
+                    <span className="font-medium">{activeFieldName}</span>
+                  </div>
+                )}
               </div>
-            )}
-            {activeFieldName && (
-              <div className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full flex items-center">
-                <span className="mr-1">Field:</span>
-                <span className="font-medium">{activeFieldName}</span>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
+                onClick={() => {
+                  window.location.href = '/dashboard/appointments';
+                }}
+              >
+                Clear Filters
+              </Button>
+            </div>
+          )}
+
+          {/* Search and filter controls */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-500" />
+              <Input
+                type="search"
+                placeholder="Search by client name, email, or phone..."
+                className="pl-10 h-10 border-indigo-200 focus-visible:ring-indigo-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            {appointmentTypes.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2 h-10 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">
+                    <Filter className="h-4 w-4" />
+                    Filter by Type
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="text-indigo-700">Appointment Types</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {appointmentTypes.map((type) => (
+                    <DropdownMenuItem
+                      key={type.id}
+                      className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
+                      onClick={() => {
+                        window.location.href = `/dashboard/appointments?type=${type.id}`;
+                      }}
+                    >
+                      <div className="flex items-center w-full">
+                        {type.color && (
+                          <div
+                            className="w-3 h-3 rounded-full mr-2"
+                            style={{ backgroundColor: type.color }}
+                          />
+                        )}
+                        <span>{type.name}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              window.location.href = '/dashboard/appointments';
-            }}
-          >
-            Clear Filters
-          </Button>
-        </div>
-      )}
 
-      {/* Search and filter controls */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search appointments..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        {appointmentTypes.length > 0 && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <Filter className="h-4 w-4" />
-                Filter by Type
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Appointment Types</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {appointmentTypes.map((type) => (
-                <DropdownMenuItem
-                  key={type.id}
-                  onClick={() => {
-                    window.location.href = `/dashboard/appointments?type=${type.id}`;
-                  }}
-                >
-                  <div className="flex items-center w-full">
-                    {type.color && (
-                      <div
-                        className="w-3 h-3 rounded-full mr-2"
-                        style={{ backgroundColor: type.color }}
-                      />
-                    )}
-                    <span>{type.name}</span>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-
-      {/* Show "No results" message when search returns empty */}
-      {filteredAppointments.length === 0 && searchQuery && (
-        <div className="bg-muted/50 p-4 rounded-md text-center my-4">
-          <p className="text-muted-foreground">No appointments match your search criteria.</p>
-        </div>
-      )}
+          {/* Show "No results" message when search returns empty */}
+          {filteredAppointments.length === 0 && searchQuery && (
+            <div className="bg-amber-50 p-6 rounded-md text-center my-6 border border-amber-200">
+              <Search className="h-8 w-8 text-amber-500 mx-auto mb-2" />
+              <h3 className="text-lg font-medium text-amber-800 mb-1">No matching appointments</h3>
+              <p className="text-amber-700">Try adjusting your search terms or clear filters to see more results.</p>
+            </div>
+          )}
+        </>
+      ) : null}
 
       <AppointmentsCalendar
         appointments={filteredAppointments}

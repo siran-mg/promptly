@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { CalendarClock, MoreHorizontal, Search, Share, Copy, Check, Loader2, Trash2, Eye } from "lucide-react";
+import { MoreHorizontal, Search, Share, Copy, Check, Loader2, Trash2, Eye, Plus, Filter } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 // No longer need supabase client as we're using the API endpoint
 import { Database } from "@/types/supabase";
 import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
 import { AppointmentDetailsDialog } from "./appointment-details-dialog";
+import { EmptyAppointmentsState } from "./empty-appointments-state";
 
 import {
   Table,
@@ -94,124 +95,128 @@ export function AppointmentsTable({
   // If no appointments, show empty state
   if (appointments.length === 0) {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle>No appointments yet</CardTitle>
-          <CardDescription>
-            When you book appointments, they will appear here.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center pb-6">
-          <CalendarClock className="h-16 w-16 text-muted-foreground" />
-        </CardContent>
-      </Card>
+      <EmptyAppointmentsState
+        onButtonClick={() => window.location.href = '/dashboard/appointments/new'}
+      />
     );
   }
 
   return (
     <div className="space-y-4">
-      {/* Active filters display */}
-      {(activeTypeId || activeFieldName) && (
-        <div className="bg-muted/50 p-3 rounded-md flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Active filters:</span>
-            {activeTypeId && (
-              <div className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full flex items-center">
-                <span className="mr-1">Type:</span>
-                <span className="font-medium">
-                  {appointmentTypes.find(t => t.id === activeTypeId)?.name || 'Unknown Type'}
-                </span>
+      {/* Only show filters and search if there are appointments */}
+      {appointments.length > 0 && (
+        <>
+          {/* Active filters display */}
+          {(activeTypeId || activeFieldName) && (
+            <div className="bg-indigo-50 p-4 rounded-md flex items-center justify-between mb-4 border border-indigo-100">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-indigo-700">Active filters:</span>
+                {activeTypeId && (
+                  <div className="bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-full flex items-center shadow-sm">
+                    <span className="mr-1">Type:</span>
+                    <span className="font-medium">
+                      {appointmentTypes.find(t => t.id === activeTypeId)?.name || 'Unknown Type'}
+                    </span>
+                  </div>
+                )}
+                {activeFieldName && (
+                  <div className="bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-full flex items-center shadow-sm">
+                    <span className="mr-1">Field:</span>
+                    <span className="font-medium">{activeFieldName}</span>
+                  </div>
+                )}
               </div>
-            )}
-            {activeFieldName && (
-              <div className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full flex items-center">
-                <span className="mr-1">Field:</span>
-                <span className="font-medium">{activeFieldName}</span>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
+                onClick={() => {
+                  // Use client-side navigation to clear filters
+                  window.location.href = '/dashboard/appointments';
+                }}
+              >
+                Clear Filters
+              </Button>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-500" />
+              <Input
+                type="search"
+                placeholder="Search by client name, email, or phone..."
+                className="pl-10 h-10 border-indigo-200 focus-visible:ring-indigo-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            {appointmentTypes.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2 h-10 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">
+                    <Filter className="h-4 w-4" />
+                    Filter by Type
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="text-indigo-700">Appointment Types</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {appointmentTypes.map((type) => (
+                    <DropdownMenuItem
+                      key={type.id}
+                      className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
+                      onClick={() => {
+                        window.location.href = `/dashboard/appointments?type=${type.id}`;
+                      }}
+                    >
+                      <div className="flex items-center w-full">
+                        {type.color && (
+                          <div
+                            className="w-3 h-3 rounded-full mr-2"
+                            style={{ backgroundColor: type.color }}
+                          />
+                        )}
+                        <span>{type.name}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              // Use client-side navigation to clear filters
-              window.location.href = '/dashboard/appointments';
-            }}
-          >
-            Clear Filters
-          </Button>
-        </div>
+        </>
       )}
 
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search appointments..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        {appointmentTypes.length > 0 && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Filter by Type
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Appointment Types</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {appointmentTypes.map((type) => (
-                <DropdownMenuItem
-                  key={type.id}
-                  onClick={() => {
-                    window.location.href = `/dashboard/appointments?type=${type.id}`;
-                  }}
-                >
-                  <div className="flex items-center w-full">
-                    {type.color && (
-                      <div
-                        className="w-3 h-3 rounded-full mr-2"
-                        style={{ backgroundColor: type.color }}
-                      />
-                    )}
-                    <span>{type.name}</span>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-
-      <div className="rounded-md border">
+      <div className="rounded-md border border-indigo-100 overflow-hidden shadow-sm">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-indigo-50">
             <TableRow>
-              <TableHead>Client</TableHead>
-              <TableHead>Date & Time</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+              <TableHead className="text-indigo-700 font-semibold">Client</TableHead>
+              <TableHead className="text-indigo-700 font-semibold">Date & Time</TableHead>
+              <TableHead className="text-indigo-700 font-semibold">Contact</TableHead>
+              <TableHead className="text-indigo-700 font-semibold">Type</TableHead>
+              <TableHead className="text-indigo-700 font-semibold">Status</TableHead>
+              <TableHead className="text-indigo-700 font-semibold w-[80px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredAppointmentsList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
-                  No appointments found.
+                  <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
+                    <Search className="h-8 w-8 mb-2 text-indigo-300" />
+                    <p>No appointments match your search criteria.</p>
+                    <p className="text-sm">Try adjusting your filters or search terms.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               filteredAppointmentsList.map((appointment) => (
                 <TableRow
                   key={appointment.id}
-                  className="cursor-pointer hover:bg-muted/50"
+                  className="cursor-pointer hover:bg-indigo-50/30 transition-colors"
                   onClick={() => {
                     setSelectedAppointment(appointment);
                     setIsDetailsDialogOpen(true);
@@ -221,7 +226,10 @@ export function AppointmentsTable({
                     {appointment.client_name}
                   </TableCell>
                   <TableCell>
-                    {format(new Date(appointment.date), "PPP p")}
+                    <div className="flex flex-col">
+                      <span className="font-medium text-indigo-700">{format(new Date(appointment.date), "EEE, MMM d")}</span>
+                      <span className="text-xs text-muted-foreground">{format(new Date(appointment.date), "h:mm a")}</span>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col">
@@ -234,11 +242,11 @@ export function AppointmentsTable({
                       <div className="flex items-center">
                         {appointment.appointment_type.color && (
                           <div
-                            className="w-2 h-2 rounded-full mr-2"
+                            className="w-3 h-3 rounded-full mr-2"
                             style={{ backgroundColor: appointment.appointment_type.color }}
                           />
                         )}
-                        <span className="text-sm">{appointment.appointment_type.name}</span>
+                        <span className="text-sm font-medium">{appointment.appointment_type.name}</span>
                       </div>
                     ) : (
                       <span className="text-xs text-muted-foreground">Not specified</span>
@@ -252,26 +260,28 @@ export function AppointmentsTable({
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 hover:bg-indigo-100 hover:text-indigo-700"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuLabel className="text-indigo-700">Appointment Actions</DropdownMenuLabel>
                         <DropdownMenuItem
+                          className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedAppointment(appointment);
                             setIsDetailsDialogOpen(true);
                           }}
                         >
-                          <Eye className="mr-2 h-4 w-4" />
-                          View details
+                          <Eye className="mr-2 h-4 w-4 text-indigo-600" />
+                          View Appointment Details
                         </DropdownMenuItem>
                         <DropdownMenuItem
+                          className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
                           onClick={async () => {
                             // First, check if the appointment has a share token
                             if (!appointment.share_token) {
@@ -333,13 +343,12 @@ export function AppointmentsTable({
                             }
                           }}
                         >
-                          <Share className="mr-2 h-4 w-4" />
-                          Share with client
+                          <Share className="mr-2 h-4 w-4 text-green-600" />
+                          Share with Client
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          className="text-destructive focus:text-destructive"
+                          className="text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             setAppointmentToDelete(appointment);
@@ -347,7 +356,7 @@ export function AppointmentsTable({
                           }}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete appointment
+                          Delete Appointment
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

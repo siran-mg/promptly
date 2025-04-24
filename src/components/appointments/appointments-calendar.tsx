@@ -10,13 +10,13 @@ import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import { useRouter } from "next/navigation";
 import { Database } from "@/types/supabase";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarClock, Plus, Trash2 } from "lucide-react";
+import { Plus, CalendarClock } from "lucide-react";
 import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
 import { AppointmentDetailsDialog } from "./appointment-details-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { EmptyAppointmentsState } from "./empty-appointments-state";
 import {
   Dialog,
   DialogContent,
@@ -151,19 +151,7 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
 
   // If no appointments, show empty state
   if (appointments.length === 0) {
-    return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle>No appointments yet</CardTitle>
-          <CardDescription>
-            When you book appointments, they will appear here.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center pb-6">
-          <CalendarClock className="h-16 w-16 text-muted-foreground" />
-        </CardContent>
-      </Card>
-    );
+    return <EmptyAppointmentsState onButtonClick={() => router.push('/dashboard/appointments/new')} />;
   }
 
   // Custom event component to show status and type
@@ -171,14 +159,14 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
     <div className="flex flex-col h-full">
       <div className="text-sm font-medium">{event.title}</div>
       <div className="text-xs mt-1 flex items-center gap-1">
-        {format(event.start, "p")}
+        <span className="font-medium">{format(event.start, "h:mm a")}</span>
         {event.typeColor && (
           <div className="flex items-center gap-1 ml-1">
             <div
-              className="w-2 h-2 rounded-full"
+              className="w-3 h-3 rounded-full"
               style={{ backgroundColor: event.typeColor }}
             />
-            <span className="text-xs opacity-90">{event.typeName}</span>
+            <span className="text-xs font-medium">{event.typeName}</span>
           </div>
         )}
       </div>
@@ -190,9 +178,12 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
             event.status === "cancelled" ? "destructive" :
             "outline"
           }
-          className="text-xs"
+          className="text-xs font-medium"
         >
-          {event.status}
+          {event.status === "scheduled" ? "Upcoming" :
+           event.status === "completed" ? "Completed" :
+           event.status === "cancelled" ? "Cancelled" :
+           event.status}
         </Badge>
       </div>
     </div>
@@ -200,14 +191,16 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
 
   return (
     <>
-      <div className="space-y-2">
-        <div className="flex items-center text-sm text-muted-foreground">
-          <div className="flex items-center mr-4">
-            <div className="w-3 h-3 rounded-full bg-primary mr-1.5 opacity-60"></div>
-            <span>Click any date to create a new appointment</span>
+      <div className="space-y-3">
+        <div className="flex items-center text-sm bg-indigo-50 p-3 rounded-md border border-indigo-100">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full bg-indigo-600 flex items-center justify-center">
+              <Plus className="h-3 w-3 text-white" />
+            </div>
+            <span className="text-indigo-700 font-medium">Click any date to create a new appointment</span>
           </div>
         </div>
-        <div className="h-[700px] bg-white rounded-md border">
+        <div className="h-[700px] bg-white rounded-md border border-indigo-100 shadow-sm overflow-hidden">
         <Calendar
           localizer={localizer}
           events={events}
@@ -224,6 +217,20 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
           selectable={true}
           components={{
             event: EventComponent,
+          }}
+          dayPropGetter={(date) => {
+            const today = new Date();
+            const isToday =
+              date.getDate() === today.getDate() &&
+              date.getMonth() === today.getMonth() &&
+              date.getFullYear() === today.getFullYear();
+
+            return {
+              style: isToday ? {
+                backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                borderTop: '2px solid #6366f1'
+              } : {}
+            };
           }}
         eventPropGetter={(event) => {
           // Use appointment type color if available, otherwise use status-based colors
@@ -265,22 +272,43 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
 
       {/* Create Appointment Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Create New Appointment</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <div className="bg-indigo-100 p-2 rounded-full">
+                <CalendarClock className="h-5 w-5 text-indigo-600" />
+              </div>
+              Schedule New Appointment
+            </DialogTitle>
+            <DialogDescription className="pt-2">
               {selectedSlot && (
-                <span>Create an appointment for {format(selectedSlot, "PPP")}?</span>
+                <div className="bg-indigo-50 p-3 rounded-md border border-indigo-100 mt-2 text-center">
+                  <span className="text-indigo-700 font-medium">
+                    {format(selectedSlot, "EEEE, MMMM d, yyyy")} at {format(selectedSlot, "h:mm a")}
+                  </span>
+                </div>
               )}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              You'll be able to select the appointment type and enter client details on the next screen.
+            </p>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+              className="border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+            >
               Cancel
             </Button>
-            <Button onClick={handleCreateAppointment} className="gap-2">
+            <Button
+              onClick={handleCreateAppointment}
+              className="gap-2 bg-indigo-600 hover:bg-indigo-700 transition-colors"
+            >
               <Plus className="h-4 w-4" />
-              Create Appointment
+              Continue to Details
             </Button>
           </DialogFooter>
         </DialogContent>
