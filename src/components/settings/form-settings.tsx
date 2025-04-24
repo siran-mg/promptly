@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import { Loader2, Upload, Share, Copy, Check, ExternalLink } from "lucide-react";
+import { Loader2, Upload, Share, ExternalLink } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -12,21 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { FormPreview } from "@/components/settings/form-preview";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ShareDialog } from "@/components/share/share-dialog";
 
 
 interface FormSettings {
@@ -46,9 +33,6 @@ export function FormSettings() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [shareToken, setShareToken] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [appointmentTypes, setAppointmentTypes] = useState<any[]>([]);
   const [formData, setFormData] = useState({
@@ -339,88 +323,21 @@ export function FormSettings() {
     );
   }
 
-  // Generate or get share token
-  const generateShareToken = async () => {
-    setIsGenerating(true);
-    try {
-      // Get user ID
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Check if a token already exists
-      const { data: existingToken } = await supabase
-        .from("form_share_tokens")
-        .select("token")
-        .eq("user_id", user.id)
-        .single();
-
-      if (existingToken?.token) {
-        setShareToken(existingToken.token);
-        setIsGenerating(false);
-        return;
-      }
-
-      // If no token exists, create one via the API
-      const response = await fetch('/api/form/share-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user.id }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        console.error('API error:', result.error);
-        toast({
-          title: 'Error',
-          description: result.error || 'Could not generate share link. Please try again.',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      setShareToken(result.shareToken.token);
-    } catch (err) {
-      console.error('Error generating share token:', err);
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  // Copy share link to clipboard
-  const copyToClipboard = () => {
-    if (shareToken) {
-      const link = `${window.location.origin}/book/${shareToken}`;
-      navigator.clipboard.writeText(link);
-      setCopied(true);
-      toast({
-        title: "Link copied",
-        description: "The booking form link has been copied to your clipboard.",
-      });
-      setTimeout(() => setCopied(false), 2000);
-    }
+  // Handle customize form button
+  const handleCustomizeForm = () => {
+    router.push('/dashboard/settings?tab=customize');
+    setIsShareDialogOpen(false);
   };
 
   // Open share dialog
-  const handleOpenShareDialog = async () => {
+  const handleOpenShareDialog = () => {
     setIsShareDialogOpen(true);
-    if (!shareToken) {
-      await generateShareToken();
-    }
   };
 
-  // Open form in new tab
+  // Open form in new tab - now handled by ShareDialog component
   const openFormInNewTab = () => {
-    if (shareToken) {
-      window.open(`${window.location.origin}/book/${shareToken}`, '_blank');
-    }
+    // This will be handled by the ShareDialog component
+    setIsShareDialogOpen(true);
   };
 
   return (
@@ -653,76 +570,12 @@ export function FormSettings() {
         </Card>
       </TabsContent>
 
-      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Share Booking Form</DialogTitle>
-            <DialogDescription>
-              Share this link with your clients to let them book appointments with you.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="grid flex-1 gap-2">
-                <label htmlFor="link" className="sr-only">
-                  Link
-                </label>
-                <Input
-                  id="link"
-                  value={shareToken ? `${window.location.origin}/book/${shareToken}` : 'Generating link...'}
-                  readOnly
-                />
-              </div>
-              <Button
-                size="icon"
-                onClick={copyToClipboard}
-                disabled={!shareToken || isGenerating}
-              >
-                {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> :
-                 copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              This link allows clients to book appointments directly with you. You can share it on your website, social media, or via email.
-            </p>
-
-            {/* Add section for appointment type-specific links */}
-            <div className="border-t pt-4 mt-4">
-              <h4 className="text-sm font-medium mb-2">Appointment Type-Specific Links</h4>
-              <p className="text-sm text-muted-foreground mb-4">
-                You can also share links for specific appointment types. These links will pre-select the appointment type for your clients.
-              </p>
-
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Select
-                    onValueChange={(value) => {
-                      if (shareToken) {
-                        navigator.clipboard.writeText(`${window.location.origin}/book/${shareToken}?type=${value}`);
-                        toast({
-                          title: "Link copied",
-                          description: "The type-specific booking link has been copied to your clipboard.",
-                        });
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select an appointment type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {appointmentTypes.map((type) => (
-                        <SelectItem key={type.id} value={type.id}>
-                          {type.name} ({type.duration} min)
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ShareDialog
+        open={isShareDialogOpen}
+        onOpenChange={setIsShareDialogOpen}
+        appointmentTypes={appointmentTypes}
+        onCustomizeForm={handleCustomizeForm}
+      />
     </Tabs>
   );
 }

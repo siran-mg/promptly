@@ -31,8 +31,29 @@ export default async function BookAppointmentPage({
       .eq("token", token)
       .single();
 
-    if (error || !shareToken) {
+    if (error) {
       console.error("Error fetching share token:", error);
+
+      // Check if the error is because the token doesn't exist
+      if (error.code === 'PGRST116') {
+        console.error("Share token not found. This could be due to RLS policies or the token doesn't exist.");
+
+        // Let's try to check if the token exists without RLS
+        const { count, error: countError } = await supabase
+          .rpc('check_token_exists', { token_param: token });
+
+        if (countError) {
+          console.error("Error checking if token exists:", countError);
+        } else {
+          console.log(`Token exists check result: ${count} records found`);
+        }
+      }
+
+      return notFound();
+    }
+
+    if (!shareToken) {
+      console.error("Share token data is null");
       return notFound();
     }
 
