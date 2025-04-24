@@ -11,7 +11,8 @@ import enUS from "date-fns/locale/en-US";
 import { useRouter } from "next/navigation";
 import { Database } from "@/types/supabase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarClock, Plus } from "lucide-react";
+import { CalendarClock, Plus, MoreHorizontal, Trash2 } from "lucide-react";
+import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -88,6 +89,8 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
   const [date, setDate] = useState(new Date());
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
+  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Convert appointments to calendar events
   const events: CalendarEvent[] = appointments.map((appointment) => {
@@ -116,6 +119,7 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
 
   // Handle event selection
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
+    // Show a toast with appointment details
     toast({
       title: `Appointment with ${event.title}`,
       description: (
@@ -131,10 +135,25 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
             )}
           </div>
           <div>Status: {event.status}</div>
+          <div className="flex gap-2 mt-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-destructive border-destructive/30 hover:bg-destructive/10"
+              onClick={(e) => {
+                e.stopPropagation();
+                setAppointmentToDelete(event.resource);
+                setIsDeleteDialogOpen(true);
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1" />
+              Delete
+            </Button>
+          </div>
         </div>
       ),
     });
-  }, [toast]);
+  }, [toast, setAppointmentToDelete, setIsDeleteDialogOpen]);
 
   // Handle slot selection (clicking on a date)
   const handleSelectSlot = useCallback((slotInfo: SlotInfo) => {
@@ -287,6 +306,18 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Appointment Dialog */}
+      <DeleteAppointmentDialog
+        appointment={appointmentToDelete}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onDeleteSuccess={() => {
+          // We don't need to update the local state here as the page will refresh
+          // when navigating back to it, fetching the latest data from the server
+          window.location.reload();
+        }}
+      />
     </>
   );
 }

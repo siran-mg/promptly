@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { CalendarClock, MoreHorizontal, Search, Share, Copy, Check, Loader2 } from "lucide-react";
+import { CalendarClock, MoreHorizontal, Search, Share, Copy, Check, Loader2, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 // No longer need supabase client as we're using the API endpoint
 import { Database } from "@/types/supabase";
+import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
 
 import {
   Table,
@@ -61,12 +62,14 @@ export function AppointmentsTable({
   activeTypeId,
   activeFieldName
 }: AppointmentsTableProps) {
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
+  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Filter appointments based on search query
   const filteredAppointments = appointments.filter((appointment) => {
@@ -307,6 +310,17 @@ export function AppointmentsTable({
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>Mark as completed</DropdownMenuItem>
                         <DropdownMenuItem>Cancel appointment</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => {
+                            setAppointmentToDelete(appointment);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete appointment
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -370,6 +384,18 @@ export function AppointmentsTable({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Appointment Dialog */}
+      <DeleteAppointmentDialog
+        appointment={appointmentToDelete}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onDeleteSuccess={() => {
+          // We don't need to update the local state here as the page will refresh
+          // when navigating back to it, fetching the latest data from the server
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }
