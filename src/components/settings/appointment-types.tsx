@@ -4,7 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Plus, Pencil, Trash2, Check, X, Star, StarOff, Clock } from "lucide-react";
+import {
+  Loader2, Plus, Pencil, Trash2, Check, Star, Clock,
+  Calendar, Settings, FileText, Palette, CheckCircle, AlertCircle, Info,
+  Edit, Eye
+} from "lucide-react";
+import { PrimaryActionButton } from "@/components/ui/primary-action-button";
 import { Database } from "@/types/supabase";
 import {
   Select,
@@ -533,88 +538,118 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 p-6 bg-indigo-50/50 rounded-lg border border-indigo-100">
         <div>
-          <h3 className="text-lg font-medium">Appointment Types</h3>
-          <p className="text-sm text-muted-foreground">
-            Create and manage different types of appointments with custom durations and fields.
+          <h3 className="text-xl font-medium flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-indigo-600" />
+            Appointment Types
+          </h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            Create and manage different types of appointments with custom durations and fields
           </p>
         </div>
-        <Button onClick={handleAddNew}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Type
-        </Button>
+        <PrimaryActionButton
+          onClick={handleAddNew}
+          icon={Plus}
+          variant="indigo"
+        >
+          Add Appointment Type
+        </PrimaryActionButton>
       </div>
 
       {appointmentTypes.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center h-40">
-            <p className="text-muted-foreground mb-4">No appointment types found.</p>
-            <div className="flex gap-3">
-              <Button onClick={handleAddNew}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Custom Appointment Type
-              </Button>
+        <Card className="border-indigo-100 overflow-hidden">
+          <div className="h-1 bg-indigo-600"></div>
+          <CardContent className="flex flex-col items-center justify-center py-12 px-6">
+            <Calendar className="h-16 w-16 text-indigo-200 mb-4" />
+            <h3 className="text-lg font-medium mb-2">No appointment types yet</h3>
+            <p className="text-muted-foreground mb-6 text-center max-w-md">
+              Appointment types help you organize your schedule and collect the right information from clients.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <PrimaryActionButton
+                onClick={handleAddNew}
+                icon={Plus}
+                variant="indigo"
+              >
+                Create Custom Type
+              </PrimaryActionButton>
               <Button
                 variant="outline"
                 onClick={async () => {
                   const { data: { user } } = await supabase.auth.getUser();
                   if (user) createDefaultAppointmentType(user.id);
                 }}
+                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 gap-2"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4" />
                 Use Standard Template
               </Button>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="border-indigo-100 overflow-hidden">
+          <div className="h-1 bg-indigo-600"></div>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Settings className="h-5 w-5 text-indigo-600" />
+              Manage Your Appointment Types
+            </CardTitle>
+            <CardDescription className="text-base">
+              Click on a type to manage its custom fields and form settings
+            </CardDescription>
+          </CardHeader>
           <CardContent className="p-0">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-indigo-50/50">
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead>Default</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="font-medium">Name</TableHead>
+                  <TableHead className="font-medium">Duration</TableHead>
+                  <TableHead className="font-medium">Default</TableHead>
+                  <TableHead className="text-right font-medium">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {appointmentTypes.map((type) => (
                   <TableRow
                     key={type.id}
-                    className="cursor-pointer hover:bg-muted/50 group relative transition-colors"
+                    className="cursor-pointer hover:bg-indigo-50/30 group relative transition-colors"
                     onClick={() => onSelectType ? onSelectType(type.id) : router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}`)}
                     title="Click to manage custom fields and form settings"
                   >
                     <TableCell className="font-medium">
-                      <div className="flex items-center">
-                        {type.color && (
-                          <div
-                            className="w-3 h-3 rounded-full mr-2"
-                            style={{ backgroundColor: type.color }}
-                          />
-                        )}
-                        <div>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-4 h-4 rounded-full border border-indigo-100 flex-shrink-0"
+                          style={{ backgroundColor: type.color || '#6366f1' }}
+                        ></div>
+                        <div className="flex flex-col">
                           <div className="flex items-center">
-                            {type.name}
-                            <span className="ml-2 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              (Click to manage custom fields and form settings)
+                            <span>{type.name}</span>
+                            <span className="ml-2 text-xs text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              (Click to manage)
                             </span>
                           </div>
                           {type.description && (
-                            <div className="text-xs text-muted-foreground">{type.description}</div>
+                            <span className="text-xs text-muted-foreground truncate max-w-[200px]">
+                              {type.description}
+                            </span>
                           )}
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{type.duration} minutes</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-indigo-600" />
+                        {type.duration} minutes
+                      </div>
+                    </TableCell>
                     <TableCell>
                       {type.is_default ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                          <Check className="h-3 w-3 mr-1" />
-                          Default
+                        <span className="flex items-center text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md text-sm">
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Default Type
                         </span>
                       ) : (
                         <Button
@@ -624,7 +659,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                             e.stopPropagation(); // Prevent row click event
                             handleSetDefault(type);
                           }}
-                          className="h-7 text-xs"
+                          className="h-7 text-xs hover:bg-indigo-50 hover:text-indigo-700"
                         >
                           <Star className="h-3 w-3 mr-1" />
                           Set as default
@@ -640,17 +675,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                             e.stopPropagation(); // Prevent row click event
                             router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}&view=form`);
                           }}
-                          className="h-8 w-8 p-0 relative group"
+                          className="h-8 w-8 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
                           title="Customize form settings for this appointment type"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z"></path>
-                            <path d="M18 14H4"></path>
-                            <path d="M14 18v4"></path>
-                            <path d="M8 6h.01"></path>
-                            <path d="M12 6h.01"></path>
-                            <path d="M16 6h.01"></path>
-                          </svg>
+                          <FileText className="h-4 w-4" />
                           <span className="sr-only">Form Settings</span>
                         </Button>
                         <Button
@@ -660,7 +688,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                             e.stopPropagation(); // Prevent row click event
                             handleEdit(type);
                           }}
-                          className="h-8 w-8 p-0 relative group"
+                          className="h-8 w-8 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
                           title="Edit appointment type"
                         >
                           <Pencil className="h-4 w-4" />
@@ -673,7 +701,9 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                             e.stopPropagation(); // Prevent row click event
                             handleDeleteClick(type);
                           }}
-                          className="h-8 w-8 p-0 relative group"
+                          className={`h-8 w-8 p-0 ${type.is_default
+                            ? 'text-gray-400 cursor-not-allowed'
+                            : 'text-red-500 hover:text-red-700 hover:bg-red-50'}`}
                           disabled={type.is_default}
                           title={type.is_default ? "Cannot delete default type" : "Delete appointment type"}
                         >
@@ -692,16 +722,29 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
 
       {/* Dialog for adding/editing appointment types */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>
-              {editingType
-                ? editingType.is_default
-                  ? "Edit Default Appointment Type"
-                  : "Edit Appointment Type"
-                : "Add Appointment Type"}
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              {editingType ? (
+                editingType.is_default ? (
+                  <>
+                    <CheckCircle className="h-5 w-5 text-indigo-600" />
+                    Edit Default Appointment Type
+                  </>
+                ) : (
+                  <>
+                    <Edit className="h-5 w-5 text-indigo-600" />
+                    Edit Appointment Type
+                  </>
+                )
+              ) : (
+                <>
+                  <Plus className="h-5 w-5 text-indigo-600" />
+                  Add Appointment Type
+                </>
+              )}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-base">
               {editingType
                 ? editingType.is_default
                   ? "Customize your default appointment type. This is the type that will be selected automatically when creating new appointments."
@@ -714,145 +757,191 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="e.g., Initial Consultation"
-                      required
-                      className={editingType?.is_default && formData.name === "Standard Appointment" ? "border-destructive" : ""}
-                    />
+                    <Label htmlFor="name" className="text-sm font-medium">Appointment Type Name</Label>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
+                      <Input
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="e.g., Initial Consultation"
+                        required
+                        className={`pl-10 border-indigo-200 focus-visible:ring-indigo-500 ${editingType?.is_default && formData.name === "Standard Appointment" ? "border-destructive" : ""}`}
+                      />
+                    </div>
                     {editingType?.is_default && formData.name === "Standard Appointment" && (
-                      <p className="text-xs text-destructive mt-1">
+                      <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
                         Please personalize the default appointment type name for your business.
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description (Optional)</Label>
-                    <Textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      placeholder="Describe what this appointment type is for"
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="duration">Duration (minutes)</Label>
-                    <Input
-                      id="duration"
-                      name="duration"
-                      type="number"
-                      min="5"
-                      max="480"
-                      step="5"
-                      value={formData.duration}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="color">Color</Label>
-                    <div className="flex items-center gap-4">
-                      <Input
-                        id="color"
-                        name="color"
-                        type="color"
-                        value={formData.color}
+                    <Label htmlFor="description" className="text-sm font-medium">Description (Optional)</Label>
+                    <div className="relative">
+                      <FileText className="absolute left-3 top-3 h-4 w-4 text-indigo-600" />
+                      <Textarea
+                        id="description"
+                        name="description"
+                        value={formData.description}
                         onChange={handleChange}
-                        className="w-16 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        id="color_text"
-                        name="color"
-                        type="text"
-                        value={formData.color}
-                        onChange={handleChange}
-                        placeholder="#6366f1"
-                        className="flex-1"
+                        placeholder="Describe what this appointment type is for"
+                        rows={3}
+                        className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                       />
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      This description will be visible to clients when booking appointments
+                    </p>
                   </div>
 
-                  <div className="flex items-center space-x-2 pt-2">
-                    <input
-                      type="checkbox"
-                      id="is_default"
-                      checked={formData.is_default}
-                      onChange={(e) => handleCheckboxChange("is_default", e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                    />
-                    <Label htmlFor="is_default" className="text-sm font-medium">
-                      Set as default appointment type
-                    </Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="duration" className="text-sm font-medium">Duration (minutes)</Label>
+                    <div className="relative">
+                      <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
+                      <Input
+                        id="duration"
+                        name="duration"
+                        type="number"
+                        min="5"
+                        max="480"
+                        step="5"
+                        value={formData.duration}
+                        onChange={handleChange}
+                        required
+                        className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      How long this appointment type typically lasts
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="color" className="text-sm font-medium">Color</Label>
+                    <div className="flex items-center gap-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                      <div
+                        className="w-12 h-12 rounded-full border-4 border-white shadow-sm flex-shrink-0"
+                        style={{ backgroundColor: formData.color }}
+                      ></div>
+                      <div className="flex-1 space-y-4">
+                        <div className="flex items-center gap-4 w-full">
+                          <Input
+                            id="color"
+                            name="color"
+                            type="color"
+                            value={formData.color}
+                            onChange={handleChange}
+                            className="w-16 h-10 p-1 cursor-pointer"
+                          />
+                          <div className="relative flex-1">
+                            <Palette className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
+                            <Input
+                              id="color_text"
+                              name="color"
+                              type="text"
+                              value={formData.color}
+                              onChange={handleChange}
+                              placeholder="#6366f1"
+                              className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      This color will be used to identify this appointment type throughout the application
+                    </p>
+                  </div>
+
+                  <div className="flex items-center space-x-2 pt-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="is_default"
+                        checked={formData.is_default}
+                        onChange={(e) => handleCheckboxChange("is_default", e.target.checked)}
+                        className="h-4 w-4 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <Label htmlFor="is_default" className="text-sm font-medium">
+                        Set as default appointment type
+                      </Label>
+                    </div>
+                    <div className="relative group">
+                      <Info className="h-4 w-4 text-indigo-400 cursor-help" />
+                      <div className="absolute left-0 -top-8 w-48 p-2 bg-black text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                        This type will be pre-selected when clients book appointments
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Preview section */}
-                <div className="border rounded-md p-4 space-y-4">
-                  <h4 className="text-sm font-medium">Preview</h4>
-                  <div className="border rounded-md p-3 bg-card">
-                    <div className="flex items-center space-x-3">
-                      {formData.color && (
+                <div className="border border-indigo-100 rounded-lg overflow-hidden">
+                  <div className="bg-indigo-50 p-3 border-b border-indigo-100">
+                    <h4 className="font-medium flex items-center gap-2 text-indigo-700">
+                      <Eye className="h-4 w-4" />
+                      Preview
+                    </h4>
+                  </div>
+                  <div className="p-6 space-y-6">
+                    <div className="border rounded-lg p-4 bg-white shadow-sm">
+                      <div className="flex items-center gap-4">
                         <div
-                          className="w-4 h-4 rounded-full"
+                          className="w-10 h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0"
                           style={{ backgroundColor: formData.color }}
-                        />
-                      )}
-                      <div>
-                        <div className="font-medium">{formData.name || "Appointment Type"}</div>
-                        {formData.description && (
-                          <div className="text-sm text-muted-foreground">{formData.description}</div>
-                        )}
-                        <div className="text-xs text-muted-foreground flex items-center mt-1">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {formData.duration || 60} minutes
+                        ></div>
+                        <div>
+                          <div className="font-medium text-lg">{formData.name || "Appointment Type"}</div>
+                          {formData.description && (
+                            <div className="text-sm text-muted-foreground">{formData.description}</div>
+                          )}
+                          <div className="text-xs text-muted-foreground flex items-center mt-1">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {formData.duration || 60} minutes
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="text-xs text-muted-foreground mt-2">
-                    This is how your appointment type will appear to clients in the booking form.
-                  </div>
-
-                  {formData.is_default && (
-                    <div className="mt-4 text-xs bg-primary/10 text-primary p-2 rounded-md">
-                      <div className="font-medium">Default Appointment Type</div>
-                      <p>This type will be pre-selected when clients book appointments.</p>
+                    <div className="text-sm text-muted-foreground">
+                      This is how your appointment type will appear to clients in the booking form
                     </div>
-                  )}
+
+                    {formData.is_default && (
+                      <div className="bg-indigo-50 text-indigo-700 p-3 rounded-md flex items-start gap-2">
+                        <CheckCircle className="h-5 w-5 text-indigo-600 mt-0.5" />
+                        <div>
+                          <div className="font-medium">Default Appointment Type</div>
+                          <p className="text-sm">This type will be pre-selected when clients book appointments</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-            <DialogFooter className="pt-4">
+            <DialogFooter className="pt-6 border-t mt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsDialogOpen(false)}
                 disabled={isSaving}
+                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Saving...
-                  </>
-                ) : editingType ? (
-                  "Update"
-                ) : (
-                  "Create"
-                )}
-              </Button>
+              <PrimaryActionButton
+                type="submit"
+                disabled={isSaving}
+                isLoading={isSaving}
+                loadingText="Saving..."
+                variant="indigo"
+              >
+                {editingType ? "Update Appointment Type" : "Create Appointment Type"}
+              </PrimaryActionButton>
             </DialogFooter>
           </form>
         </DialogContent>
