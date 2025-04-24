@@ -358,6 +358,55 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      },
+      form_settings_per_type: {
+        Row: {
+          id: string
+          user_id: string
+          appointment_type_id: string
+          form_title: string | null
+          form_description: string | null
+          logo_url: string | null
+          accent_color: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          appointment_type_id: string
+          form_title?: string | null
+          form_description?: string | null
+          logo_url?: string | null
+          accent_color?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          appointment_type_id?: string
+          form_title?: string | null
+          form_description?: string | null
+          logo_url?: string | null
+          accent_color?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_settings_per_type_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_settings_per_type_appointment_type_id_fkey"
+            columns: ["appointment_type_id"]
+            referencedRelation: "appointment_types"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

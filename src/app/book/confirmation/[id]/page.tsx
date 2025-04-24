@@ -34,17 +34,36 @@ export default async function AppointmentConfirmationPage({
     }
 
     // Get the form settings for the user who owns this appointment
-    const { data: formSettings } = await supabase
-      .from("form_settings")
-      .select("*")
-      .eq("user_id", appointment.user_id)
-      .single();
+    let settings;
 
-    // Use default settings if none found
-    const settings = formSettings || {
-      logo_url: null,
-      accent_color: "#6366f1"
-    };
+    // If the appointment has a type, check for type-specific settings
+    if (appointment.appointment_type_id) {
+      const { data: typeSettings } = await supabase
+        .from("form_settings_per_type")
+        .select("*")
+        .eq("user_id", appointment.user_id)
+        .eq("appointment_type_id", appointment.appointment_type_id)
+        .single();
+
+      if (typeSettings) {
+        settings = typeSettings;
+      }
+    }
+
+    // If no type-specific settings, use global settings
+    if (!settings) {
+      const { data: formSettings } = await supabase
+        .from("form_settings")
+        .select("*")
+        .eq("user_id", appointment.user_id)
+        .single();
+
+      // Use default settings if none found
+      settings = formSettings || {
+        logo_url: null,
+        accent_color: "#6366f1"
+      };
+    }
 
     console.log('Form settings:', settings);
 

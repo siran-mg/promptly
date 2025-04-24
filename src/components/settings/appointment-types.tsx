@@ -681,8 +681,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                   <TableRow
                     key={type.id}
                     className="cursor-pointer hover:bg-muted/50 group relative transition-colors"
-                    onClick={() => onSelectType ? onSelectType(type.id) : router.push(`/dashboard/settings/appointment-types/${type.id}/fields`)}
-                    title="Click to manage custom fields"
+                    onClick={() => onSelectType ? onSelectType(type.id) : router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}`)}
+                    title="Click to manage custom fields and form settings"
                   >
                     <TableCell className="font-medium">
                       <div className="flex items-center">
@@ -696,7 +696,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                           <div className="flex items-center">
                             {type.name}
                             <span className="ml-2 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              (Click to manage custom fields)
+                              (Click to manage custom fields and form settings)
                             </span>
                           </div>
                           {type.description && (
@@ -729,6 +729,26 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent row click event
+                            router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}&view=form`);
+                          }}
+                          className="h-8 w-8 p-0 relative group"
+                          title="Customize form settings for this appointment type"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z"></path>
+                            <path d="M18 14H4"></path>
+                            <path d="M14 18v4"></path>
+                            <path d="M8 6h.01"></path>
+                            <path d="M12 6h.01"></path>
+                            <path d="M16 6h.01"></path>
+                          </svg>
+                          <span className="sr-only">Form Settings</span>
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"

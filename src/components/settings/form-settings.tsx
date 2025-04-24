@@ -12,6 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FormPreview } from "@/components/settings/form-preview";
 import {
   Dialog,
@@ -43,6 +50,7 @@ export function FormSettings() {
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [appointmentTypes, setAppointmentTypes] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     form_title: "",
     form_description: "",
@@ -50,9 +58,9 @@ export function FormSettings() {
     accent_color: "#6366f1",
   });
 
-  // Fetch form settings
+  // Fetch form settings and appointment types
   useEffect(() => {
-    const fetchSettings = async () => {
+    const fetchData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -61,36 +69,50 @@ export function FormSettings() {
           return;
         }
 
+        // Fetch form settings
         const { data, error } = await supabase
           .from("form_settings")
           .select("*")
           .eq("user_id", user.id)
           .single();
 
-        if (error) {
+        if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
           console.error("Error fetching form settings:", error);
           toast({
             title: "Error",
             description: "Could not load form settings. Please try again.",
             variant: "destructive",
           });
-          return;
+        } else if (data) {
+          setFormData({
+            form_title: data.form_title || "Book an Appointment",
+            form_description: data.form_description || "Fill out the form below to schedule your appointment.",
+            logo_url: data.logo_url || "",
+            accent_color: data.accent_color || "#6366f1",
+          });
         }
 
-        setFormData({
-          form_title: data.form_title || "Book an Appointment",
-          form_description: data.form_description || "Fill out the form below to schedule your appointment.",
-          logo_url: data.logo_url || "",
-          accent_color: data.accent_color || "#6366f1",
-        });
+        // Fetch appointment types in the same effect
+        const { data: typesData, error: typesError } = await supabase
+          .from("appointment_types")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("is_default", { ascending: false })
+          .order("name");
+
+        if (typesError) {
+          console.error("Error fetching appointment types:", typesError);
+        } else {
+          setAppointmentTypes(typesData || []);
+        }
       } catch (err) {
-        console.error("Error in fetchSettings:", err);
+        console.error("Error in fetchData:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchSettings();
+    fetchData();
   }, [router, supabase, toast]);
 
   // Handle form input changes
@@ -213,20 +235,54 @@ export function FormSettings() {
     e.preventDefault();
     setIsSaving(true);
 
+    console.log("Submitting global form settings:", formData);
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { error } = await supabase
+      // First check if a record already exists
+      const { data: existingRecord, error: checkError } = await supabase
         .from("form_settings")
-        .update({
-          form_title: formData.form_title,
-          form_description: formData.form_description,
-          logo_url: formData.logo_url,
-          accent_color: formData.accent_color,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", user.id);
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        console.error("Error checking existing record:", checkError);
+        // Continue anyway, we'll try the upsert
+      }
+
+      // Prepare the data to save
+      const formSettingsData = {
+        form_title: formData.form_title,
+        form_description: formData.form_description,
+        logo_url: formData.logo_url,
+        accent_color: formData.accent_color,
+        updated_at: new Date().toISOString(),
+      };
+
+      let error;
+
+      if (existingRecord) {
+        // If record exists, update it
+        const { error: updateError } = await supabase
+          .from("form_settings")
+          .update(formSettingsData)
+          .eq("id", existingRecord.id);
+
+        error = updateError;
+      } else {
+        // Otherwise insert a new record
+        const { error: insertError } = await supabase
+          .from("form_settings")
+          .insert({
+            ...formSettingsData,
+            user_id: user.id
+          });
+
+        error = insertError;
+      }
 
       if (error) {
         throw error;
@@ -252,11 +308,22 @@ export function FormSettings() {
           accent_color: data.accent_color || "#6366f1",
         });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error saving form settings:", err);
+
+      // Provide more specific error messages
+      let errorMessage = "Could not save form settings. Please try again.";
+
+      // Check for specific error codes or messages
+      if (err?.code === "23505") {
+        errorMessage = "A record with this user already exists. Try refreshing the page.";
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+
       toast({
         title: "Save failed",
-        description: "Could not save form settings. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -555,6 +622,35 @@ export function FormSettings() {
             </Button>
           </CardFooter>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Type-Specific Form Settings</CardTitle>
+            <CardDescription>
+              You can customize form settings for each appointment type separately.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              The settings on this page are global and will be used for all appointment types by default.
+              However, you can override these settings for specific appointment types.
+            </p>
+            <div className="flex items-center justify-between border p-4 rounded-md bg-muted/50">
+              <div>
+                <h4 className="font-medium">Customize per appointment type</h4>
+                <p className="text-sm text-muted-foreground">
+                  Create custom form settings for each appointment type
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard/settings/appointment-types")}
+              >
+                Manage Appointment Types
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </TabsContent>
 
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
@@ -586,9 +682,44 @@ export function FormSettings() {
                  copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-4">
               This link allows clients to book appointments directly with you. You can share it on your website, social media, or via email.
             </p>
+
+            {/* Add section for appointment type-specific links */}
+            <div className="border-t pt-4 mt-4">
+              <h4 className="text-sm font-medium mb-2">Appointment Type-Specific Links</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                You can also share links for specific appointment types. These links will pre-select the appointment type for your clients.
+              </p>
+
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Select
+                    onValueChange={(value) => {
+                      if (shareToken) {
+                        navigator.clipboard.writeText(`${window.location.origin}/book/${shareToken}?type=${value}`);
+                        toast({
+                          title: "Link copied",
+                          description: "The type-specific booking link has been copied to your clipboard.",
+                        });
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select an appointment type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {appointmentTypes.map((type) => (
+                        <SelectItem key={type.id} value={type.id}>
+                          {type.name} ({type.duration} min)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

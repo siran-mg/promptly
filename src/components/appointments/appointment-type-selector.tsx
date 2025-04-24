@@ -39,6 +39,8 @@ export function AppointmentTypeSelector({
   const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
   const supabase = createClient();
 
+  console.log('AppointmentTypeSelector initialized with:', { value, userId });
+
   useEffect(() => {
     const fetchAppointmentTypes = async () => {
       setIsLoading(true);
@@ -57,10 +59,19 @@ export function AppointmentTypeSelector({
 
         setAppointmentTypes(data || []);
 
+        console.log('Fetched appointment types:', data);
+        console.log('Current value:', value);
+
         // If no value is selected and we have types, select the default one
         if (!value && data && data.length > 0) {
           const defaultType = data.find(type => type.is_default) || data[0];
+          console.log('Setting default appointment type:', defaultType);
           onChange(defaultType.id);
+        } else if (value) {
+          console.log('Using provided appointment type value:', value);
+          // Verify that the value exists in the fetched types
+          const typeExists = data?.some(type => type.id === value);
+          console.log('Type exists in fetched data:', typeExists);
         }
       } catch (err) {
         console.error("Error in fetchAppointmentTypes:", err);

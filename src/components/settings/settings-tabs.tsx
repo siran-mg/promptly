@@ -8,7 +8,10 @@ import { useEffect, useState } from "react";
 import { AppointmentTypes } from "./appointment-types";
 import { CustomFieldsManager } from "./custom-fields-manager";
 import { Button } from "@/components/ui/button";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { AppointmentTypeFieldsClient } from "./appointment-type-fields-client";
+import { AppointmentTypeFormClient } from "./appointment-type-form-client";
+import { Database } from "@/types/supabase";
 
 interface SettingsTabsProps {
   profileSettings: React.ReactNode;
@@ -19,7 +22,10 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
   const [userId, setUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("profile");
   const [selectedAppointmentTypeId, setSelectedAppointmentTypeId] = useState<string | null>(null);
+  const [selectedView, setSelectedView] = useState<string | null>(null);
+  const [appointmentType, setAppointmentType] = useState<Database["public"]["Tables"]["appointment_types"]["Row"] | null>(null);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
@@ -33,6 +39,35 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
     getUserId();
   }, [supabase]);
 
+  // Fetch appointment type when ID changes
+  useEffect(() => {
+    const fetchAppointmentType = async () => {
+      if (!selectedAppointmentTypeId) {
+        setAppointmentType(null);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("appointment_types")
+          .select("*")
+          .eq("id", selectedAppointmentTypeId)
+          .single();
+
+        if (error) {
+          console.error("Error fetching appointment type:", error);
+          return;
+        }
+
+        setAppointmentType(data);
+      } catch (err) {
+        console.error("Error in fetchAppointmentType:", err);
+      }
+    };
+
+    fetchAppointmentType();
+  }, [selectedAppointmentTypeId, supabase]);
+
   // Check for tab parameter in URL
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -45,6 +80,13 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
       setSelectedAppointmentTypeId(appointmentTypeId);
     } else {
       setSelectedAppointmentTypeId(null);
+    }
+
+    const view = searchParams.get('view');
+    if (view === 'fields' || view === 'form') {
+      setSelectedView(view);
+    } else {
+      setSelectedView(null);
     }
   }, [searchParams]);
 
@@ -91,24 +133,40 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
       </TabsContent>
 
       <TabsContent value="appointment-types" className="space-y-6">
-        {selectedAppointmentTypeId ? (
+        {selectedAppointmentTypeId && appointmentType ? (
           <div className="space-y-6">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="mr-2"
-                onClick={() => setSelectedAppointmentTypeId(null)}
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Back to Types
-              </Button>
-            </div>
-            <CustomFieldsManager appointmentTypeId={selectedAppointmentTypeId} />
+            {selectedView === 'fields' ? (
+              <AppointmentTypeFieldsClient
+                appointmentTypeId={selectedAppointmentTypeId}
+                appointmentTypeName={appointmentType.name}
+                onBack={() => {
+                  router.push("/dashboard/settings?tab=appointment-types");
+                }}
+              />
+            ) : selectedView === 'form' ? (
+              <AppointmentTypeFormClient
+                appointmentTypeId={selectedAppointmentTypeId}
+                appointmentType={appointmentType}
+                onBack={() => {
+                  router.push("/dashboard/settings?tab=appointment-types");
+                }}
+              />
+            ) : (
+              // Default to fields view when no specific view is selected
+              <AppointmentTypeFieldsClient
+                appointmentTypeId={selectedAppointmentTypeId}
+                appointmentTypeName={appointmentType.name}
+                onBack={() => {
+                  router.push("/dashboard/settings?tab=appointment-types");
+                }}
+              />
+            )}
           </div>
         ) : (
           <AppointmentTypes
-            onSelectType={(typeId) => setSelectedAppointmentTypeId(typeId)}
+            onSelectType={(typeId) => {
+              router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${typeId}`);
+            }}
           />
         )}
       </TabsContent>

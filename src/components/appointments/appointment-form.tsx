@@ -28,12 +28,21 @@ import { cn } from "@/lib/utils";
 interface AppointmentFormProps {
   userId: string;
   accentColor?: string;
+  defaultTypeId?: string | null;
+  onAppointmentTypeChange?: (typeId: string) => void;
 }
 
-export function AppointmentForm({ userId, accentColor = "#6366f1" }: AppointmentFormProps) {
+export function AppointmentForm({
+  userId,
+  accentColor = "#6366f1",
+  defaultTypeId = null,
+  onAppointmentTypeChange
+}: AppointmentFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
+
+  console.log('AppointmentForm initialized with:', { userId, accentColor, defaultTypeId });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -45,6 +54,52 @@ export function AppointmentForm({ userId, accentColor = "#6366f1" }: Appointment
     notes: "",
     appointmentTypeId: "",
   });
+
+  // Set appointment type from defaultTypeId or URL parameter
+  useEffect(() => {
+    const setAppointmentType = async (typeId: string) => {
+      console.log('Setting appointment type to:', typeId);
+
+      // Verify that the appointment type exists
+      try {
+        const { data, error } = await supabase
+          .from("appointment_types")
+          .select("id, name")
+          .eq("id", typeId)
+          .eq("user_id", userId)
+          .single();
+
+        if (error) {
+          console.error('Error verifying appointment type:', error);
+          return;
+        }
+
+        if (data) {
+          console.log('Verified appointment type exists:', data);
+          setFormData(prev => ({ ...prev, appointmentTypeId: typeId }));
+        } else {
+          console.warn('Appointment type not found:', typeId);
+        }
+      } catch (err) {
+        console.error('Error in setAppointmentType:', err);
+      }
+    };
+
+    // First check if we have a defaultTypeId prop
+    if (defaultTypeId) {
+      console.log('Setting appointment type from defaultTypeId:', defaultTypeId);
+      setAppointmentType(defaultTypeId);
+    }
+    // Otherwise check URL parameters
+    else if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      const typeId = url.searchParams.get('type');
+      if (typeId) {
+        console.log('Setting appointment type from URL parameter:', typeId);
+        setAppointmentType(typeId);
+      }
+    }
+  }, [defaultTypeId, userId, supabase]);
 
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
 
@@ -252,7 +307,22 @@ export function AppointmentForm({ userId, accentColor = "#6366f1" }: Appointment
             <Label>Appointment Type</Label>
             <AppointmentTypeSelector
               value={formData.appointmentTypeId}
-              onChange={(value) => setFormData(prev => ({ ...prev, appointmentTypeId: value }))}
+              onChange={(value) => {
+                setFormData(prev => ({ ...prev, appointmentTypeId: value }));
+
+                // Call the callback if provided
+                if (onAppointmentTypeChange) {
+                  onAppointmentTypeChange(value);
+                }
+
+                // Also dispatch a custom event for other components to listen to
+                if (typeof window !== 'undefined') {
+                  const event = new CustomEvent('appointmentTypeChanged', {
+                    detail: { typeId: value }
+                  });
+                  window.dispatchEvent(event);
+                }
+              }}
               userId={userId}
             />
           </div>
