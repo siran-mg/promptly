@@ -6,6 +6,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { ClientsTable } from "@/components/clients/clients-table";
 import { AddClientButton } from "@/components/clients/add-client-button";
+import { Users, UserPlus } from "lucide-react";
 
 export default async function ClientsPage() {
   const cookieStore = cookies();
@@ -62,8 +63,13 @@ export default async function ClientsPage() {
   return (
     <DashboardShell>
       <DashboardHeader
-        heading="Clients"
-        text="Manage your client information and history."
+        heading={
+          <span className="flex items-center gap-2">
+            <Users className="h-6 w-6 text-indigo-600" />
+            Your Client Directory
+          </span>
+        }
+        text="View, manage, and track all your client relationships in one place"
       >
         <AddClientButton />
       </DashboardHeader>
