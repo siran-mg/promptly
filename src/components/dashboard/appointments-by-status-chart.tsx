@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PieChart } from "lucide-react";
 
 interface StatusData {
   status: string;
@@ -136,9 +137,12 @@ export function AppointmentsByStatusChart({ data }: AppointmentsByStatusChartPro
   return (
     <Card className="col-span-1">
       <CardHeader>
-        <CardTitle>Appointments by Status</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <PieChart className="h-5 w-5 text-indigo-600" />
+          Appointment Status
+        </CardTitle>
         <CardDescription>
-          Distribution of appointments by their current status
+          See the breakdown of completed, scheduled, and canceled bookings
         </CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center">

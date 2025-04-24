@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { TrendingUp } from "lucide-react";
 
 interface MonthData {
   month: string;
@@ -120,9 +121,12 @@ export function AppointmentsByMonthChart({ data }: AppointmentsByMonthChartProps
   return (
     <Card className="col-span-2">
       <CardHeader>
-        <CardTitle>Appointments by Month</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-indigo-600" />
+          Monthly Booking Trends
+        </CardTitle>
         <CardDescription>
-          Number of appointments scheduled each month
+          See how your appointment volume changes over time
         </CardDescription>
       </CardHeader>
       <CardContent>

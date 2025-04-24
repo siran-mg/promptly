@@ -1,5 +1,5 @@
 interface DashboardHeaderProps {
-  heading: string;
+  heading: React.ReactNode;
   text?: string;
   children?: React.ReactNode;
 }

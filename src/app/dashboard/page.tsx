@@ -9,7 +9,16 @@ import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { SmartShareButton } from "@/components/dashboard/smart-share-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarClock, Plus, Share, Settings } from "lucide-react";
+import {
+  CalendarClock,
+  Plus,
+  Share,
+  Settings,
+  Sparkles,
+  BookOpen,
+  BarChart3,
+  Palette
+} from "lucide-react";
 
 export default async function DashboardPage() {
   const cookieStore = cookies();
@@ -36,47 +45,52 @@ export default async function DashboardPage() {
     <DashboardShell>
       {/* Hero Section with Quick Actions */}
       <div className="bg-gradient-to-r from-indigo-50 to-blue-50 -mx-6 px-6 py-8 mb-8 border-b">
-        <h1 className="text-2xl font-bold tracking-tight mb-1">Welcome to your Dashboard</h1>
-        <p className="text-muted-foreground mb-6">Manage your appointments and booking settings</p>
+        <h1 className="text-2xl font-bold tracking-tight mb-1">
+          <span className="flex items-center gap-2">
+            <Sparkles className="h-6 w-6 text-indigo-600" />
+            Welcome to Your Booking Hub
+          </span>
+        </h1>
+        <p className="text-muted-foreground mb-6">Everything you need to manage your appointments in one place</p>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Button variant="default" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md" asChild>
+          <Button variant="default" size="lg" className="h-28 flex flex-col items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md transition-all duration-200" asChild>
             <Link href="/dashboard/appointments/new">
-              <Plus className="h-6 w-6 mb-1" />
+              <Plus className="h-7 w-7 mb-1" />
               <div className="text-center">
-                <div className="font-medium text-base">New Appointment</div>
-                <div className="text-xs opacity-90">Schedule a new appointment</div>
+                <div className="font-medium text-base">Create Appointment</div>
+                <div className="text-xs opacity-90">Add a new booking to your schedule</div>
               </div>
             </Link>
           </Button>
-          <Button variant="outline" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-white shadow-sm" asChild>
+          <Button variant="outline" size="lg" className="h-28 flex flex-col items-center justify-center gap-2 bg-white shadow-sm hover:bg-gray-50 transition-all duration-200" asChild>
             <Link href="/dashboard/appointments">
-              <CalendarClock className="h-6 w-6 mb-1 text-indigo-600" />
+              <CalendarClock className="h-7 w-7 mb-1 text-blue-600" />
               <div className="text-center">
-                <div className="font-medium text-base">View Appointments</div>
-                <div className="text-xs text-muted-foreground">Manage your schedule</div>
+                <div className="font-medium text-base">Calendar View</div>
+                <div className="text-xs text-muted-foreground">See and manage all your bookings</div>
               </div>
             </Link>
           </Button>
-          <div className="relative h-24 flex flex-col items-center justify-center gap-2 bg-white shadow-sm rounded-md border hover:bg-gray-50 transition-colors cursor-pointer group">
+          <div className="relative h-28 flex flex-col items-center justify-center gap-2 bg-white shadow-sm rounded-md border hover:bg-gray-50 transition-all duration-200 cursor-pointer group">
             {/* Invisible button that covers the entire card for accessibility */}
             <div className="absolute inset-0 w-full h-full">
               <SmartShareButton variant="ghost" className="w-full h-full opacity-0" />
             </div>
 
             {/* Visual content */}
-            <Share className="h-6 w-6 mb-1 text-indigo-600 group-hover:text-indigo-700" />
+            <Share className="h-7 w-7 mb-1 text-green-600 group-hover:text-green-700" />
             <div className="text-center mt-1">
-              <div className="font-medium text-base">Share Booking Form</div>
-              <div className="text-xs text-muted-foreground">Let clients book with you</div>
+              <div className="font-medium text-base">Share Your Form</div>
+              <div className="text-xs text-muted-foreground">Let clients book appointments online</div>
             </div>
           </div>
-          <Button variant="outline" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-white shadow-sm" asChild>
+          <Button variant="outline" size="lg" className="h-28 flex flex-col items-center justify-center gap-2 bg-white shadow-sm hover:bg-gray-50 transition-all duration-200" asChild>
             <Link href="/dashboard/settings?tab=form">
-              <Settings className="h-6 w-6 mb-1 text-indigo-600" />
+              <Palette className="h-7 w-7 mb-1 text-purple-600" />
               <div className="text-center">
-                <div className="font-medium text-base">Customize Form</div>
-                <div className="text-xs text-muted-foreground">Personalize your booking form</div>
+                <div className="font-medium text-base">Design Your Form</div>
+                <div className="text-xs text-muted-foreground">Customize colors, logo and fields</div>
               </div>
             </Link>
           </Button>
@@ -84,8 +98,13 @@ export default async function DashboardPage() {
       </div>
 
       <DashboardHeader
-        heading="Dashboard Overview"
-        text="Track your appointments and performance."
+        heading={
+          <span className="flex items-center gap-2">
+            <BarChart3 className="h-6 w-6 text-indigo-600" />
+            Your Business at a Glance
+          </span>
+        }
+        text="Track performance metrics and upcoming appointments"
       />
 
       {/* Main Content */}
@@ -97,30 +116,42 @@ export default async function DashboardPage() {
         {/* Additional Resources */}
         <div className="mt-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Help & Resources</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-indigo-600" />
+                Quick Tips & Resources
+              </CardTitle>
               <CardDescription>
-                Learn more about using Promptly
+                Helpful guides to get the most out of Promptly
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="bg-primary/10 p-2 rounded-full">
-                    <CalendarClock className="h-5 w-5 text-primary" />
+                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <CalendarClock className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-medium">Managing Your Schedule</h3>
-                    <p className="text-sm text-muted-foreground">Learn how to effectively manage your appointments and client bookings.</p>
+                    <h3 className="font-medium">Efficient Schedule Management</h3>
+                    <p className="text-sm text-muted-foreground">Learn time-saving techniques for managing your calendar and reducing no-shows.</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="bg-primary/10 p-2 rounded-full">
-                    <Share className="h-5 w-5 text-primary" />
+                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <Share className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="font-medium">Customizing Your Booking Form</h3>
-                    <p className="text-sm text-muted-foreground">Personalize your booking form to match your brand and collect the information you need.</p>
+                    <h3 className="font-medium">Maximizing Form Conversions</h3>
+                    <p className="text-sm text-muted-foreground">Design tips to create booking forms that attract more clients and increase conversion rates.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="bg-purple-100 p-2 rounded-full">
+                    <Palette className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Form Customization Guide</h3>
+                    <p className="text-sm text-muted-foreground">Step-by-step instructions for creating beautiful, branded booking forms that impress clients.</p>
                   </div>
                 </div>
               </div>
