@@ -2,9 +2,10 @@
 
 import { FormSettingsPerType } from "@/components/settings/form-settings-per-type";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Palette, FileText } from "lucide-react";
 import { Database } from "@/types/supabase";
 import { useRouter } from "next/navigation";
+import { PrimaryActionButton } from "@/components/ui/primary-action-button";
 
 type AppointmentType = Database["public"]["Tables"]["appointment_types"]["Row"];
 
@@ -34,30 +35,41 @@ export function AppointmentTypeFormClient({
   return (
     <div className="space-y-6">
       {showBackButton && (
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <Button
             variant="outline"
             onClick={handleBack}
+            className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Types
+            <ArrowLeft className="h-4 w-4" />
+            Back to Appointment Types
           </Button>
 
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={() => router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${appointmentTypeId}&view=fields`)}
+            className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
           >
+            <FileText className="h-4 w-4" />
             Manage Custom Fields
           </Button>
         </div>
       )}
 
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Form Settings for {appointmentType.name}</h2>
-        <p className="text-muted-foreground">
-          Customize how the booking form appears to clients for this appointment type.
-          These settings control the appearance of the form when clients book this specific type of appointment.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-indigo-50/50 rounded-lg border border-indigo-100 mb-6">
+        <div>
+          <h2 className="text-xl font-medium flex items-center gap-2">
+            <Palette className="h-5 w-5 text-indigo-600" />
+            Form Settings for {appointmentType.name}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Customize how the booking form appears to clients for this appointment type
+          </p>
+        </div>
+        <div
+          className="w-8 h-8 rounded-full flex-shrink-0 border-2 border-white shadow-sm"
+          style={{ backgroundColor: appointmentType.color || '#6366f1' }}
+        ></div>
       </div>
 
       <FormSettingsPerType
