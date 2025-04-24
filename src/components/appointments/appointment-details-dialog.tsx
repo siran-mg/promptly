@@ -58,6 +58,7 @@ interface AppointmentDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
   onDelete: () => void;
   onShare?: () => void;
+  onStatusChange?: (appointmentId: string, newStatus: string) => void;
 }
 
 export function AppointmentDetailsDialog({
@@ -65,7 +66,8 @@ export function AppointmentDetailsDialog({
   isOpen,
   onOpenChange,
   onDelete,
-  onShare
+  onShare,
+  onStatusChange
 }: AppointmentDetailsDialogProps) {
   const { toast } = useToast();
   const supabase = createClient();
@@ -92,6 +94,11 @@ export function AppointmentDetailsDialog({
         title: "Status updated",
         description: `Appointment status has been updated to ${newStatus}.`,
       });
+
+      // Call the callback to update parent component state
+      if (onStatusChange) {
+        onStatusChange(appointment.id, newStatus);
+      }
     } catch (err: any) {
       console.error("Error updating appointment status:", err);
       toast({

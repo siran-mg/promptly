@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { CalendarClock, MoreHorizontal, Search, Share, Copy, Check, Loader2, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -36,6 +36,7 @@ type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
     id: string;
     name: string;
     color: string | null;
+    duration: number;
   } | null;
   field_values?: {
     id: string;
@@ -48,6 +49,7 @@ type AppointmentType = {
   id: string;
   name: string;
   color: string | null;
+  duration: number;
 };
 
 interface AppointmentsTableProps {
@@ -73,17 +75,21 @@ export function AppointmentsTable({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [filteredAppointmentsList, setFilteredAppointmentsList] = useState<Appointment[]>([]);
 
-  // Filter appointments based on search query
-  const filteredAppointments = appointments.filter((appointment) => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      appointment.client_name.toLowerCase().includes(searchLower) ||
-      appointment.client_email.toLowerCase().includes(searchLower) ||
-      appointment.client_phone.toLowerCase().includes(searchLower) ||
-      appointment.status.toLowerCase().includes(searchLower)
-    );
-  });
+  // Filter appointments based on search query and update state
+  useEffect(() => {
+    const filtered = appointments.filter((appointment) => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        appointment.client_name.toLowerCase().includes(searchLower) ||
+        appointment.client_email.toLowerCase().includes(searchLower) ||
+        appointment.client_phone.toLowerCase().includes(searchLower) ||
+        appointment.status.toLowerCase().includes(searchLower)
+      );
+    });
+    setFilteredAppointmentsList(filtered);
+  }, [appointments, searchQuery]);
 
   // If no appointments, show empty state
   if (appointments.length === 0) {
@@ -195,14 +201,14 @@ export function AppointmentsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAppointments.length === 0 ? (
+            {filteredAppointmentsList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
                   No appointments found.
                 </TableCell>
               </TableRow>
             ) : (
-              filteredAppointments.map((appointment) => (
+              filteredAppointmentsList.map((appointment) => (
                 <TableRow
                   key={appointment.id}
                   className="cursor-pointer hover:bg-muted/50"
@@ -437,6 +443,21 @@ export function AppointmentsTable({
             setIsDetailsDialogOpen(false);
             setShareDialogOpen(true);
           }
+        }}
+        onStatusChange={(appointmentId, newStatus) => {
+          // Update the filtered appointments to reflect the change
+          const updatedFilteredAppointments = filteredAppointmentsList.map(appointment => {
+            if (appointment.id === appointmentId) {
+              return {
+                ...appointment,
+                status: newStatus
+              };
+            }
+            return appointment;
+          });
+
+          // Force a re-render by updating the filtered appointments array
+          setFilteredAppointmentsList([...updatedFilteredAppointments]);
         }}
       />
     </div>

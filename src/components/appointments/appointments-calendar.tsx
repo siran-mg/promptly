@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Calendar, Views, DateLocalizer, SlotInfo } from "react-big-calendar";
 import { dateFnsLocalizer } from "react-big-calendar";
 import format from "date-fns/format";
@@ -95,30 +95,37 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
-  // Convert appointments to calendar events
-  const events: CalendarEvent[] = appointments.map((appointment) => {
-    const startDate = new Date(appointment.date);
-    const endDate = new Date(startDate);
+  // Initialize calendar events from appointments
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
 
-    // If we have appointment duration from the type, use it, otherwise default to 1 hour
-    const durationInHours = appointment.appointment_type?.duration
-      ? appointment.appointment_type.duration / 60
-      : 1;
+  // Update events when appointments change
+  useEffect(() => {
+    const mappedEvents = appointments.map((appointment) => {
+      const startDate = new Date(appointment.date);
+      const endDate = new Date(startDate);
 
-    endDate.setHours(endDate.getHours() + durationInHours);
+      // If we have appointment duration from the type, use it, otherwise default to 1 hour
+      const durationInHours = appointment.appointment_type?.duration
+        ? appointment.appointment_type.duration / 60
+        : 1;
 
-    return {
-      id: appointment.id,
-      title: appointment.client_name,
-      start: startDate,
-      end: endDate,
-      status: appointment.status,
-      resource: appointment,
-      // Store the appointment type color for use in the eventPropGetter
-      typeColor: appointment.appointment_type?.color || null,
-      typeName: appointment.appointment_type?.name || "Appointment",
-    };
-  });
+      endDate.setHours(endDate.getHours() + durationInHours);
+
+      return {
+        id: appointment.id,
+        title: appointment.client_name,
+        start: startDate,
+        end: endDate,
+        status: appointment.status,
+        resource: appointment,
+        // Store the appointment type color for use in the eventPropGetter
+        typeColor: appointment.appointment_type?.color || null,
+        typeName: appointment.appointment_type?.name || "Appointment",
+      };
+    });
+
+    setEvents(mappedEvents);
+  }, [appointments]);
 
   // Handle event selection
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
@@ -289,6 +296,25 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
           setAppointmentToDelete(selectedAppointment);
           setIsDetailsDialogOpen(false);
           setIsDeleteDialogOpen(true);
+        }}
+        onStatusChange={(appointmentId, newStatus) => {
+          // Update the local state to reflect the status change
+          const updatedEvents = events.map(event => {
+            if (event.id === appointmentId) {
+              return {
+                ...event,
+                status: newStatus,
+                resource: {
+                  ...event.resource,
+                  status: newStatus
+                }
+              };
+            }
+            return event;
+          });
+
+          // Force a re-render by updating the events array
+          setEvents([...updatedEvents]);
         }}
       />
 
