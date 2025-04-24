@@ -75,6 +75,17 @@ export function DeleteAppointmentTypeDialog({
     if (!appointmentType) return false;
 
     try {
+      // Delete form settings associated with this type
+      const { error: formSettingsError } = await supabase
+        .from("form_settings_per_type")
+        .delete()
+        .eq("appointment_type_id", appointmentType.id);
+
+      if (formSettingsError) {
+        console.error("Error deleting form settings:", formSettingsError);
+        // Continue anyway
+      }
+
       // Delete custom fields associated with this type
       const { error: fieldsError } = await supabase
         .from("appointment_custom_fields")
@@ -162,7 +173,7 @@ export function DeleteAppointmentTypeDialog({
       // Check if this type is used by any appointments
       const { data: appointmentsData, error: appointmentsError } = await supabase
         .from("appointments")
-        .select("id, title, scheduled_for, client_name")
+        .select("id, client_name, date")
         .eq("appointment_type_id", appointmentType.id);
 
       if (appointmentsError) {
@@ -179,6 +190,12 @@ export function DeleteAppointmentTypeDialog({
             description: (
               <div className="space-y-2">
                 <p>This appointment type is used by {appointmentsData.length} appointments.</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Examples: {appointmentsData.slice(0, 3).map(app =>
+                    `${app.client_name} (${new Date(app.date).toLocaleDateString()})`
+                  ).join(", ")}
+                  {appointmentsData.length > 3 ? ` and ${appointmentsData.length - 3} more...` : ""}
+                </p>
                 <div className="flex gap-2 mt-2">
                   <Button
                     size="sm"
@@ -216,10 +233,19 @@ export function DeleteAppointmentTypeDialog({
           return;
         }
 
-        // For fewer appointments, show a warning
+        // For fewer appointments, show a warning with details
         toast({
           title: "Appointments found",
-          description: "This appointment type is used by appointments. Please reassign them first.",
+          description: (
+            <div>
+              <p>This appointment type is used by {appointmentsData.length} appointments. Please reassign them first.</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {appointmentsData.map(app =>
+                  `${app.client_name} (${new Date(app.date).toLocaleDateString()})`
+                ).join(", ")}
+              </p>
+            </div>
+          ),
           variant: "destructive",
         });
         setIsDeleting(false);
