@@ -41,7 +41,7 @@ export default async function DashboardPage() {
 
         <div className="grid gap-4 md:grid-cols-3">
           <Button variant="default" size="lg" className="h-24 flex flex-col items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md" asChild>
-            <Link href="/booking">
+            <Link href="/dashboard/appointments/new">
               <Plus className="h-6 w-6 mb-1" />
               <div className="text-center">
                 <div className="font-medium text-base">New Appointment</div>

@@ -23,6 +23,26 @@ export function DynamicAppointmentForm({
   const supabase = createClient();
   const [settings, setSettings] = useState(initialSettings);
   const [currentTypeId, setCurrentTypeId] = useState<string | null>(defaultTypeId);
+  const [initialDate, setInitialDate] = useState<Date | null>(null);
+
+  // Check for date parameter in URL
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const dateParam = searchParams.get('date');
+      if (dateParam) {
+        try {
+          const parsedDate = new Date(dateParam);
+          // Check if the date is valid
+          if (!isNaN(parsedDate.getTime())) {
+            setInitialDate(parsedDate);
+          }
+        } catch (error) {
+          console.error('Error parsing date from URL:', error);
+        }
+      }
+    }
+  }, []);
 
   // Listen for appointment type changes
   const handleAppointmentTypeChange = useCallback(async (typeId: string) => {
@@ -138,6 +158,7 @@ export function DynamicAppointmentForm({
         accentColor={settings.accent_color}
         defaultTypeId={currentTypeId}
         onAppointmentTypeChange={handleAppointmentTypeChange}
+        initialDate={initialDate}
       />
     </div>
   );

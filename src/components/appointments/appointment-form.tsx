@@ -30,13 +30,15 @@ interface AppointmentFormProps {
   accentColor?: string;
   defaultTypeId?: string | null;
   onAppointmentTypeChange?: (typeId: string) => void;
+  initialDate?: Date | null;
 }
 
 export function AppointmentForm({
   userId,
   accentColor = "#6366f1",
   defaultTypeId = null,
-  onAppointmentTypeChange
+  onAppointmentTypeChange,
+  initialDate = null
 }: AppointmentFormProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -50,8 +52,8 @@ export function AppointmentForm({
     clientName: "",
     clientEmail: "",
     clientPhone: "",
-    date: new Date(),
-    time: "09:00",
+    date: initialDate || new Date(),
+    time: initialDate ? format(initialDate, "HH:mm") : "09:00",
     notes: "",
     appointmentTypeId: "",
   });

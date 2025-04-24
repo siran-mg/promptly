@@ -140,11 +140,11 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
     setIsCreateDialogOpen(true);
   }, []);
 
-  // Navigate to booking page with pre-filled date
+  // Navigate to new appointment page with pre-filled date
   const handleCreateAppointment = useCallback(() => {
     if (selectedSlot) {
       const formattedDate = format(selectedSlot, "yyyy-MM-dd'T'HH:mm");
-      router.push(`/booking?date=${encodeURIComponent(formattedDate)}`);
+      router.push(`/dashboard/appointments/new?date=${encodeURIComponent(formattedDate)}`);
     }
     setIsCreateDialogOpen(false);
   }, [selectedSlot, router]);

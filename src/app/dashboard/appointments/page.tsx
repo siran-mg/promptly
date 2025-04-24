@@ -56,7 +56,7 @@ export default async function AppointmentsPage({
   // Fetch appointment types for filtering
   const { data: appointmentTypes, error: typesError } = await supabase
     .from("appointment_types")
-    .select("id, name, color")
+    .select("id, name, color, duration")
     .order("name");
 
   if (typesError) {
@@ -69,7 +69,7 @@ export default async function AppointmentsPage({
         heading="Appointments"
         text="Manage your upcoming and past appointments."
       >
-        <Link href="/booking">
+        <Link href="/dashboard/appointments/new">
           <Button size="sm">
             <Plus className="mr-2 h-4 w-4" />
             New Appointment
