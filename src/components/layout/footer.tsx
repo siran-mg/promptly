@@ -6,7 +6,7 @@ export function Footer() {
       <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
         <div className="text-center md:text-left">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Promptly. All rights reserved.
+            &copy; {new Date().getFullYear()} Coachly. All rights reserved.
           </p>
         </div>
         <nav className="flex items-center gap-4 text-sm">

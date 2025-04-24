@@ -36,7 +36,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <CalendarClock className="h-6 w-6" />
           <Link href="/" className="text-xl font-bold">
-            Promptly
+            Coachly
           </Link>
         </div>
         <nav className="flex items-center gap-4">

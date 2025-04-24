@@ -48,7 +48,7 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-bold tracking-tight mb-1">
           <span className="flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-indigo-600" />
-            Welcome to Your Booking Hub
+            Welcome back, 👋 Ready to streamline your schedule?
           </span>
         </h1>
         <p className="text-muted-foreground mb-6">Everything you need to manage your appointments in one place</p>
@@ -122,7 +122,7 @@ export default async function DashboardPage() {
                 Quick Tips & Resources
               </CardTitle>
               <CardDescription>
-                Helpful guides to get the most out of Promptly
+                Helpful guides to get the most out of Coachly
               </CardDescription>
             </CardHeader>
             <CardContent>

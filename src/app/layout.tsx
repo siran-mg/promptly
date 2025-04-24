@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Promptly - Appointment & Reminder SaaS",
+  title: "Coachly - Appointment & Reminder SaaS",
   description: "Schedule appointments and send automated reminders via email and SMS",
 };
 

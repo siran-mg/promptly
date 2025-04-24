@@ -11,7 +11,7 @@ import { SettingsTabs } from "@/components/settings/settings-tabs";
 import { Sliders } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Settings | Promptly",
+  title: "Settings | Coachly",
   description: "Manage your account settings and preferences",
 };
 

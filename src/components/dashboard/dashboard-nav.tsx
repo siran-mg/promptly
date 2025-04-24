@@ -108,7 +108,7 @@ export function DashboardNav() {
         <div className="w-8 h-8 rounded-md bg-indigo-600 flex items-center justify-center">
           <CalendarClock className="h-5 w-5 text-white" />
         </div>
-        <div className="font-bold text-lg">Promptly</div>
+        <div className="font-bold text-lg">Coachly</div>
       </div>
 
       {/* Navigation Items */}
