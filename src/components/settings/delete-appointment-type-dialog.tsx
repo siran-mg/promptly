@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { Database } from "@/types/supabase";
+import { Button } from "@/components/ui/button";
 
 import {
   AlertDialog,
@@ -24,7 +26,6 @@ interface DeleteAppointmentTypeDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onDeleteSuccess: () => void;
-  onCheckBeforeDelete?: (appointmentType: AppointmentType) => Promise<boolean>;
 }
 
 export function DeleteAppointmentTypeDialog({
@@ -32,31 +33,48 @@ export function DeleteAppointmentTypeDialog({
   isOpen,
   onOpenChange,
   onDeleteSuccess,
-  onCheckBeforeDelete,
 }: DeleteAppointmentTypeDialogProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
 
-  const handleDelete = async (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    
-    if (!appointmentType) return;
+  // Fetch all appointment types for reassignment
+  useEffect(() => {
+    const fetchAppointmentTypes = async () => {
+      if (!appointmentType || !isOpen) return;
 
-    setIsDeleting(true);
-    try {
-      // If there's a check function, run it first
-      if (onCheckBeforeDelete) {
-        const canProceed = await onCheckBeforeDelete(appointmentType);
-        if (!canProceed) {
-          setIsDeleting(false);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await supabase
+          .from("appointment_types")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("is_default", { ascending: false })
+          .order("name");
+
+        if (error) {
+          console.error("Error fetching appointment types:", error);
           return;
         }
-      }
 
+        setAppointmentTypes(data || []);
+      } catch (err) {
+        console.error("Error fetching appointment types:", err);
+      }
+    };
+
+    fetchAppointmentTypes();
+  }, [supabase, appointmentType, isOpen]);
+
+  // Perform the actual deletion
+  const performDelete = async () => {
+    if (!appointmentType) return false;
+
+    try {
       // Delete custom fields associated with this type
       const { error: fieldsError } = await supabase
         .from("appointment_custom_fields")
@@ -106,11 +124,116 @@ export function DeleteAppointmentTypeDialog({
       });
 
       onDeleteSuccess();
+      return true;
     } catch (err) {
       console.error("Error deleting appointment type:", err);
       toast({
         title: "Error",
         description: "Could not delete appointment type. Please try again.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const handleDelete = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    if (!appointmentType) return;
+
+    setIsDeleting(true);
+    try {
+      // Check if this is the default type and not the only type
+      if (appointmentType.is_default && appointmentTypes.length > 1) {
+        console.log("Cannot delete default type when there are multiple types");
+        toast({
+          title: "Cannot delete default type",
+          description: "Please set another type as default before deleting this one.",
+          variant: "destructive",
+        });
+        setIsDeleting(false);
+        onOpenChange(false);
+        return;
+      }
+
+      // Check if this type is used by any appointments
+      const { data: appointmentsData, error: appointmentsError } = await supabase
+        .from("appointments")
+        .select("id, title, scheduled_for, client_name")
+        .eq("appointment_type_id", appointmentType.id);
+
+      if (appointmentsError) {
+        console.error("Error checking appointments:", appointmentsError);
+        setIsDeleting(false);
+        return;
+      }
+
+      if (appointmentsData && appointmentsData.length > 0) {
+        // Check if we have a lot of appointments - if so, offer a direct link instead of showing them all
+        if (appointmentsData.length > 10) {
+          toast({
+            title: "Multiple appointments found",
+            description: (
+              <div className="space-y-2">
+                <p>This appointment type is used by {appointmentsData.length} appointments.</p>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="bg-white text-destructive hover:bg-gray-100 border border-destructive/20 font-medium"
+                    onClick={() => {
+                      router.push(`/dashboard/appointments?type=${appointmentType.id}`);
+                      onOpenChange(false);
+                    }}
+                  >
+                    View All Appointments
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="bg-white text-primary hover:bg-gray-100 border border-primary/20 font-medium"
+                    onClick={() => {
+                      toast({
+                        title: "Reassign appointments first",
+                        description: "Please reassign these appointments to another type before deleting this one.",
+                        variant: "destructive",
+                      });
+                      onOpenChange(false);
+                    }}
+                  >
+                    Reassign & Delete
+                  </Button>
+                </div>
+              </div>
+            ),
+            variant: "destructive",
+          });
+          setIsDeleting(false);
+          onOpenChange(false);
+          return;
+        }
+
+        // For fewer appointments, show a warning
+        toast({
+          title: "Appointments found",
+          description: "This appointment type is used by appointments. Please reassign them first.",
+          variant: "destructive",
+        });
+        setIsDeleting(false);
+        onOpenChange(false);
+        return;
+      }
+
+      // Now that we've confirmed it's safe to delete, proceed with deletion
+      await performDelete();
+    } catch (err) {
+      console.error("Error in handleDelete:", err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
