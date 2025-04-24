@@ -48,6 +48,7 @@ type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
     id: string;
     name: string;
     color: string | null;
+    duration: number;
   } | null;
   field_values?: {
     id: string;
@@ -60,6 +61,7 @@ type AppointmentType = {
   id: string;
   name: string;
   color: string | null;
+  duration: number;
 };
 
 interface AppointmentsCalendarProps {

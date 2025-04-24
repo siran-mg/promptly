@@ -14,13 +14,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
+// No need for router import
 
 type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
   appointment_type?: {
     id: string;
     name: string;
     color: string | null;
+    duration: number;
   } | null;
   field_values?: {
     id: string;
@@ -33,6 +34,7 @@ type AppointmentType = {
   id: string;
   name: string;
   color: string | null;
+  duration: number;
 };
 
 interface AppointmentsCalendarClientProps {
@@ -48,7 +50,7 @@ export function AppointmentsCalendarClient({
   activeTypeId,
   activeFieldName
 }: AppointmentsCalendarClientProps) {
-  const router = useRouter();
+  // No need for router here
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>(appointments);
 
@@ -65,7 +67,6 @@ export function AppointmentsCalendarClient({
         (appointment.client_name && appointment.client_name.toLowerCase().includes(query)) ||
         (appointment.client_email && appointment.client_email.toLowerCase().includes(query)) ||
         (appointment.client_phone && appointment.client_phone.toLowerCase().includes(query)) ||
-        (appointment.title && appointment.title.toLowerCase().includes(query)) ||
         (appointment.appointment_type?.name && appointment.appointment_type.name.toLowerCase().includes(query))
       );
     });
