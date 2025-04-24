@@ -92,16 +92,25 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
 
   return (
     <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-8">
-        <TabsTrigger value="profile" className="flex items-center gap-2">
+      <TabsList className="grid w-full grid-cols-3 mb-8 p-1 bg-indigo-50/50 border-indigo-100">
+        <TabsTrigger
+          value="profile"
+          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+        >
           <User className="h-4 w-4" />
           Profile
         </TabsTrigger>
-        <TabsTrigger value="form" className="flex items-center gap-2">
+        <TabsTrigger
+          value="form"
+          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+        >
           <Settings className="h-4 w-4" />
           Form Settings
         </TabsTrigger>
-        <TabsTrigger value="appointment-types" className="flex items-center gap-2">
+        <TabsTrigger
+          value="appointment-types"
+          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+        >
           <Calendar className="h-4 w-4" />
           Appointment Types
         </TabsTrigger>

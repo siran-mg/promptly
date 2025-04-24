@@ -8,6 +8,7 @@ import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { FormSettings } from "@/components/settings/form-settings";
 import { ProfileSettings } from "@/components/settings/profile-settings";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
+import { Sliders } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Settings | Promptly",
@@ -27,8 +28,13 @@ export default async function SettingsPage() {
   return (
     <DashboardShell>
       <DashboardHeader
-        heading="Settings"
-        text="Manage your account settings and preferences."
+        heading={
+          <span className="flex items-center gap-2">
+            <Sliders className="h-6 w-6 text-indigo-600" />
+            Account Settings
+          </span>
+        }
+        text="Customize your profile and booking preferences"
       />
       <div className="mt-6 space-y-6">
         <SettingsTabs
