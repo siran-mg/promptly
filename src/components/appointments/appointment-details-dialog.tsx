@@ -4,16 +4,16 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
-import { 
-  Calendar, 
-  Clock, 
-  Mail, 
-  Phone, 
-  User, 
-  Tag, 
-  CheckCircle2, 
-  XCircle, 
-  Edit, 
+import {
+  Calendar,
+  Clock,
+  Mail,
+  Phone,
+  User,
+  Tag,
+  CheckCircle2,
+  XCircle,
+  Edit,
   Trash2,
   Share
 } from "lucide-react";
@@ -141,12 +141,10 @@ export function AppointmentDetailsDialog({
           </div>
 
           {/* Date and time */}
-          <div className="flex items-start gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <div>
-              <span className="text-sm font-medium">Date:</span>
-              <div className="text-sm">{formattedDate}</div>
-            </div>
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium">Date:</span>
+            <span className="text-sm">{formattedDate}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -162,26 +160,26 @@ export function AppointmentDetailsDialog({
 
           {/* Contact information */}
           <Separator />
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">Contact Information</h3>
-            
+          <div>
+            <h3 className="text-sm font-medium mb-2">Contact Information</h3>
+
             {appointment.client_email && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mb-1">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <a 
-                  href={`mailto:${appointment.client_email}`} 
+                <a
+                  href={`mailto:${appointment.client_email}`}
                   className="text-sm text-primary hover:underline"
                 >
                   {appointment.client_email}
                 </a>
               </div>
             )}
-            
+
             {appointment.client_phone && (
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <a 
-                  href={`tel:${appointment.client_phone}`} 
+                <a
+                  href={`tel:${appointment.client_phone}`}
                   className="text-sm text-primary hover:underline"
                 >
                   {appointment.client_phone}
@@ -192,17 +190,18 @@ export function AppointmentDetailsDialog({
 
           {/* Status */}
           <Separator />
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">Status</h3>
+          <div>
+            <h3 className="text-sm font-medium mb-2">Status</h3>
             <div className="flex items-center gap-2">
+              <span className="text-sm">Current status:</span>
               <Select
                 value={status}
                 onValueChange={handleStatusChange}
                 disabled={isUpdating}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[140px]">
                   <SelectValue>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center">
                       <Badge
                         variant={
                           status === "scheduled" ? "default" :
@@ -241,8 +240,8 @@ export function AppointmentDetailsDialog({
           {appointment.notes && (
             <>
               <Separator />
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium">Notes</h3>
+              <div>
+                <h3 className="text-sm font-medium mb-2">Notes</h3>
                 <p className="text-sm whitespace-pre-wrap">{appointment.notes}</p>
               </div>
             </>
