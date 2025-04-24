@@ -75,6 +75,8 @@ interface CalendarEvent {
   end: Date;
   status: string;
   resource: Appointment;
+  typeColor: string | null;
+  typeName: string;
 }
 
 export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: AppointmentsCalendarProps) {
@@ -89,7 +91,13 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
   const events: CalendarEvent[] = appointments.map((appointment) => {
     const startDate = new Date(appointment.date);
     const endDate = new Date(startDate);
-    endDate.setHours(endDate.getHours() + 1); // Assume 1 hour appointments
+
+    // If we have appointment duration from the type, use it, otherwise default to 1 hour
+    const durationInHours = appointment.appointment_type?.duration
+      ? appointment.appointment_type.duration / 60
+      : 1;
+
+    endDate.setHours(endDate.getHours() + durationInHours);
 
     return {
       id: appointment.id,
@@ -98,6 +106,9 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
       end: endDate,
       status: appointment.status,
       resource: appointment,
+      // Store the appointment type color for use in the eventPropGetter
+      typeColor: appointment.appointment_type?.color || null,
+      typeName: appointment.appointment_type?.name || "Appointment",
     };
   });
 
@@ -105,7 +116,21 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
     toast({
       title: `Appointment with ${event.title}`,
-      description: `${format(event.start, "PPP 'at' p")} - Status: ${event.status}`,
+      description: (
+        <div className="space-y-1">
+          <div>{format(event.start, "PPP 'at' p")}</div>
+          <div className="flex items-center gap-2">
+            <span>Type: {event.typeName}</span>
+            {event.typeColor && (
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: event.typeColor }}
+              />
+            )}
+          </div>
+          <div>Status: {event.status}</div>
+        </div>
+      ),
     });
   }, [toast]);
 
@@ -141,12 +166,21 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
     );
   }
 
-  // Custom event component to show status
+  // Custom event component to show status and type
   const EventComponent = ({ event }: { event: CalendarEvent }) => (
     <div className="flex flex-col h-full">
       <div className="text-sm font-medium">{event.title}</div>
-      <div className="text-xs mt-1">
+      <div className="text-xs mt-1 flex items-center gap-1">
         {format(event.start, "p")}
+        {event.typeColor && (
+          <div className="flex items-center gap-1 ml-1">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: event.typeColor }}
+            />
+            <span className="text-xs opacity-90">{event.typeName}</span>
+          </div>
+        )}
       </div>
       <div className="mt-auto">
         <Badge
@@ -192,22 +226,36 @@ export function AppointmentsCalendar({ appointments, appointmentTypes = [] }: Ap
             event: EventComponent,
           }}
         eventPropGetter={(event) => {
-          const backgroundColor =
-            event.status === "scheduled" ? "#6366f1" :
-            event.status === "completed" ? "#10b981" :
-            event.status === "cancelled" ? "#ef4444" :
-            "#6b7280";
+          // Use appointment type color if available, otherwise use status-based colors
+          let backgroundColor = event.typeColor || null;
+
+          // If no type color, fall back to status-based colors
+          if (!backgroundColor) {
+            backgroundColor =
+              event.status === "scheduled" ? "#6366f1" :
+              event.status === "completed" ? "#10b981" :
+              event.status === "cancelled" ? "#ef4444" :
+              "#6b7280";
+          }
+
+          // For cancelled appointments, add a strikethrough effect
+          const textDecoration = event.status === "cancelled" ? "line-through" : "none";
+
+          // Adjust opacity based on status
+          const opacity = event.status === "cancelled" ? 0.6 :
+                         event.status === "completed" ? 0.75 : 0.85;
 
           return {
             style: {
               backgroundColor,
               borderRadius: "4px",
-              opacity: 0.8,
+              opacity,
               color: "#fff",
               border: "0px",
               display: "block",
               padding: "4px",
               height: "100%",
+              textDecoration,
             },
           };
         }}
