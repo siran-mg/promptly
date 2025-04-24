@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
@@ -11,9 +11,6 @@ import {
   Phone,
   User,
   Tag,
-  CheckCircle2,
-  XCircle,
-  Edit,
   Trash2,
   Share
 } from "lucide-react";
@@ -71,8 +68,15 @@ export function AppointmentDetailsDialog({
 }: AppointmentDetailsDialogProps) {
   const { toast } = useToast();
   const supabase = createClient();
-  const [status, setStatus] = useState<string>(appointment?.status || "scheduled");
+  const [status, setStatus] = useState<string>("scheduled");
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Update status when appointment changes
+  useEffect(() => {
+    if (appointment) {
+      setStatus(appointment.status);
+    }
+  }, [appointment]);
 
   if (!appointment) return null;
 
