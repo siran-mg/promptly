@@ -42,16 +42,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { DeleteAppointmentTypeDialog } from "./delete-appointment-type-dialog";
 
 type AppointmentType = Database["public"]["Tables"]["appointment_types"]["Row"];
 
@@ -409,101 +400,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
     }
   };
 
-  // Delete an appointment type
-  const handleDelete = async () => {
-    if (!typeToDelete) {
-      console.log("handleDelete: No typeToDelete found");
-      return;
-    }
 
-    console.log("handleDelete: Starting deletion process for", typeToDelete.id, typeToDelete.name);
-
-    try {
-      // Check if this is the default type
-      if (typeToDelete.is_default) {
-        console.log("handleDelete: Cannot delete default type");
-        toast({
-          title: "Cannot delete default type",
-          description: "Please set another type as default before deleting this one.",
-          variant: "destructive",
-        });
-        setIsDeleteDialogOpen(false);
-        return;
-      }
-
-      // Check if this type is used by any appointments
-      console.log("handleDelete: Checking if type is used by appointments");
-      const { data: appointmentsData, error: appointmentsError } = await supabase
-        .from("appointments")
-        .select("id, title, scheduled_for, client_name")
-        .eq("appointment_type_id", typeToDelete.id);
-
-      if (appointmentsError) {
-        console.error("Error checking appointments:", appointmentsError);
-        return;
-      }
-
-      console.log("handleDelete: Found", appointmentsData?.length || 0, "appointments using this type");
-
-      if (appointmentsData && appointmentsData.length > 0) {
-        console.log("handleDelete: Opening reassign dialog");
-        setAppointmentsUsingType(appointmentsData);
-
-        // Check if we have a lot of appointments - if so, offer a direct link instead of showing them all
-        if (appointmentsData.length > 10) {
-          toast({
-            title: "Multiple appointments found",
-            description: (
-              <div className="space-y-2">
-                <p>This appointment type is used by {appointmentsData.length} appointments.</p>
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="bg-white text-destructive hover:bg-gray-100 border border-destructive/20 font-medium"
-                    onClick={() => {
-                      router.push(`/dashboard/appointments?type=${typeToDelete.id}`);
-                      setIsDeleteDialogOpen(false);
-                    }}
-                  >
-                    View All Appointments
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="bg-white text-primary hover:bg-gray-100 border border-primary/20 font-medium"
-                    onClick={() => {
-                      setIsReassignDialogOpen(true);
-                      setIsDeleteDialogOpen(false);
-                    }}
-                  >
-                    Reassign & Delete
-                  </Button>
-                </div>
-              </div>
-            ),
-            variant: "destructive",
-          });
-          setIsDeleteDialogOpen(false);
-          return;
-        }
-
-        // For fewer appointments, show the reassign dialog
-        setIsReassignDialogOpen(true);
-        setIsDeleteDialogOpen(false);
-        return;
-      }
-
-      // Now that we've confirmed it's safe to delete, proceed with deletion
-      console.log("handleDelete: Proceeding with deletion");
-      const result = await deleteAppointmentType();
-      console.log("handleDelete: Deletion result:", result);
-    } catch (err) {
-      console.error("Error in handleDelete:", err);
-    } finally {
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   // Save a new or edited appointment type
   const handleSubmit = async (e: React.FormEvent) => {
@@ -955,24 +852,89 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       </Dialog>
 
       {/* Confirmation dialog for deletion */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the appointment type
-              {typeToDelete && <strong> "{typeToDelete.name}"</strong>}.
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteAppointmentTypeDialog
+        appointmentType={typeToDelete}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onDeleteSuccess={() => {
+          // Update local state
+          if (typeToDelete) {
+            setAppointmentTypes(prev => prev.filter(t => t.id !== typeToDelete.id));
+          }
+          setTypeToDelete(null);
+        }}
+        onCheckBeforeDelete={async (type) => {
+          // Check if this is the default type and not the only type
+          if (type.is_default && appointmentTypes.length > 1) {
+            toast({
+              title: "Cannot delete default type",
+              description: "Please set another type as default before deleting this one.",
+              variant: "destructive",
+            });
+            return false;
+          }
+
+          // Check if this type is used by any appointments
+          const { data: appointmentsData, error: appointmentsError } = await supabase
+            .from("appointments")
+            .select("id, title, scheduled_for, client_name")
+            .eq("appointment_type_id", type.id);
+
+          if (appointmentsError) {
+            console.error("Error checking appointments:", appointmentsError);
+            return false;
+          }
+
+          if (appointmentsData && appointmentsData.length > 0) {
+            setAppointmentsUsingType(appointmentsData);
+
+            // Check if we have a lot of appointments - if so, offer a direct link instead of showing them all
+            if (appointmentsData.length > 10) {
+              toast({
+                title: "Multiple appointments found",
+                description: (
+                  <div className="space-y-2">
+                    <p>This appointment type is used by {appointmentsData.length} appointments.</p>
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="bg-white text-destructive hover:bg-gray-100 border border-destructive/20 font-medium"
+                        onClick={() => {
+                          router.push(`/dashboard/appointments?type=${type.id}`);
+                          setIsDeleteDialogOpen(false);
+                        }}
+                      >
+                        View All Appointments
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="bg-white text-primary hover:bg-gray-100 border border-primary/20 font-medium"
+                        onClick={() => {
+                          setIsReassignDialogOpen(true);
+                          setIsDeleteDialogOpen(false);
+                        }}
+                      >
+                        Reassign & Delete
+                      </Button>
+                    </div>
+                  </div>
+                ),
+                variant: "destructive",
+              });
+              return false;
+            }
+
+            // For fewer appointments, show the reassign dialog
+            setIsReassignDialogOpen(true);
+            setIsDeleteDialogOpen(false);
+            return false;
+          }
+
+          return true;
+        }}
+      />
 
       {/* Dialog for reassigning appointments */}
       <Dialog open={isReassignDialogOpen} onOpenChange={setIsReassignDialogOpen}>

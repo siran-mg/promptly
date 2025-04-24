@@ -561,7 +561,7 @@ export function FormSettings() {
               </div>
               <Button
                 variant="outline"
-                onClick={() => router.push("/dashboard/settings/appointment-types")}
+                onClick={() => router.push("/dashboard/settings?tab=appointment-typess")}
               >
                 Manage Appointment Types
               </Button>

@@ -9,28 +9,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShareDialog } from "@/components/share/share-dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { DeleteAppointmentTypeDialog } from "./delete-appointment-type-dialog";
 
-interface AppointmentType {
-  id: string;
-  name: string;
-  duration: number;
-  description: string | null;
-  color: string | null;
-  is_default: boolean;
-  user_id: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { Database } from "@/types/supabase";
+
+type AppointmentType = Database["public"]["Tables"]["appointment_types"]["Row"];
 
 export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
   const router = useRouter();
@@ -69,7 +52,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
             description: "Could not load appointment type. Please try again.",
             variant: "destructive",
           });
-          router.push("/dashboard/settings/appointment-types");
+          router.push("/dashboard/settings?tab=appointment-typess");
           return;
         }
 
@@ -98,45 +81,11 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
     fetchData();
   }, [router, supabase, toast, typeId]);
 
-  // Handle delete appointment type
-  const handleDeleteAppointmentType = async () => {
-    if (!appointmentType) return;
 
-    try {
-      const { error } = await supabase
-        .from("appointment_types")
-        .delete()
-        .eq("id", appointmentType.id);
-
-      if (error) {
-        console.error("Error deleting appointment type:", error);
-        toast({
-          title: "Error",
-          description: "Could not delete appointment type. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Appointment type deleted",
-        description: "The appointment type has been deleted successfully.",
-      });
-
-      router.push("/dashboard/settings/appointment-types");
-    } catch (err) {
-      console.error("Error in handleDeleteAppointmentType:", err);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   // Handle customize form button
   const handleCustomizeForm = () => {
-    router.push(`/dashboard/settings/appointment-types/${typeId}/form`);
+    router.push(`/dashboard/settings?tab=appointment-typess/${typeId}/form`);
     setIsShareDialogOpen(false);
   };
 
@@ -158,7 +107,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
       <div className="flex items-center justify-between">
         <Button
           variant="outline"
-          onClick={() => router.push("/dashboard/settings/appointment-types")}
+          onClick={() => router.push("/dashboard/settings?tab=appointment-typess")}
           className="gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -167,7 +116,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/settings/appointment-types/${typeId}/edit`)}
+            onClick={() => router.push(`/dashboard/settings?tab=appointment-typess/${typeId}/edit`)}
             className="gap-2"
           >
             <Edit className="h-4 w-4" />
@@ -217,7 +166,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
         <CardFooter className="flex justify-between">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/settings/appointment-types/${typeId}/form`)}
+            onClick={() => router.push(`/dashboard/settings?tab=appointment-typess/${typeId}/form`)}
           >
             Customize Form
           </Button>
@@ -236,23 +185,14 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
         onCustomizeForm={handleCustomizeForm}
       />
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the appointment type "{appointmentType.name}".
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteAppointmentType} className="bg-destructive text-destructive-foreground">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteAppointmentTypeDialog
+        appointmentType={appointmentType}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onDeleteSuccess={() => {
+          router.push("/dashboard/settings?tab=appointment-typess");
+        }}
+      />
     </div>
   );
 }

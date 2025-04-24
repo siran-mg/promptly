@@ -25,7 +25,7 @@ export default async function AppointmentTypeFieldsPage({ params }: { params: { 
 
   if (error) {
     console.error("Error fetching appointment type:", error);
-    redirect("/dashboard/settings/appointment-types");
+    redirect("/dashboard/settings?tab=appointment-typess");
   }
 
   return (
