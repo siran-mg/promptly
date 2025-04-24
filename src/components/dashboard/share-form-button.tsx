@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Share } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { ShareDialog } from "@/components/share/share-dialog";
 import { useRouter } from "next/navigation";
+import { PrimaryActionButton } from "@/components/ui/primary-action-button";
 
 interface ShareFormButtonProps {
   userId: string;
@@ -51,14 +51,14 @@ export function ShareFormButton({ userId, className }: ShareFormButtonProps) {
 
   return (
     <>
-      <Button
+      <PrimaryActionButton
         onClick={() => setIsOpen(true)}
-        variant="outline"
-        className={`gap-2 text-white ${className || ''}`}
+        icon={Share}
+        variant={className?.includes('indigo') ? 'indigo' : 'default'}
+        className={className || ''}
       >
-        <Share className="h-4 w-4" />
         Share Booking Form
-      </Button>
+      </PrimaryActionButton>
 
       <ShareDialog
         open={isOpen}

@@ -131,7 +131,7 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
               Generate a unique link that clients can use to book appointments with you
             </p>
           </div>
-          {userId && <ShareFormButton userId={userId} className="bg-indigo-600 hover:bg-indigo-700 transition-colors" />}
+          {userId && <ShareFormButton userId={userId} className="indigo" />}
         </div>
 
         {formSettings}

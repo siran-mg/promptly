@@ -7,6 +7,7 @@ import {
   Loader2, Upload, Share, ExternalLink, Palette, Type, FileText,
   Image, Save, Eye, Link, Check, Trash2, RefreshCw, Calendar
 } from "lucide-react";
+import { PrimaryActionButton } from "@/components/ui/primary-action-button";
 import { useToast } from "@/components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -592,23 +593,16 @@ export function FormSettings() {
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Reset to Default
               </Button>
-              <Button
+              <PrimaryActionButton
                 type="submit"
                 disabled={isSaving}
-                className="bg-indigo-600 hover:bg-indigo-700 transition-colors gap-2"
+                isLoading={isSaving}
+                loadingText="Saving Changes..."
+                icon={Save}
+                variant="indigo"
               >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Saving Changes...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4" />
-                    Save Form Settings
-                  </>
-                )}
-              </Button>
+                Save Form Settings
+              </PrimaryActionButton>
             </CardFooter>
           </form>
         </Card>
@@ -647,13 +641,13 @@ export function FormSettings() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              <Button
+              <PrimaryActionButton
                 onClick={handleOpenShareDialog}
-                className="gap-2 bg-indigo-600 hover:bg-indigo-700 transition-colors"
+                icon={Share}
+                variant="indigo"
               >
-                <Share className="h-4 w-4" />
                 Share Booking Link
-              </Button>
+              </PrimaryActionButton>
               <Button
                 variant="outline"
                 onClick={openFormInNewTab}
