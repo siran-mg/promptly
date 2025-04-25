@@ -286,6 +286,26 @@ export function AppointmentForm({
 
           if (notificationError) {
             console.error("Error creating notification:", notificationError);
+          } else {
+            // Send push notification if the in-app notification was created successfully
+            try {
+              await fetch('/api/push/send', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  userId,
+                  title: 'New Appointment Booked',
+                  body: `${formData.clientName} booked a ${appointmentTypeName} for ${format(appointmentDate, "MMM d, yyyy 'at' h:mm a")}`,
+                  url: `/dashboard/appointments?appointmentId=${data.id}`,
+                  tag: 'new-appointment',
+                }),
+              });
+            } catch (pushError) {
+              console.error("Error sending push notification:", pushError);
+              // Continue anyway as the main appointment and notification were created
+            }
           }
         } catch (notifError) {
           console.error("Error creating notification:", notifError);

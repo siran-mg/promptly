@@ -7,6 +7,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { FormSettings } from "@/components/settings/form-settings";
 import { ProfileSettings } from "@/components/settings/profile-settings";
+import { NotificationSettings } from "@/components/settings/notification-settings";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
 import { Sliders } from "lucide-react";
 
@@ -40,6 +41,7 @@ export default async function SettingsPage() {
         <SettingsTabs
           profileSettings={<ProfileSettings />}
           formSettings={<FormSettings />}
+          notificationSettings={<NotificationSettings />}
         />
       </div>
     </DashboardShell>

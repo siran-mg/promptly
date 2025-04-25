@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Settings, Calendar, ArrowLeft, Share } from "lucide-react";
+import { User, Settings, Calendar, ArrowLeft, Share, Bell } from "lucide-react";
 import { ShareFormButton } from "@/components/dashboard/share-form-button";
 import { createClient } from "@/lib/supabase";
 import { useEffect, useState } from "react";
@@ -16,9 +16,10 @@ import { Database } from "@/types/supabase";
 interface SettingsTabsProps {
   profileSettings: React.ReactNode;
   formSettings: React.ReactNode;
+  notificationSettings?: React.ReactNode;
 }
 
-export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProps) {
+export function SettingsTabs({ profileSettings, formSettings, notificationSettings }: SettingsTabsProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("profile");
   const [selectedAppointmentTypeId, setSelectedAppointmentTypeId] = useState<string | null>(null);
@@ -92,7 +93,7 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
 
   return (
     <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-8 p-1 bg-indigo-50/50 border-indigo-100">
+      <TabsList className="grid w-full grid-cols-4 mb-8 p-1 bg-indigo-50/50 border-indigo-100">
         <TabsTrigger
           value="profile"
           className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
@@ -106,6 +107,13 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
         >
           <Settings className="h-4 w-4" />
           Form Settings
+        </TabsTrigger>
+        <TabsTrigger
+          value="notifications"
+          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+        >
+          <Bell className="h-4 w-4" />
+          Notifications
         </TabsTrigger>
         <TabsTrigger
           value="appointment-types"
@@ -135,6 +143,10 @@ export function SettingsTabs({ profileSettings, formSettings }: SettingsTabsProp
         </div>
 
         {formSettings}
+      </TabsContent>
+
+      <TabsContent value="notifications" className="space-y-6">
+        {notificationSettings}
       </TabsContent>
 
       <TabsContent value="appointment-types" className="space-y-6">
