@@ -15,6 +15,7 @@ interface DynamicAppointmentFormProps {
   };
   selectedTypes?: string[];
   hideAppointmentTypes?: boolean;
+  isDashboard?: boolean;
 }
 
 export function DynamicAppointmentForm({
@@ -22,7 +23,8 @@ export function DynamicAppointmentForm({
   defaultTypeId,
   initialSettings,
   selectedTypes = [],
-  hideAppointmentTypes = false
+  hideAppointmentTypes = false,
+  isDashboard = false
 }: DynamicAppointmentFormProps) {
   const supabase = createClient();
   const [settings, setSettings] = useState(initialSettings);
@@ -165,6 +167,7 @@ export function DynamicAppointmentForm({
         initialDate={initialDate}
         selectedTypes={selectedTypes}
         hideAppointmentTypes={hideAppointmentTypes}
+        isDashboard={isDashboard}
       />
     </div>
   );

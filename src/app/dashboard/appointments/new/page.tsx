@@ -45,6 +45,7 @@ export default async function NewAppointmentPage() {
           userId={session.user.id}
           defaultTypeId={null}
           initialSettings={settings}
+          isDashboard={true}
         />
       </div>
     </DashboardShell>

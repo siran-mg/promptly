@@ -33,6 +33,7 @@ interface AppointmentFormProps {
   initialDate?: Date | null;
   selectedTypes?: string[];
   hideAppointmentTypes?: boolean;
+  isDashboard?: boolean;
 }
 
 export function AppointmentForm({
@@ -42,7 +43,8 @@ export function AppointmentForm({
   onAppointmentTypeChange,
   initialDate = null,
   selectedTypes = [],
-  hideAppointmentTypes = false
+  hideAppointmentTypes = false,
+  isDashboard = false
 }: AppointmentFormProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -262,8 +264,14 @@ export function AppointmentForm({
       });
       setCustomFieldValues({});
 
-      // Redirect to confirmation page
-      router.push(`/book/confirmation/${data.id}`);
+      // Redirect based on context
+      if (isDashboard) {
+        // If created from dashboard, redirect to appointments calendar view
+        router.push('/dashboard/appointments?view=calendar');
+      } else {
+        // If created from public form, redirect to confirmation page
+        router.push(`/book/confirmation/${data.id}`);
+      }
     } catch (err) {
       console.error("Error submitting form:", err);
       toast({
