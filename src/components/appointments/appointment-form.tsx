@@ -132,6 +132,27 @@ export function AppointmentForm({
     }
   }, [defaultTypeId, userId, supabase]);
 
+  // Check for client information in URL parameters
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      const clientName = url.searchParams.get('clientName');
+      const clientEmail = url.searchParams.get('clientEmail');
+      const clientPhone = url.searchParams.get('clientPhone');
+
+      // Update form data with client information if available
+      if (clientName || clientEmail || clientPhone) {
+        console.log('Pre-filling client information from URL parameters');
+        setFormData(prev => ({
+          ...prev,
+          clientName: clientName || prev.clientName,
+          clientEmail: clientEmail || prev.clientEmail,
+          clientPhone: clientPhone || prev.clientPhone
+        }));
+      }
+    }
+  }, []);
+
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
 
   // Time slots are now handled by the TimePicker component

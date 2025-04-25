@@ -177,13 +177,17 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
-                          onClick={() =>
-                            toast({
-                              title: "Book Appointment",
-                              description: "This feature is coming soon.",
-                              variant: "default",
-                            })
-                          }
+                          onClick={() => {
+                            // Create URL with client info as query parameters
+                            const params = new URLSearchParams({
+                              clientName: client.name,
+                              clientEmail: client.email,
+                              clientPhone: client.phone
+                            });
+
+                            // Redirect to new appointment page with client info
+                            window.location.href = `/dashboard/appointments/new?${params.toString()}`;
+                          }}
                         >
                           <Calendar className="mr-2 h-4 w-4 text-green-600" />
                           Book New Appointment
