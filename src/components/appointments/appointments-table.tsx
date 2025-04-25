@@ -2,14 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { MoreHorizontal, Search, Share, Copy, Check, Loader2, Trash2, Eye, Plus, Filter, CalendarClock } from "lucide-react";
+import { MoreHorizontal, Search, Share, Loader2, Trash2, Eye, Plus, Filter, CalendarClock, Copy, Check } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 // No longer need supabase client as we're using the API endpoint
 import { Database } from "@/types/supabase";
 import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
 import { AppointmentDetailsDialog } from "./appointment-details-dialog";
 import { EmptyAppointmentsState } from "./empty-appointments-state";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import {
   Table,
@@ -30,7 +36,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AppointmentStatusBadge } from "./appointment-status-badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
   appointment_type?: {
@@ -225,7 +230,9 @@ export function AppointmentsTable({
                 <TableRow
                   key={appointment.id}
                   className="cursor-pointer hover:bg-indigo-50/30 transition-colors"
-                  onClick={() => {
+                  onClick={(e) => {
+                    // Only open details dialog if the click is not on a dropdown menu item
+                    if (e.defaultPrevented) return;
                     setSelectedAppointment(appointment);
                     setIsDetailsDialogOpen(true);
                   }}
@@ -269,7 +276,10 @@ export function AppointmentsTable({
                         <Button
                           variant="ghost"
                           className="h-8 w-8 p-0 hover:bg-indigo-100 hover:text-indigo-700"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                          }}
                         >
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
@@ -281,6 +291,7 @@ export function AppointmentsTable({
                           className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
+                            e.preventDefault();
                             setSelectedAppointment(appointment);
                             setIsDetailsDialogOpen(true);
                           }}
@@ -290,7 +301,10 @@ export function AppointmentsTable({
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
-                          onClick={async () => {
+                          onClick={async (e) => {
+                            // Stop propagation and prevent default to prevent the row click from opening the details dialog
+                            e.stopPropagation();
+                            e.preventDefault();
                             // First, check if the appointment has a share token
                             if (!appointment.share_token) {
                               // Generate a share token before opening the dialog
@@ -359,6 +373,7 @@ export function AppointmentsTable({
                           className="text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
+                            e.preventDefault();
                             setAppointmentToDelete(appointment);
                             setIsDeleteDialogOpen(true);
                           }}
@@ -378,54 +393,47 @@ export function AppointmentsTable({
 
       {/* Share Dialog */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Share Appointment</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl flex items-center justify-center text-primary">
+              <Share className="h-5 w-5 mr-2" />
+              <span>Share Appointment Link</span>
+            </DialogTitle>
+            <DialogDescription className="text-center">
               Share this link with your client to let them view their appointment details.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="grid flex-1 gap-2">
-                <label htmlFor="link" className="sr-only">
-                  Link
-                </label>
-                <Input
-                  id="link"
-                  value={currentAppointment && currentAppointment.share_token ?
-                    `${window.location.origin}/appointment/${currentAppointment.share_token}` :
-                    'No share link available'}
-                  readOnly
-                />
-              </div>
-              <Button
-                size="icon"
-                onClick={async () => {
-                  if (currentAppointment && currentAppointment.share_token) {
-                    // We already have a valid share token, just copy it
-                    const link = `${window.location.origin}/appointment/${currentAppointment.share_token}`;
-                    navigator.clipboard.writeText(link);
-                    setCopied(true);
-                    toast({
-                      title: "Link copied",
-                      description: "The appointment link has been copied to your clipboard.",
-                    });
-                    setTimeout(() => setCopied(false), 2000);
-                  }
-                }}
-              >
-                {isGeneratingToken ? <Loader2 className="h-4 w-4 animate-spin" /> :
-                 copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
+          <div className="flex items-center space-x-2 pt-4">
+            <div className="grid flex-1 gap-2">
+              <Input
+                id="link"
+                value={currentAppointment && currentAppointment.share_token ?
+                  `${window.location.origin}/appointment/${currentAppointment.share_token}` :
+                  'No share link available'}
+                readOnly
+                className="border-primary/20 focus-visible:ring-primary/30"
+              />
             </div>
-            <div className="flex flex-col space-y-2">
-              <h3 className="text-sm font-medium">Appointment for</h3>
-              <p className="text-sm">{currentAppointment?.client_name}</p>
-              <p className="text-xs text-muted-foreground">
-                {currentAppointment ? format(new Date(currentAppointment.date), "PPP p") : ''}
-              </p>
-            </div>
+            <Button
+              size="icon"
+              className={copied ? "bg-green-600 hover:bg-green-700" : ""}
+              onClick={async () => {
+                if (currentAppointment && currentAppointment.share_token) {
+                  // Copy the link to clipboard
+                  const link = `${window.location.origin}/appointment/${currentAppointment.share_token}`;
+                  navigator.clipboard.writeText(link);
+                  setCopied(true);
+                  toast({
+                    title: "Link copied",
+                    description: "The appointment link has been copied to your clipboard.",
+                  });
+                  setTimeout(() => setCopied(false), 2000);
+                }
+              }}
+            >
+              {isGeneratingToken ? <Loader2 className="h-4 w-4 animate-spin" /> :
+               copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -458,6 +466,7 @@ export function AppointmentsTable({
             setCurrentAppointment(selectedAppointment);
             setIsDetailsDialogOpen(false);
             setShareDialogOpen(true);
+            setCopied(false);
           }
         }}
         onStatusChange={(appointmentId, newStatus) => {
