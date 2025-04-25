@@ -15,7 +15,8 @@ export function NotificationSettings() {
             Push Notifications
           </CardTitle>
           <CardDescription>
-            Receive notifications on your device when you get new appointments (enabled by default)
+            Receive notifications on your device when you get new appointments (enabled by default).
+            Note: Action buttons may not appear on all browsers and devices.
           </CardDescription>
         </CardHeader>
         <CardContent>

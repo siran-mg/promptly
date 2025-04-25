@@ -270,7 +270,7 @@ export function AppointmentForm({
           }
 
           // Create notification
-          const { error: notificationError } = await supabase
+          const { data: notificationData, error: notificationError } = await supabase
             .from("notifications")
             .insert({
               user_id: userId,
@@ -282,12 +282,15 @@ export function AppointmentForm({
               },
               related_id: data.id,
               is_read: false,
-            });
+            })
+            .select()
+            .single();
 
           if (notificationError) {
             console.error("Error creating notification:", notificationError);
           } else {
             // Send push notification if the in-app notification was created successfully
+            const notificationId = notificationData?.id;
             try {
               console.log("Sending push notification for new appointment");
 
@@ -302,6 +305,30 @@ export function AppointmentForm({
                   body: `${formData.clientName} booked a ${appointmentTypeName} for ${format(appointmentDate, "MMM d, yyyy 'at' h:mm a")}`,
                   url: `/dashboard/appointments?appointmentId=${data.id}`,
                   tag: 'new-appointment',
+                  // Ensure actions are properly formatted for notification API
+                  actions: [
+                    {
+                      action: 'view',
+                      title: 'View Appointment',
+                      icon: '/view-icon.svg'  // Optional icon for platforms that support it
+                    },
+                    {
+                      action: 'markAsRead',
+                      title: 'Mark as Read',
+                      icon: '/check-icon.svg'  // Optional icon for platforms that support it
+                    }
+                  ],
+                  // Force these settings to ensure actions are visible
+                  requireInteraction: true,
+                  renotify: true,
+                  data: {
+                    appointmentId: data.id,
+                    notificationId: notificationId,
+                    clientName: formData.clientName,
+                    appointmentType: appointmentTypeName,
+                    date: appointmentDate.toISOString(),
+                    time: formData.time
+                  }
                 }),
               });
 
