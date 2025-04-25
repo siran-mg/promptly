@@ -37,13 +37,15 @@ export function ActiveFiltersDisplay({
     <div className="bg-amber-50 p-4 rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border border-amber-200">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm font-medium text-amber-800">Active filters:</span>
-        {activeTypeId && (
+        {activeTypeId && activeTypeId.split(',').map(typeId => (
           <FilterTag
+            key={typeId}
             label="Type"
-            value={appointmentTypes.find(t => t.id === activeTypeId)?.name || 'Unknown Type'}
+            value={appointmentTypes.find(t => t.id === typeId)?.name || 'Unknown Type'}
             paramName="type"
+            paramValue={typeId}
           />
-        )}
+        ))}
         {activeFieldName && (
           <FilterTag
             label="Field"

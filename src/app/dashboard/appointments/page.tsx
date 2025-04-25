@@ -11,12 +11,7 @@ import {
   Plus,
   List,
   Calendar,
-  CalendarDays,
-  CalendarClock,
-  Clock,
-  Users,
-  Search,
-  Filter
+  CalendarClock
 } from "lucide-react";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -36,8 +31,11 @@ export default async function AppointmentsPage({
   }
 
   // Extract filter parameters
-  const typeId = searchParams.type as string;
+  const typeParam = searchParams.type as string;
   const fieldName = searchParams.field as string;
+
+  // Parse type IDs (could be a single ID or a comma-separated list)
+  const typeIds = typeParam ? typeParam.split(',') : [];
 
   // Build the query
   let query = supabase
@@ -49,8 +47,12 @@ export default async function AppointmentsPage({
     `);
 
   // Apply filters if provided
-  if (typeId) {
-    query = query.eq('appointment_type_id', typeId);
+  if (typeIds.length === 1) {
+    // If only one type is selected, use eq
+    query = query.eq('appointment_type_id', typeIds[0]);
+  } else if (typeIds.length > 1) {
+    // If multiple types are selected, use in
+    query = query.in('appointment_type_id', typeIds);
   }
 
   // Order by date
@@ -107,7 +109,7 @@ export default async function AppointmentsPage({
             <AppointmentsCalendarClient
               appointments={appointments || []}
               appointmentTypes={appointmentTypes || []}
-              activeTypeId={typeId}
+              activeTypeId={typeParam}
               activeFieldName={fieldName}
             />
           </TabsContent>
@@ -115,7 +117,7 @@ export default async function AppointmentsPage({
             <AppointmentsTable
               appointments={appointments || []}
               appointmentTypes={appointmentTypes || []}
-              activeTypeId={typeId}
+              activeTypeId={typeParam}
               activeFieldName={fieldName}
             />
           </TabsContent>

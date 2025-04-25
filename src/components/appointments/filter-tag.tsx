@@ -7,19 +7,38 @@ interface FilterTagProps {
   label: string;
   value: string;
   paramName: string;
+  paramValue?: string;
   onClear?: () => void;
 }
 
-export function FilterTag({ label, value, paramName, onClear }: FilterTagProps) {
+export function FilterTag({ label, value, paramName, paramValue, onClear }: FilterTagProps) {
   const router = useRouter();
 
   const handleClear = () => {
     if (onClear) {
       onClear();
     } else {
-      // Remove this filter from the URL and navigate
+      // Get the current URL
       const url = new URL(window.location.href);
-      url.searchParams.delete(paramName);
+
+      if (paramValue && paramName === 'type') {
+        // For type filters, we need to handle multiple values
+        const currentTypes = url.searchParams.get(paramName)?.split(',') || [];
+        // Remove the specific type
+        const newTypes = currentTypes.filter(t => t !== paramValue);
+
+        if (newTypes.length === 0) {
+          // If no types left, remove the parameter
+          url.searchParams.delete(paramName);
+        } else {
+          // Otherwise, update with remaining types
+          url.searchParams.set(paramName, newTypes.join(','));
+        }
+      } else {
+        // For other filters, just remove the parameter
+        url.searchParams.delete(paramName);
+      }
+
       router.push(url.pathname + url.search);
     }
   };
