@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { MoreHorizontal, Search, Mail, Phone, UserPlus, Calendar, MessageSquare, Filter, User } from "lucide-react";
+import { Search, Mail, Phone, Calendar, Filter } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Database } from "@/types/supabase";
 
 import {
   Table,
@@ -14,17 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyClientsState } from "./empty-clients-state";
 
@@ -105,7 +95,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
               <TableHead className="text-indigo-700 font-semibold">Contact</TableHead>
               <TableHead className="text-indigo-700 font-semibold">Appointments</TableHead>
               <TableHead className="text-indigo-700 font-semibold">Last Appointment</TableHead>
-              <TableHead className="text-indigo-700 font-semibold w-[80px]">Actions</TableHead>
+              <TableHead className="text-indigo-700 font-semibold w-[150px]">Book Appointment</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -153,61 +143,24 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                     )}
                   </TableCell>
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-indigo-100 hover:text-indigo-700">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel className="text-indigo-700">Client Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
-                          onClick={() =>
-                            toast({
-                              title: "View Client Details",
-                              description: "This feature is coming soon.",
-                              variant: "default",
-                            })
-                          }
-                        >
-                          <User className="mr-2 h-4 w-4 text-indigo-600" />
-                          View Client Profile
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
-                          onClick={() => {
-                            // Create URL with client info as query parameters
-                            const params = new URLSearchParams({
-                              clientName: client.name,
-                              clientEmail: client.email,
-                              clientPhone: client.phone
-                            });
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 transition-colors flex items-center gap-2 w-full"
+                      onClick={() => {
+                        // Create URL with client info as query parameters
+                        const params = new URLSearchParams({
+                          clientName: client.name,
+                          clientEmail: client.email,
+                          clientPhone: client.phone
+                        });
 
-                            // Redirect to new appointment page with client info
-                            window.location.href = `/dashboard/appointments/new?${params.toString()}`;
-                          }}
-                        >
-                          <Calendar className="mr-2 h-4 w-4 text-green-600" />
-                          Book New Appointment
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
-                          onClick={() =>
-                            toast({
-                              title: "Send Message",
-                              description: "This feature is coming soon.",
-                              variant: "default",
-                            })
-                          }
-                        >
-                          <MessageSquare className="mr-2 h-4 w-4 text-blue-600" />
-                          Send Message
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        // Redirect to new appointment page with client info
+                        window.location.href = `/dashboard/appointments/new?${params.toString()}`;
+                      }}
+                    >
+                      <Calendar className="h-4 w-4" />
+                      Book Appointment
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -218,6 +171,3 @@ export function ClientsTable({ clients }: ClientsTableProps) {
     </div>
   );
 }
-
-// Import the Users icon for the empty state
-import { Users } from "lucide-react";
