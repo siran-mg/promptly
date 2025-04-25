@@ -252,6 +252,47 @@ export function AppointmentForm({
         }
       }
 
+      // Create a notification if this is a booking from a shared link (not from dashboard)
+      if (!isDashboard && data) {
+        try {
+          // Get appointment type name if available
+          let appointmentTypeName = "Appointment";
+          if (formData.appointmentTypeId) {
+            const { data: typeData } = await supabase
+              .from("appointment_types")
+              .select("name")
+              .eq("id", formData.appointmentTypeId)
+              .single();
+
+            if (typeData) {
+              appointmentTypeName = typeData.name;
+            }
+          }
+
+          // Create notification
+          const { error: notificationError } = await supabase
+            .from("notifications")
+            .insert({
+              user_id: userId,
+              type: "new_appointment",
+              content: {
+                clientName: formData.clientName,
+                date: appointmentDate.toISOString(),
+                appointmentTypeName,
+              },
+              related_id: data.id,
+              is_read: false,
+            });
+
+          if (notificationError) {
+            console.error("Error creating notification:", notificationError);
+          }
+        } catch (notifError) {
+          console.error("Error creating notification:", notifError);
+          // Continue anyway as the main appointment was created
+        }
+      }
+
       // Reset form
       setFormData({
         clientName: "",

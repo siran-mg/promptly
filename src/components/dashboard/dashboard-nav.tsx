@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import {
   CalendarClock, Home, Settings, Users,
   LogOut, User, Share, BarChart3,
-  CalendarDays, Clock, ChevronRight
+  CalendarDays, Clock, ChevronRight,
+  Bell, LucideIcon
 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useEffect, useState } from "react";
@@ -15,44 +16,61 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { NavItemWithBadge } from "@/components/ui/nav-item-with-badge";
+import { useNotifications } from "@/contexts/notifications-context";
 
 interface NavItem {
   title: string;
   href: string;
-  icon: React.ReactNode;
+  icon: React.ReactNode | LucideIcon;
+  badge?: number;
+  activePaths?: string[];
 }
-
-const navItems: NavItem[] = [
-  {
-    title: "Overview",
-    href: "/dashboard",
-    icon: <BarChart3 className="h-5 w-5" />,
-  },
-  {
-    title: "Appointments",
-    href: "/dashboard/appointments",
-    icon: <CalendarClock className="h-5 w-5" />,
-  },
-  {
-    title: "Clients",
-    href: "/dashboard/clients",
-    icon: <Users className="h-5 w-5" />,
-  },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: <Settings className="h-5 w-5" />,
-  },
-];
 
 export function DashboardNav() {
   const pathname = usePathname();
   const supabase = createClient();
+  const { unreadCount } = useNotifications();
   const [userProfile, setUserProfile] = useState<{
     full_name?: string;
     email?: string;
     avatar_url?: string;
   } | null>(null);
+
+  // Define navigation items
+  const navItems = [
+    {
+      title: "Overview",
+      href: "/dashboard",
+      icon: BarChart3,
+      activePaths: ["/dashboard$"]
+    },
+    {
+      title: "Appointments",
+      href: "/dashboard/appointments",
+      icon: CalendarClock,
+      activePaths: ["/dashboard/appointments"]
+    },
+    {
+      title: "Notifications",
+      href: "/dashboard/notifications",
+      icon: Bell,
+      ...(unreadCount > 0 ? { badge: unreadCount } : {}),
+      activePaths: ["/dashboard/notifications"]
+    },
+    {
+      title: "Clients",
+      href: "/dashboard/clients",
+      icon: Users,
+      activePaths: ["/dashboard/clients"]
+    },
+    {
+      title: "Settings",
+      href: "/dashboard/settings",
+      icon: Settings,
+      activePaths: ["/dashboard/settings"]
+    },
+  ];
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -121,7 +139,23 @@ export function DashboardNav() {
 
         <div className="space-y-1">
           {navItems.map((item) => {
+            // Use NavItemWithBadge for items with badges
+            if (item.badge !== undefined) {
+              return (
+                <NavItemWithBadge
+                  key={item.href}
+                  href={item.href}
+                  title={item.title}
+                  icon={item.icon as LucideIcon}
+                  badgeCount={item.badge}
+                  activePaths={item.activePaths}
+                />
+              );
+            }
+
+            // Use regular Link for items without badges
             const active = isActive(item.href);
+            const Icon = item.icon as LucideIcon;
 
             return (
               <Link
@@ -138,7 +172,7 @@ export function DashboardNav() {
                   "p-1 rounded-md",
                   active ? "bg-indigo-100 text-indigo-700" : "text-muted-foreground"
                 )}>
-                  {item.icon}
+                  <Icon className="h-5 w-5" />
                 </div>
                 <span>{item.title}</span>
                 {active && (
