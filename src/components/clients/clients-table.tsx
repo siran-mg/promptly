@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { Search, Mail, Phone, Calendar, Filter } from "lucide-react";
+import { Search, Mail, Phone, Calendar, Filter, Trash2, MoreHorizontal, Edit } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 import {
@@ -16,7 +16,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { EmptyClientsState } from "./empty-clients-state";
+import { DeleteClientDialog } from "./delete-client-dialog";
+import { EditClientDialog } from "./edit-client-dialog";
 
 // Define a client type based on appointments
 type Client = {
@@ -34,6 +44,10 @@ interface ClientsTableProps {
 
 export function ClientsTable({ clients }: ClientsTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
 
   // Filter clients based on search query
@@ -95,7 +109,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
               <TableHead className="text-indigo-700 font-semibold">Contact</TableHead>
               <TableHead className="text-indigo-700 font-semibold">Appointments</TableHead>
               <TableHead className="text-indigo-700 font-semibold">Last Appointment</TableHead>
-              <TableHead className="text-indigo-700 font-semibold w-[150px]">Book Appointment</TableHead>
+              <TableHead className="text-indigo-700 font-semibold w-[80px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -143,24 +157,55 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Button
-                      size="sm"
-                      className="bg-green-600 hover:bg-green-700 transition-colors flex items-center gap-2 w-full"
-                      onClick={() => {
-                        // Create URL with client info as query parameters
-                        const params = new URLSearchParams({
-                          clientName: client.name,
-                          clientEmail: client.email,
-                          clientPhone: client.phone
-                        });
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-indigo-100 hover:text-indigo-700">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuLabel className="text-indigo-700">Client Actions</DropdownMenuLabel>
+                        <DropdownMenuItem
+                          className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
+                          onClick={() => {
+                            // Create URL with client info as query parameters
+                            const params = new URLSearchParams({
+                              clientName: client.name,
+                              clientEmail: client.email,
+                              clientPhone: client.phone
+                            });
 
-                        // Redirect to new appointment page with client info
-                        window.location.href = `/dashboard/appointments/new?${params.toString()}`;
-                      }}
-                    >
-                      <Calendar className="h-4 w-4" />
-                      Book Appointment
-                    </Button>
+                            // Redirect to new appointment page with client info
+                            window.location.href = `/dashboard/appointments/new?${params.toString()}`;
+                          }}
+                        >
+                          <Calendar className="mr-2 h-4 w-4 text-green-600" />
+                          Book New Appointment
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
+                          onClick={() => {
+                            setClientToEdit(client);
+                            setIsEditDialogOpen(true);
+                          }}
+                        >
+                          <Edit className="mr-2 h-4 w-4 text-indigo-600" />
+                          Edit Client
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="hover:bg-indigo-50 hover:text-red-700 cursor-pointer"
+                          onClick={() => {
+                            setClientToDelete(client);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4 text-red-600" />
+                          Remove Client
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -168,6 +213,28 @@ export function ClientsTable({ clients }: ClientsTableProps) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Delete Client Dialog */}
+      <DeleteClientDialog
+        client={clientToDelete}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onDeleteSuccess={() => {
+          // Reload the page to refresh the client list
+          window.location.reload();
+        }}
+      />
+
+      {/* Edit Client Dialog */}
+      <EditClientDialog
+        client={clientToEdit}
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onUpdateSuccess={() => {
+          // Reload the page to refresh the client list
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }
