@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslations } from "next-intl";
+import { useDateFormatter } from "@/hooks/use-date-formatter";
 
 // Define a more complete profile type
 interface Profile {
@@ -38,6 +40,8 @@ export function ProfileSettings() {
   });
   const { toast } = useToast();
   const supabase = createClient();
+  const t = useTranslations();
+  const { formatDate } = useDateFormatter();
 
   useEffect(() => {
     const fetchUserAndProfile = async () => {
@@ -123,21 +127,21 @@ export function ProfileSettings() {
       // Check if there was a warning about the profile not being updated
       if (result.warning) {
         toast({
-          title: "Avatar uploaded",
-          description: "Your profile picture was uploaded but couldn't be saved to your profile. It will be visible until you refresh the page.",
+          title: t('settings.profileSettings.avatarUploaded'),
+          description: t('settings.profileSettings.avatarUploadedButNotSaved'),
           variant: "default",
         });
       } else {
         toast({
-          title: "Avatar updated",
-          description: "Your profile picture has been updated successfully.",
+          title: t('settings.profileSettings.avatarUpdated'),
+          description: t('settings.profileSettings.avatarUpdatedDescription'),
         });
       }
     } catch (err: any) {
       console.error('Error uploading avatar:', err);
       toast({
-        title: "Upload failed",
-        description: err.message || "Could not upload profile picture. Please try again.",
+        title: t('settings.profileSettings.uploadFailed'),
+        description: err.message || t('settings.profileSettings.uploadFailedDescription'),
         variant: "destructive",
       });
     } finally {
@@ -193,8 +197,8 @@ export function ProfileSettings() {
       }
 
       toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
+        title: t('settings.profileSettings.updateSuccess'),
+        description: t('settings.profileSettings.updateSuccessDescription'),
       });
 
       // Refresh profile data
@@ -210,8 +214,8 @@ export function ProfileSettings() {
     } catch (err) {
       console.error("Error updating profile:", err);
       toast({
-        title: "Update failed",
-        description: "Could not update profile. Please try again.",
+        title: t('settings.profileSettings.updateFailed'),
+        description: t('settings.profileSettings.updateFailedDescription'),
         variant: "destructive",
       });
     } finally {
@@ -223,7 +227,7 @@ export function ProfileSettings() {
     return (
       <div className="flex flex-col justify-center items-center h-64 gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
-        <p className="text-muted-foreground">Loading your profile information...</p>
+        <p className="text-muted-foreground">{t('settings.profileSettings.loading')}</p>
       </div>
     );
   }
@@ -235,10 +239,10 @@ export function ProfileSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-red-600">
             <AlertCircle className="h-5 w-5" />
-            Not Authenticated
+            {t('common.notAuthenticated')}
           </CardTitle>
           <CardDescription>
-            Please log in to view and manage your profile information.
+            {t('settings.profileSettings.loginRequired')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -246,7 +250,7 @@ export function ProfileSettings() {
             onClick={() => window.location.href = "/login"}
             className="bg-red-600 hover:bg-red-700"
           >
-            Go to Login
+            {t('common.goToLogin')}
           </Button>
         </CardContent>
       </Card>
@@ -259,10 +263,10 @@ export function ProfileSettings() {
       <CardHeader className="pb-4">
         <CardTitle className="text-xl flex items-center gap-2">
           <UserIcon className="h-5 w-5 text-indigo-600" />
-          Your Profile Information
+          {t('settings.profileSettings.title')}
         </CardTitle>
         <CardDescription className="text-base">
-          Update your personal information and manage your account settings
+          {t('settings.profileSettings.description')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -318,12 +322,12 @@ export function ProfileSettings() {
                 {uploadingAvatar ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Uploading...
+                    {t('common.uploading')}
                   </>
                 ) : (
                   <>
                     <Upload className="h-4 w-4 mr-2" />
-                    Update Profile Picture
+                    {t('settings.profileSettings.updateAvatar')}
                   </>
                 )}
               </Button>
@@ -334,11 +338,11 @@ export function ProfileSettings() {
           <div className="space-y-6">
             <h3 className="font-medium text-lg flex items-center gap-2">
               <Mail className="h-5 w-5 text-indigo-600" />
-              Contact Information
+              {t('settings.profileSettings.contactInfo')}
             </h3>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+              <Label htmlFor="email" className="text-sm font-medium">{t('settings.profileSettings.email')}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -350,12 +354,12 @@ export function ProfileSettings() {
                 />
               </div>
               <p className="text-sm text-muted-foreground">
-                Your email address is used for login and cannot be changed.
+                {t('settings.profileSettings.emailHelp')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="full_name" className="text-sm font-medium">Full Name</Label>
+              <Label htmlFor="full_name" className="text-sm font-medium">{t('settings.profileSettings.name')}</Label>
               <div className="relative">
                 <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
                 <Input
@@ -363,14 +367,14 @@ export function ProfileSettings() {
                   name="full_name"
                   value={formData.full_name}
                   onChange={handleChange}
-                  placeholder="Your full name"
+                  placeholder={t('settings.profileSettings.namePlaceholder')}
                   className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="website" className="text-sm font-medium">Website</Label>
+              <Label htmlFor="website" className="text-sm font-medium">{t('settings.profileSettings.website')}</Label>
               <div className="relative">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
                 <Input
@@ -378,7 +382,7 @@ export function ProfileSettings() {
                   name="website"
                   value={formData.website}
                   onChange={handleChange}
-                  placeholder="https://example.com"
+                  placeholder={t('settings.profileSettings.websitePlaceholder')}
                   className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                 />
               </div>
@@ -389,20 +393,16 @@ export function ProfileSettings() {
           <div className="space-y-4 bg-indigo-50/50 p-4 rounded-lg">
             <h3 className="font-medium text-lg flex items-center gap-2">
               <Calendar className="h-5 w-5 text-indigo-600" />
-              Account Information
+              {t('settings.profileSettings.accountInfo')}
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-indigo-600" />
-                  <p className="text-sm font-medium">Account created</p>
+                  <p className="text-sm font-medium">{t('settings.profileSettings.accountCreated')}</p>
                 </div>
                 <p className="text-sm bg-white px-3 py-1 rounded-full border border-indigo-100">
-                  {new Date(user.created_at).toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                  })}
+                  {formatDate(new Date(user.created_at), { shortDate: true })}
                 </p>
               </div>
               <div className="flex justify-between items-center">
@@ -412,14 +412,14 @@ export function ProfileSettings() {
                   ) : (
                     <AlertCircle className="h-4 w-4 text-amber-600" />
                   )}
-                  <p className="text-sm font-medium">Email verification</p>
+                  <p className="text-sm font-medium">{t('settings.profileSettings.emailVerification')}</p>
                 </div>
                 <p className={`text-sm px-3 py-1 rounded-full border ${
                   user.email_confirmed_at
                     ? "bg-green-50 text-green-700 border-green-100"
                     : "bg-amber-50 text-amber-700 border-amber-100"
                 }`}>
-                  {user.email_confirmed_at ? "Verified" : "Not Verified"}
+                  {user.email_confirmed_at ? t('settings.profileSettings.verified') : t('settings.profileSettings.notVerified')}
                 </p>
               </div>
             </div>
@@ -434,12 +434,12 @@ export function ProfileSettings() {
             {saving ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Saving Changes...
+                {t('settings.profileSettings.saving')}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4" />
-                Save Profile Changes
+                {t('settings.profileSettings.saveChanges')}
               </>
             )}
           </Button>

@@ -14,7 +14,8 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect("/login");
+    // Redirect to the default locale login page
+    redirect("/en/login");
   }
 
   return (

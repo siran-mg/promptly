@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarClock, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface EmptyAppointmentsStateProps {
   title?: string;
@@ -13,12 +14,18 @@ interface EmptyAppointmentsStateProps {
 }
 
 export function EmptyAppointmentsState({
-  title = "No Appointments Yet",
-  description = "Create your first appointment to get started",
-  buttonText = "Create Your First Appointment",
+  title,
+  description,
+  buttonText,
   onButtonClick,
 }: EmptyAppointmentsStateProps) {
   const router = useRouter();
+  const t = useTranslations();
+
+  // Set default values using translations
+  const defaultTitle = t('appointments.empty.title');
+  const defaultDescription = t('appointments.empty.description');
+  const defaultButtonText = t('appointments.empty.buttonText');
 
   const handleButtonClick = () => {
     if (onButtonClick) {
@@ -32,21 +39,21 @@ export function EmptyAppointmentsState({
     <Card className="border-indigo-100 overflow-hidden">
       <div className="h-1 bg-indigo-600"></div>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">{title}</CardTitle>
+        <CardTitle className="text-xl">{title || defaultTitle}</CardTitle>
         <CardDescription className="text-base">
-          {description}
+          {description || defaultDescription}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center pb-8 gap-4">
         <div className="bg-indigo-50 p-4 rounded-full">
           <CalendarClock className="h-16 w-16 text-indigo-600" />
         </div>
-        <Button 
+        <Button
           className="bg-indigo-600 hover:bg-indigo-700 transition-colors flex items-center gap-2"
           onClick={handleButtonClick}
         >
           <Plus className="h-4 w-4" />
-          {buttonText}
+          {buttonText || defaultButtonText}
         </Button>
       </CardContent>
     </Card>

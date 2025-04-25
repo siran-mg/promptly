@@ -6,6 +6,7 @@ import { ArrowLeft, Palette, FileText } from "lucide-react";
 import { Database } from "@/types/supabase";
 import { useRouter } from "next/navigation";
 import { PrimaryActionButton } from "@/components/ui/primary-action-button";
+import { useTranslations } from "next-intl";
 
 type AppointmentType = Database["public"]["Tables"]["appointment_types"]["Row"];
 
@@ -23,6 +24,7 @@ export function AppointmentTypeFormClient({
   showBackButton = true
 }: AppointmentTypeFormClientProps) {
   const router = useRouter();
+  const t = useTranslations();
 
   const handleBack = () => {
     if (onBack) {
@@ -42,7 +44,7 @@ export function AppointmentTypeFormClient({
             className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Appointment Types
+            {t('settings.appointmentTypes.backToTypes')}
           </Button>
 
           <Button
@@ -51,7 +53,7 @@ export function AppointmentTypeFormClient({
             className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
           >
             <FileText className="h-4 w-4" />
-            Manage Custom Fields
+            {t('settings.appointmentTypes.manageCustomFields')}
           </Button>
         </div>
       )}
@@ -60,10 +62,10 @@ export function AppointmentTypeFormClient({
         <div>
           <h2 className="text-xl font-medium flex items-center gap-2">
             <Palette className="h-5 w-5 text-indigo-600" />
-            Form Settings for {appointmentType.name}
+            {t('settings.appointmentTypes.formSettingsFor', { name: appointmentType.name })}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Customize how the booking form appears to clients for this appointment type
+            {t('settings.appointmentTypes.formSettingsDescription')}
           </p>
         </div>
         <div

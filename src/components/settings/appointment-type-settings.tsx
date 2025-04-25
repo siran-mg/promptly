@@ -168,11 +168,11 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
             variant="outline"
             onClick={() => router.push(`/dashboard/settings?tab=appointment-typess/${typeId}/form`)}
           >
-            Customize Form
+            {t('settings.appointmentTypes.customizeForm')}
           </Button>
           <Button onClick={handleOpenShareDialog} className="gap-2">
             <Share className="h-4 w-4" />
-            Share Booking Link
+            {t('settings.formSettingsSection.shareBookingLink')}
           </Button>
         </CardFooter>
       </Card>

@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { CalendarClock, Check, Trash2, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useDateFormatter } from "@/hooks/use-date-formatter";
 
 interface Notification {
   id: string;
@@ -25,6 +27,8 @@ export function NotificationsPage() {
   const supabase = createClient();
   const { toast } = useToast();
   const router = useRouter();
+  const t = useTranslations();
+  const { formatDate } = useDateFormatter();
 
   // Fetch notifications
   const fetchNotifications = async () => {
@@ -38,8 +42,8 @@ export function NotificationsPage() {
     if (error) {
       console.error("Error fetching notifications:", error);
       toast({
-        title: "Error",
-        description: "Could not load notifications. Please try again.",
+        title: t('common.error'),
+        description: t('notifications.errors.loadFailed'),
         variant: "destructive",
       });
       setIsLoading(false);
@@ -97,8 +101,8 @@ export function NotificationsPage() {
     setUnreadCount(0);
 
     toast({
-      title: "Success",
-      description: "All notifications marked as read",
+      title: t('common.success'),
+      description: t('notifications.allMarkedAsRead'),
     });
   };
 
@@ -127,8 +131,8 @@ export function NotificationsPage() {
     }
 
     toast({
-      title: "Success",
-      description: "Notification deleted",
+      title: t('common.success'),
+      description: t('notifications.deleted'),
     });
   };
 
@@ -198,9 +202,9 @@ export function NotificationsPage() {
         <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-4">
           <Bell className="h-6 w-6 text-indigo-600" />
         </div>
-        <h3 className="text-lg font-medium">No notifications yet</h3>
+        <h3 className="text-lg font-medium">{t('notifications.empty.title')}</h3>
         <p className="text-muted-foreground mt-1">
-          When you receive notifications, they will appear here.
+          {t('notifications.empty.description')}
         </p>
       </div>
     );
@@ -212,7 +216,7 @@ export function NotificationsPage() {
         <div>
           {unreadCount > 0 && (
             <p className="text-sm text-muted-foreground">
-              You have {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
+              {t('notifications.unreadCount', { count: unreadCount })}
             </p>
           )}
         </div>
@@ -222,7 +226,7 @@ export function NotificationsPage() {
           onClick={markAllAsRead}
           disabled={unreadCount === 0}
         >
-          Mark all as read
+          {t('notifications.markAllAsRead')}
         </Button>
       </div>
 
@@ -242,15 +246,18 @@ export function NotificationsPage() {
                 <div className="flex-1">
                   <div className="flex justify-between">
                     <h3 className="text-base font-medium">
-                      New appointment booked
+                      {t('notifications.newAppointmentBooked')}
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
                     </p>
                   </div>
                   <p className="text-sm mt-1">
-                    {notif.content.clientName} booked a {notif.content.appointmentTypeName} for{' '}
-                    {format(new Date(notif.content.date), "MMM d, yyyy 'at' h:mm a")}
+                    {t('notifications.clientBookedAppointment', {
+                      clientName: notif.content.clientName,
+                      appointmentType: notif.content.appointmentTypeName,
+                      date: formatDate(new Date(notif.content.date), { includeTime: true })
+                    })}
                   </p>
                   <div className="mt-3 flex items-center space-x-2">
                     {notif.related_id && (
@@ -259,7 +266,7 @@ export function NotificationsPage() {
                         size="sm"
                         onClick={() => viewAppointment(notif)}
                       >
-                        View Appointment
+                        {t('notifications.viewAppointment')}
                       </Button>
                     )}
                     {!notif.is_read && (
@@ -269,7 +276,7 @@ export function NotificationsPage() {
                         onClick={() => markAsRead(notif.id)}
                       >
                         <Check className="h-4 w-4 mr-1" />
-                        Mark as Read
+                        {t('notifications.markAsRead')}
                       </Button>
                     )}
                     <Button
@@ -279,7 +286,7 @@ export function NotificationsPage() {
                       onClick={() => deleteNotification(notif.id)}
                     >
                       <Trash2 className="h-4 w-4 mr-1" />
-                      Delete
+                      {t('notifications.delete')}
                     </Button>
                   </div>
                 </div>

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { PrimaryActionButton } from "@/components/ui/primary-action-button";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,7 @@ export function FormSettings() {
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
+  const t = useTranslations();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -67,14 +69,14 @@ export function FormSettings() {
         if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
           console.error("Error fetching form settings:", error);
           toast({
-            title: "Error",
-            description: "Could not load form settings. Please try again.",
+            title: t('common.errorLabel'),
+            description: t('settings.appointmentTypes.errors.loadGlobalFailed'),
             variant: "destructive",
           });
         } else if (data) {
           setFormData({
-            form_title: data.form_title || "Book an Appointment",
-            form_description: data.form_description || "Fill out the form below to schedule your appointment.",
+            form_title: data.form_title || t('settings.appointmentTypes.defaultTitle'),
+            form_description: data.form_description || t('settings.appointmentTypes.defaultDescription'),
             logo_url: data.logo_url || "",
             accent_color: data.accent_color || "#6366f1",
           });
@@ -121,8 +123,8 @@ export function FormSettings() {
     const fileType = file.type;
     if (!fileType.startsWith("image/")) {
       toast({
-        title: "Invalid file type",
-        description: "Please upload an image file (JPEG, PNG, etc.)",
+        title: t('settings.formSettings.errors.invalidFileType'),
+        description: t('settings.formSettings.errors.invalidFileTypeDescription'),
         variant: "destructive",
       });
       return;
@@ -132,8 +134,8 @@ export function FormSettings() {
     const maxSize = 2 * 1024 * 1024; // 2MB
     if (file.size > maxSize) {
       toast({
-        title: "File too large",
-        description: "Please upload an image smaller than 2MB",
+        title: t('settings.formSettings.errors.fileTooLarge'),
+        description: t('settings.formSettings.errors.fileTooLargeDescription'),
         variant: "destructive",
       });
       return;
@@ -146,8 +148,8 @@ export function FormSettings() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
-          title: "Authentication error",
-          description: "Please log in again to upload a logo.",
+          title: t('settings.formSettings.errors.authError'),
+          description: t('settings.formSettings.errors.authErrorDescription'),
           variant: "destructive",
         });
         return;
@@ -203,14 +205,14 @@ export function FormSettings() {
       setFormData((prev) => ({ ...prev, logo_url: publicUrl }));
 
       toast({
-        title: "Logo uploaded",
-        description: "Your logo has been uploaded successfully.",
+        title: t('settings.formSettings.logoUploaded'),
+        description: t('settings.formSettings.logoUploadedDescription'),
       });
     } catch (err: any) {
       console.error("Error uploading logo:", err);
       toast({
-        title: "Upload failed",
-        description: err?.message || "Could not upload logo. Please try again.",
+        title: t('settings.formSettings.errors.uploadFailed'),
+        description: err?.message || t('settings.formSettings.errors.uploadFailedDescription'),
         variant: "destructive",
       });
     } finally {
@@ -277,8 +279,8 @@ export function FormSettings() {
       }
 
       toast({
-        title: "Settings saved",
-        description: "Your form settings have been saved successfully.",
+        title: t('settings.formSettings.settingsSaved'),
+        description: t('settings.formSettings.typeSettingsSaved'),
       });
 
       // Refresh form data
@@ -290,8 +292,8 @@ export function FormSettings() {
 
       if (data) {
         setFormData({
-          form_title: data.form_title || "Book an Appointment",
-          form_description: data.form_description || "Fill out the form below to schedule your appointment.",
+          form_title: data.form_title || t('settings.formSettings.defaultTitle'),
+          form_description: data.form_description || t('settings.formSettings.defaultDescription'),
           logo_url: data.logo_url || "",
           accent_color: data.accent_color || "#6366f1",
         });
@@ -300,17 +302,17 @@ export function FormSettings() {
       console.error("Error saving form settings:", err);
 
       // Provide more specific error messages
-      let errorMessage = "Could not save form settings. Please try again.";
+      let errorMessage = t('settings.appointmentTypes.errors.saveFailedDescription');
 
       // Check for specific error codes or messages
       if (err?.code === "23505") {
-        errorMessage = "A record with this user already exists. Try refreshing the page.";
+        errorMessage = t('settings.appointmentTypes.errors.duplicateRecord');
       } else if (err?.message) {
         errorMessage = err.message;
       }
 
       toast({
-        title: "Save failed",
+        title: t('settings.appointmentTypes.errors.saveFailed'),
         description: errorMessage,
         variant: "destructive",
       });
@@ -323,7 +325,7 @@ export function FormSettings() {
     return (
       <div className="flex flex-col justify-center items-center h-64 gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
-        <p className="text-muted-foreground">Loading your form settings...</p>
+        <p className="text-muted-foreground">{t('settings.appointmentTypes.loading')}</p>
       </div>
     );
   }
@@ -353,14 +355,14 @@ export function FormSettings() {
           className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
           <Palette className="h-4 w-4" />
-          Customize Form
+          {t('settings.appointmentTypes.customizeForm')}
         </TabsTrigger>
         <TabsTrigger
           value="preview"
           className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
           <Eye className="h-4 w-4" />
-          Preview & Share
+          {t('settings.appointmentTypes.previewTab')}
         </TabsTrigger>
       </TabsList>
 
@@ -370,10 +372,10 @@ export function FormSettings() {
           <CardHeader className="pb-4">
             <CardTitle className="text-xl flex items-center gap-2">
               <Palette className="h-5 w-5 text-indigo-600" />
-              Form Customization
+              {t('settings.appointmentTypes.formCustomization')}
             </CardTitle>
             <CardDescription className="text-base">
-              Customize how your appointment booking form appears to clients
+              {t('settings.appointmentTypes.formCustomizationDescription')}
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -381,11 +383,11 @@ export function FormSettings() {
           <div className="space-y-4">
             <h3 className="font-medium text-lg flex items-center gap-2">
               <Type className="h-5 w-5 text-indigo-600" />
-              Text Content
+              {t('settings.appointmentTypes.textContent')}
             </h3>
 
             <div className="space-y-2">
-              <Label htmlFor="form_title" className="text-sm font-medium">Form Title</Label>
+              <Label htmlFor="form_title" className="text-sm font-medium">{t('settings.appointmentTypes.formTitle')}</Label>
               <div className="relative">
                 <Type className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
                 <Input
@@ -393,18 +395,18 @@ export function FormSettings() {
                   name="form_title"
                   value={formData.form_title}
                   onChange={handleChange}
-                  placeholder="Book an Appointment"
+                  placeholder={t('settings.formSettings.defaultTitle')}
                   className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                   required
                 />
               </div>
               <p className="text-sm text-muted-foreground">
-                This title appears at the top of your booking form.
+                {t('settings.appointmentTypes.formTitleHelp')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="form_description" className="text-sm font-medium">Form Description</Label>
+              <Label htmlFor="form_description" className="text-sm font-medium">{t('settings.appointmentTypes.formDescription')}</Label>
               <div className="relative">
                 <FileText className="absolute left-3 top-3 h-4 w-4 text-indigo-600" />
                 <Textarea
@@ -412,13 +414,13 @@ export function FormSettings() {
                   name="form_description"
                   value={formData.form_description}
                   onChange={handleChange}
-                  placeholder="Fill out the form below to schedule your appointment."
+                  placeholder={t('settings.formSettings.defaultDescription')}
                   className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                   rows={3}
                 />
               </div>
               <p className="text-sm text-muted-foreground">
-                A brief description that appears below the title.
+                {t('settings.appointmentTypes.formDescriptionHelp')}
               </p>
             </div>
           </div>
@@ -426,11 +428,11 @@ export function FormSettings() {
           <div className="space-y-4">
             <h3 className="font-medium text-lg flex items-center gap-2">
               <Image className="h-5 w-5 text-indigo-600" />
-              Brand Identity
+              {t('settings.appointmentTypes.brandIdentity')}
             </h3>
 
             <div className="space-y-2">
-              <Label htmlFor="logo" className="text-sm font-medium">Company Logo</Label>
+              <Label htmlFor="logo" className="text-sm font-medium">{t('settings.appointmentTypes.companyLogo')}</Label>
               <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
                 <div className="flex items-center justify-center w-32 h-32 bg-white rounded-lg border-2 border-dashed border-indigo-200 overflow-hidden">
                   {formData.logo_url ? (
@@ -442,7 +444,7 @@ export function FormSettings() {
                   ) : (
                     <div className="flex flex-col items-center justify-center text-center p-4">
                       <Image className="w-8 h-8 text-indigo-300 mb-2" />
-                      <p className="text-xs text-muted-foreground">No logo uploaded</p>
+                      <p className="text-xs text-muted-foreground">{t('settings.appointmentTypes.noLogo')}</p>
                     </div>
                   )}
                 </div>
@@ -454,7 +456,7 @@ export function FormSettings() {
                       className="flex items-center justify-center flex-1 h-10 px-4 py-2 text-sm font-medium text-indigo-700 bg-white border border-indigo-300 rounded-md shadow-sm hover:bg-indigo-50 cursor-pointer transition-colors"
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      {isUploading ? "Uploading..." : "Upload Logo"}
+                      {isUploading ? t('common.uploading') : t('settings.appointmentTypes.uploadLogo')}
                     </Label>
                     {formData.logo_url && (
                       <Button
@@ -486,21 +488,21 @@ export function FormSettings() {
                             setFormData((prev) => ({ ...prev, logo_url: "" }));
 
                             toast({
-                              title: "Logo removed",
-                              description: "Your logo has been removed successfully.",
+                              title: t('settings.appointmentTypes.logoRemoved'),
+                              description: t('settings.appointmentTypes.logoRemovedDescription'),
                             });
                           } catch (err: any) {
                             console.error("Error removing logo:", err);
                             toast({
-                              title: "Error",
-                              description: err?.message || "Could not remove logo. Please try again.",
+                              title: t('common.errorLabel'),
+                              description: err?.message || t('settings.appointmentTypes.errors.removeLogoFailed'),
                               variant: "destructive",
                             });
                           }
                         }}
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
-                        Remove Logo
+                        {t('settings.appointmentTypes.removeLogo')}
                       </Button>
                     )}
                   </div>
@@ -513,11 +515,11 @@ export function FormSettings() {
                     disabled={isUploading}
                   />
                   <div className="text-sm space-y-1">
-                    <p className="font-medium">Logo requirements:</p>
+                    <p className="font-medium">{t('settings.appointmentTypes.logoRequirements')}:</p>
                     <ul className="text-xs text-muted-foreground space-y-1">
-                      <li>• Recommended size: 200x200 pixels</li>
-                      <li>• Maximum file size: 2MB</li>
-                      <li>• Supported formats: PNG, JPG, SVG</li>
+                      <li>• {t('settings.appointmentTypes.logoSize')}</li>
+                      <li>• {t('settings.appointmentTypes.logoMaxSize')}</li>
+                      <li>• {t('settings.appointmentTypes.logoFormats')}</li>
                     </ul>
                   </div>
                 </div>
@@ -528,11 +530,11 @@ export function FormSettings() {
           <div className="space-y-4">
             <h3 className="font-medium text-lg flex items-center gap-2">
               <Palette className="h-5 w-5 text-indigo-600" />
-              Color Scheme
+              {t('settings.appointmentTypes.colorScheme')}
             </h3>
 
             <div className="space-y-2">
-              <Label htmlFor="accent_color" className="text-sm font-medium">Accent Color</Label>
+              <Label htmlFor="accent_color" className="text-sm font-medium">{t('settings.appointmentTypes.accentColor')}</Label>
               <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
                 <div
                   className="w-16 h-16 rounded-full border-4 border-white shadow-sm flex-shrink-0"
@@ -562,11 +564,11 @@ export function FormSettings() {
                     </div>
                   </div>
                   <div className="text-sm space-y-1">
-                    <p className="font-medium">This color will be used for:</p>
+                    <p className="font-medium">{t('settings.appointmentTypes.colorUsage')}:</p>
                     <ul className="text-xs text-muted-foreground space-y-1">
-                      <li>• Buttons and call-to-action elements</li>
-                      <li>• Highlights and accents throughout the form</li>
-                      <li>• Selected states and interactive elements</li>
+                      <li>• {t('settings.appointmentTypes.colorButtons')}</li>
+                      <li>• {t('settings.appointmentTypes.colorHighlights')}</li>
+                      <li>• {t('settings.appointmentTypes.colorInteractive')}</li>
                     </ul>
                   </div>
                 </div>
@@ -584,24 +586,24 @@ export function FormSettings() {
                     accent_color: "#6366f1"
                   });
                   toast({
-                    title: "Colors reset",
-                    description: "Accent color has been reset to default.",
+                    title: t('settings.appointmentTypes.colorsReset'),
+                    description: t('settings.appointmentTypes.colorsResetDescription'),
                   });
                 }}
                 className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-                Reset to Default
+                {t('settings.appointmentTypes.resetToDefault')}
               </Button>
               <PrimaryActionButton
                 type="submit"
                 disabled={isSaving}
                 isLoading={isSaving}
-                loadingText="Saving Changes..."
+                loadingText={t('common.savingChanges')}
                 icon={Save}
                 variant="indigo"
               >
-                Save Form Settings
+                {t('settings.appointmentTypes.saveFormSettings')}
               </PrimaryActionButton>
             </CardFooter>
           </form>
@@ -614,10 +616,10 @@ export function FormSettings() {
           <CardHeader className="pb-4">
             <CardTitle className="text-xl flex items-center gap-2">
               <Eye className="h-5 w-5 text-indigo-600" />
-              Form Preview
+              {t('settings.appointmentTypes.formPreview')}
             </CardTitle>
             <CardDescription className="text-base">
-              Preview how your booking form will appear to clients
+              {t('settings.appointmentTypes.previewDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-8">
@@ -634,10 +636,10 @@ export function FormSettings() {
             <div className="space-y-1 w-full sm:w-auto">
               <h4 className="text-sm font-medium flex items-center gap-2">
                 <Link className="h-4 w-4 text-indigo-600" />
-                Share with clients
+                {t('settings.formSettingsSection.shareWithClients')}
               </h4>
               <p className="text-xs text-muted-foreground">
-                Generate a unique link for clients to book appointments
+                {t('settings.formSettingsSection.generateLinkDescription')}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -646,7 +648,7 @@ export function FormSettings() {
                 icon={Share}
                 variant="indigo"
               >
-                Share Booking Link
+                {t('settings.formSettingsSection.shareBookingLink')}
               </PrimaryActionButton>
               <Button
                 variant="outline"
@@ -654,7 +656,7 @@ export function FormSettings() {
                 className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
               >
                 <ExternalLink className="h-4 w-4" />
-                Open in New Tab
+                {t('settings.formSettingsSection.openInNewTab')}
               </Button>
             </div>
           </CardFooter>
@@ -665,19 +667,18 @@ export function FormSettings() {
           <CardHeader className="pb-4">
             <CardTitle className="text-xl flex items-center gap-2">
               <Calendar className="h-5 w-5 text-indigo-600" />
-              Type-Specific Form Settings
+              {t('settings.formSettingsSection.typeSpecificSettings')}
             </CardTitle>
             <CardDescription className="text-base">
-              Customize form settings for each appointment type separately
+              {t('settings.formSettingsSection.typeSpecificDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-8">
             <div className="bg-indigo-50/30 p-6 rounded-lg border border-indigo-100 space-y-6">
               <div className="flex flex-col gap-2">
-                <h4 className="font-medium text-indigo-700">Global vs. Type-Specific Settings</h4>
+                <h4 className="font-medium text-indigo-700">{t('settings.formSettingsSection.globalVsTypeSpecific')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  The settings on this page are global and will be used for all appointment types by default.
-                  However, you can override these settings for specific appointment types.
+                  {t('settings.formSettingsSection.globalVsTypeSpecificDescription')}
                 </p>
               </div>
 
@@ -695,7 +696,7 @@ export function FormSettings() {
                       <div>
                         <h5 className="font-medium">{type.name}</h5>
                         <p className="text-xs text-muted-foreground">
-                          {type.duration} min • {type.is_default ? 'Default type' : 'Custom type'}
+                          {type.duration} min • {type.is_default ? t('settings.formSettingsSection.defaultTypeLabel') : t('settings.formSettingsSection.customType')}
                         </p>
                       </div>
                     </div>
@@ -706,7 +707,7 @@ export function FormSettings() {
                       onClick={() => router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}&view=form`)}
                     >
                       <Palette className="h-3.5 w-3.5 mr-2" />
-                      Customize Form
+                      {t('settings.formSettingsSection.customizeForm')}
                     </Button>
                   </div>
                 ))}
@@ -714,16 +715,16 @@ export function FormSettings() {
                 {appointmentTypes.length === 0 && (
                   <div className="col-span-2 flex flex-col items-center justify-center p-8 text-center bg-white rounded-lg border border-dashed border-indigo-200">
                     <Calendar className="h-10 w-10 text-indigo-300 mb-2" />
-                    <h4 className="font-medium">No appointment types found</h4>
+                    <h4 className="font-medium">{t('settings.formSettingsSection.noAppointmentTypes')}</h4>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Create appointment types to customize form settings for each type
+                      {t('settings.formSettingsSection.noAppointmentTypesDescription')}
                     </p>
                     <Button
                       variant="outline"
                       onClick={() => router.push("/dashboard/settings?tab=appointment-types")}
                       className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
                     >
-                      Manage Appointment Types
+                      {t('settings.formSettingsSection.manageAppointmentTypes')}
                     </Button>
                   </div>
                 )}

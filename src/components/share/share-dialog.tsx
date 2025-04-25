@@ -44,6 +44,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface AppointmentType {
   id: string;
@@ -86,6 +87,7 @@ export function ShareDialog({
   const supabase = createClient();
   const { toast } = useToast();
   const router = useRouter();
+  const t = useTranslations();
 
   const [shareTokens, setShareTokens] = useState<ShareToken[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -127,8 +129,8 @@ export function ShareDialog({
       if (!response.ok) {
         console.error('API error:', result.error);
         toast({
-          title: 'Error',
-          description: result.error || 'Could not fetch share links. Please try again.',
+          title: t('common.errorLabel'),
+          description: result.error || t('settings.formSettingsSection.linkErrors.fetchFailed'),
           variant: 'destructive',
         });
         return;
@@ -144,8 +146,8 @@ export function ShareDialog({
     } catch (err) {
       console.error('Error fetching share tokens:', err);
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred. Please try again.',
+        title: t('common.errorLabel'),
+        description: t('errors.unexpectedError'),
         variant: 'destructive',
       });
     } finally {
@@ -155,7 +157,7 @@ export function ShareDialog({
 
   // Initialize the form for creating a new token
   const initializeNewTokenForm = () => {
-    setTokenName('Default Link');
+    setTokenName(t('settings.formSettingsSection.defaultLinkName'));
 
     // Initialize selected types - only select the default type or the specified defaultTypeId
     const initialSelectedTypes: Record<string, boolean> = {};
@@ -220,8 +222,8 @@ export function ShareDialog({
       if (!response.ok) {
         console.error('API error:', result.error);
         toast({
-          title: 'Error',
-          description: result.error || 'Could not create share link. Please try again.',
+          title: t('common.errorLabel'),
+          description: result.error || t('settings.formSettingsSection.linkErrors.createFailed'),
           variant: 'destructive',
         });
         return;
@@ -232,14 +234,14 @@ export function ShareDialog({
       setIsCreatingNew(false);
 
       toast({
-        title: 'New link created',
-        description: 'Your new booking form link has been created.',
+        title: t('settings.formSettingsSection.newLinkCreated'),
+        description: t('settings.formSettingsSection.newLinkCreatedDescription'),
       });
     } catch (err) {
       console.error('Error creating share token:', err);
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred. Please try again.',
+        title: t('common.errorLabel'),
+        description: t('errors.unexpectedError'),
         variant: 'destructive',
       });
     } finally {
@@ -282,8 +284,8 @@ export function ShareDialog({
       if (!response.ok) {
         console.error('API error:', result.error);
         toast({
-          title: 'Error',
-          description: result.error || 'Could not update share link. Please try again.',
+          title: t('common.errorLabel'),
+          description: result.error || t('settings.formSettingsSection.linkErrors.updateFailed'),
           variant: 'destructive',
         });
         return;
@@ -296,14 +298,14 @@ export function ShareDialog({
       setEditingToken(null);
 
       toast({
-        title: 'Link updated',
-        description: 'Your booking form link has been updated.',
+        title: t('settings.formSettingsSection.linkUpdated'),
+        description: t('settings.formSettingsSection.linkUpdatedDescription'),
       });
     } catch (err) {
       console.error('Error updating share token:', err);
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred. Please try again.',
+        title: t('common.errorLabel'),
+        description: t('errors.unexpectedError'),
         variant: 'destructive',
       });
     } finally {
@@ -337,8 +339,8 @@ export function ShareDialog({
       if (!response.ok) {
         console.error('API error:', result.error);
         toast({
-          title: 'Error',
-          description: result.error || 'Could not delete share link. Please try again.',
+          title: t('common.errorLabel'),
+          description: result.error || t('settings.formSettingsSection.linkErrors.deleteFailed'),
           variant: 'destructive',
         });
         return;
@@ -351,14 +353,14 @@ export function ShareDialog({
       setTokenToDelete(null);
 
       toast({
-        title: 'Link deleted',
-        description: 'Your booking form link has been deleted.',
+        title: t('settings.formSettingsSection.linkDeleted'),
+        description: t('settings.formSettingsSection.linkDeletedDescription'),
       });
     } catch (err) {
       console.error('Error deleting share token:', err);
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred. Please try again.',
+        title: t('common.errorLabel'),
+        description: t('errors.unexpectedError'),
         variant: 'destructive',
       });
     } finally {
@@ -382,8 +384,8 @@ export function ShareDialog({
     setCopied(token.id);
 
     toast({
-      title: "Link copied",
-      description: "The booking form link has been copied to your clipboard.",
+      title: t('settings.formSettingsSection.linkCopied'),
+      description: t('settings.formSettingsSection.linkCopiedDescription'),
     });
 
     setTimeout(() => setCopied(null), 2000);
@@ -433,7 +435,7 @@ export function ShareDialog({
     }
 
     let shareUrl = '';
-    const text = 'Book an appointment with me using this link:';
+    const text = t('settings.formSettingsSection.shareText');
 
     switch (platform) {
       case 'facebook':
@@ -443,7 +445,7 @@ export function ShareDialog({
         shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`;
         break;
       case 'email':
-        shareUrl = `mailto:?subject=Book an appointment&body=${encodeURIComponent(`${text} ${link}`)}`;
+        shareUrl = `mailto:?subject=${encodeURIComponent(t('settings.formSettingsSection.emailSubject'))}&body=${encodeURIComponent(`${text} ${link}`)}`;
         break;
     }
 
@@ -532,10 +534,10 @@ export function ShareDialog({
         <DialogHeader className="text-center">
           <DialogTitle className="text-xl flex items-center justify-center text-primary">
             <Share className="h-5 w-5 mr-2" />
-            <span>Share Your Booking Form</span>
+            <span>{t('settings.formSettingsSection.shareForm')}</span>
           </DialogTitle>
           <DialogDescription>
-            Create and manage links to share with your clients.
+            {t('settings.formSettingsSection.shareFormDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -554,13 +556,13 @@ export function ShareDialog({
                   className="w-full bg-primary hover:bg-primary/90"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Create New Booking Link
+                  {t('settings.formSettingsSection.createNewLink')}
                 </Button>
 
                 <div className="relative">
                   <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search links..."
+                    placeholder={t('settings.formSettingsSection.searchLinks')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-8 bg-white border-primary/20 focus-visible:ring-primary/30"
@@ -586,31 +588,31 @@ export function ShareDialog({
                   {editingToken ? (
                     <>
                       <Edit className="h-4 w-4 mr-1.5 text-primary" />
-                      Edit Booking Link
+                      {t('settings.formSettingsSection.editLink')}
                     </>
                   ) : (
                     <>
                       <Plus className="h-4 w-4 mr-1.5 text-primary" />
-                      New Booking Link
+                      {t('settings.formSettingsSection.newLink')}
                     </>
                   )}
                 </h3>
 
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="link-name">Link Name</Label>
+                    <Label htmlFor="link-name">{t('settings.formSettingsSection.linkName')}</Label>
                     <Input
                       id="link-name"
                       value={tokenName}
                       onChange={(e) => setTokenName(e.target.value)}
-                      placeholder="e.g. Default Link, Client Booking, etc."
+                      placeholder={t('settings.formSettingsSection.linkNamePlaceholder')}
                       className="mt-1"
                     />
                   </div>
 
                   {appointmentTypes.length > 0 && (
                     <div>
-                      <Label className="block mb-2">Appointment Types to Include</Label>
+                      <Label className="block mb-2">{t('settings.formSettingsSection.appointmentTypesToInclude')}</Label>
                       <div className="space-y-2">
                         {appointmentTypes.map((type) => (
                           <div key={type.id} className="flex items-center justify-between p-2 bg-white rounded-md border border-muted">
@@ -639,12 +641,12 @@ export function ShareDialog({
                                 {defaultType === type.id ? (
                                   <>
                                     <CheckCircle className="h-3 w-3 mr-1" />
-                                    Default
+                                    {t('settings.appointmentTypes.defaultType')}
                                   </>
                                 ) : (
                                   <>
                                     <Circle className="h-3 w-3 mr-1" />
-                                    Set as default
+                                    {t('settings.appointmentTypes.setAsDefault')}
                                   </>
                                 )}
                               </Button>
@@ -661,7 +663,7 @@ export function ShareDialog({
                       onClick={cancelEditing}
                       className="border-gray-200 hover:bg-gray-100"
                     >
-                      Cancel
+                      {t('common.cancelButton')}
                     </Button>
                     <Button
                       onClick={editingToken ? updateShareToken : createShareToken}
@@ -673,7 +675,7 @@ export function ShareDialog({
                       ) : (
                         <Check className="h-4 w-4 mr-2" />
                       )}
-                      {editingToken ? 'Update Link' : 'Create Link'}
+                      {editingToken ? t('settings.formSettingsSection.updateLink') : t('settings.formSettingsSection.createLink')}
                     </Button>
                   </div>
                 </div>
@@ -686,13 +688,13 @@ export function ShareDialog({
                 {filteredTokens.length === 0 && searchQuery && (
                   <div className="text-center py-6">
                     <Search className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-muted-foreground">No links found matching "{searchQuery}"</p>
+                    <p className="text-muted-foreground">{t('settings.formSettingsSection.noLinksFound', { query: searchQuery })}</p>
                     <Button
                       variant="link"
                       onClick={() => setSearchQuery('')}
                       className="mt-2 text-primary"
                     >
-                      Clear search
+                      {t('settings.formSettingsSection.clearSearch')}
                     </Button>
                   </div>
                 )}
@@ -710,14 +712,14 @@ export function ShareDialog({
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => startEditing(token)}>
                               <Edit className="h-4 w-4 mr-2" />
-                              Edit
+                              {t('common.editButton')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
                               setTokenToDelete(token.id);
                               setDeleteConfirmOpen(true);
                             }}>
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
+                              {t('common.deleteButton')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -750,7 +752,7 @@ export function ShareDialog({
                       {/* Appointment types included */}
                       {token.selected_types && token.selected_types.length > 0 ? (
                         <div className="mt-3">
-                          <p className="text-xs text-muted-foreground mb-1">Appointment types:</p>
+                          <p className="text-xs text-muted-foreground mb-1">{t('settings.formSettingsSection.appointmentTypes')}:</p>
                           <div className="flex flex-wrap gap-1">
                             {appointmentTypes
                               .filter(type => token.selected_types?.includes(type.id))
@@ -769,7 +771,7 @@ export function ShareDialog({
                                   />
                                   {type.name}
                                   {token.default_type === type.id && (
-                                    <span className="ml-1">(Default)</span>
+                                    <span className="ml-1">({t('settings.appointmentTypes.defaultType')})</span>
                                   )}
                                 </div>
                               ))
@@ -777,7 +779,7 @@ export function ShareDialog({
                           </div>
                         </div>
                       ) : (
-                        <p className="text-xs text-muted-foreground mt-2">No appointment types selected</p>
+                        <p className="text-xs text-muted-foreground mt-2">{t('settings.formSettingsSection.noAppointmentTypesSelected')}</p>
                       )}
                     </CardContent>
                     <CardFooter className="p-4 pt-0 flex justify-between">
@@ -789,7 +791,7 @@ export function ShareDialog({
                           onClick={() => shareOnSocial(token, 'email')}
                         >
                           <Mail className="h-3 w-3 mr-1" />
-                          Email
+                          {t('settings.formSettingsSection.email')}
                         </Button>
                         <Button
                           size="sm"
@@ -800,7 +802,7 @@ export function ShareDialog({
                           }}
                         >
                           <Share2 className="h-3 w-3 mr-1" />
-                          Open
+                          {t('settings.formSettingsSection.open')}
                         </Button>
                       </div>
                       <Button
@@ -809,7 +811,7 @@ export function ShareDialog({
                         className="text-xs bg-primary hover:bg-primary/90"
                       >
                         <Settings className="h-3 w-3 mr-1" />
-                        Customize Form
+                        {t('settings.formSettingsSection.customizeForm')}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -821,9 +823,9 @@ export function ShareDialog({
             {!isCreatingNew && !editingToken && shareTokens.length === 0 && (
               <div className="text-center py-12 flex flex-col items-center justify-center">
                 <Share2 className="h-16 w-16 mx-auto text-primary/20 mb-6" />
-                <h3 className="text-xl font-medium mb-2">No booking links yet</h3>
+                <h3 className="text-xl font-medium mb-2">{t('settings.formSettingsSection.noLinksYet')}</h3>
                 <p className="text-muted-foreground mb-6 max-w-xs mx-auto">
-                  Create your first booking link to share with clients and start receiving appointments.
+                  {t('settings.formSettingsSection.createFirstLink')}
                 </p>
                 <Button
                   onClick={startCreatingNew}
@@ -831,7 +833,7 @@ export function ShareDialog({
                   size="lg"
                 >
                   <Plus className="h-5 w-5 mr-2" />
-                  Create Booking Link
+                  {t('settings.formSettingsSection.createBookingLink')}
                 </Button>
               </div>
             )}
@@ -847,7 +849,7 @@ export function ShareDialog({
               className="border-gray-200 hover:bg-gray-100"
             >
               <X className="h-4 w-4 mr-2" />
-              Close
+              {t('common.close')}
             </Button>
           </div>
         )}
@@ -857,13 +859,13 @@ export function ShareDialog({
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('common.confirmDelete')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this booking link. This action cannot be undone.
+              {t('settings.formSettingsSection.deleteConfirmation')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancelButton')}</AlertDialogCancel>
             <AlertDialogAction
               asChild
             >
@@ -877,7 +879,7 @@ export function ShareDialog({
                 ) : (
                   <Trash2 className="h-4 w-4 mr-2" />
                 )}
-                Delete
+                {t('common.deleteButton')}
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>

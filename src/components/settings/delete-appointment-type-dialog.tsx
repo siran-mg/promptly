@@ -7,6 +7,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { Database } from "@/types/supabase";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
+import { useDateFormatter } from "@/hooks/use-date-formatter";
 
 import {
   AlertDialog,
@@ -39,6 +41,8 @@ export function DeleteAppointmentTypeDialog({
   const supabase = createClient();
   const [isDeleting, setIsDeleting] = useState(false);
   const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
+  const t = useTranslations();
+  const { formatDate } = useDateFormatter();
 
   // Fetch all appointment types for reassignment
   useEffect(() => {
@@ -130,8 +134,8 @@ export function DeleteAppointmentTypeDialog({
       }
 
       toast({
-        title: "Appointment type deleted",
-        description: "The appointment type has been deleted successfully.",
+        title: t('settings.appointmentTypes.deleted.title'),
+        description: t('settings.appointmentTypes.deleted.description'),
       });
 
       onDeleteSuccess();
@@ -139,8 +143,8 @@ export function DeleteAppointmentTypeDialog({
     } catch (err) {
       console.error("Error deleting appointment type:", err);
       toast({
-        title: "Error",
-        description: "Could not delete appointment type. Please try again.",
+        title: t('common.errorLabel'),
+        description: t('settings.appointmentTypes.errors.deleteFailed'),
         variant: "destructive",
       });
       return false;
@@ -161,8 +165,8 @@ export function DeleteAppointmentTypeDialog({
       if (appointmentType.is_default && appointmentTypes.length > 1) {
         console.log("Cannot delete default type when there are multiple types");
         toast({
-          title: "Cannot delete default type",
-          description: "Please set another type as default before deleting this one.",
+          title: t('settings.appointmentTypes.cannotDeleteDefault'),
+          description: t('settings.appointmentTypes.cannotDeleteDefaultDescription'),
           variant: "destructive",
         });
         setIsDeleting(false);
@@ -186,15 +190,15 @@ export function DeleteAppointmentTypeDialog({
         // Check if we have a lot of appointments - if so, offer a direct link instead of showing them all
         if (appointmentsData.length > 10) {
           toast({
-            title: "Multiple appointments found",
+            title: t('settings.appointmentTypes.multipleAppointmentsFound'),
             description: (
               <div className="space-y-2">
-                <p>This appointment type is used by {appointmentsData.length} appointments.</p>
+                <p>{t('settings.appointmentTypes.appointmentsUsingType', { count: appointmentsData.length })}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Examples: {appointmentsData.slice(0, 3).map(app =>
-                    `${app.client_name} (${new Date(app.date).toLocaleDateString()})`
+                  {t('settings.appointmentTypes.examples')}: {appointmentsData.slice(0, 3).map(app =>
+                    `${app.client_name} (${formatDate(new Date(app.date), { shortDate: true })})`
                   ).join(", ")}
-                  {appointmentsData.length > 3 ? ` and ${appointmentsData.length - 3} more...` : ""}
+                  {appointmentsData.length > 3 ? t('settings.appointmentTypes.andMore', { count: appointmentsData.length - 3 }) : ""}
                 </p>
                 <div className="flex gap-2 mt-2">
                   <Button
@@ -206,7 +210,7 @@ export function DeleteAppointmentTypeDialog({
                       onOpenChange(false);
                     }}
                   >
-                    View All Appointments
+                    {t('settings.appointmentTypes.viewAllAppointments')}
                   </Button>
                   <Button
                     size="sm"
@@ -214,14 +218,14 @@ export function DeleteAppointmentTypeDialog({
                     className="bg-white text-primary hover:bg-gray-100 border border-primary/20 font-medium"
                     onClick={() => {
                       toast({
-                        title: "Reassign appointments first",
-                        description: "Please reassign these appointments to another type before deleting this one.",
+                        title: t('settings.appointmentTypes.reassignFirst'),
+                        description: t('settings.appointmentTypes.reassignFirstDescription'),
                         variant: "destructive",
                       });
                       onOpenChange(false);
                     }}
                   >
-                    Reassign & Delete
+                    {t('settings.appointmentTypes.reassignAndDelete')}
                   </Button>
                 </div>
               </div>
@@ -235,13 +239,13 @@ export function DeleteAppointmentTypeDialog({
 
         // For fewer appointments, show a warning with details
         toast({
-          title: "Appointments found",
+          title: t('settings.appointmentTypes.appointmentsFound'),
           description: (
             <div>
-              <p>This appointment type is used by {appointmentsData.length} appointments. Please reassign them first.</p>
+              <p>{t('settings.appointmentTypes.appointmentsFoundDescription', { count: appointmentsData.length })}</p>
               <p className="text-sm text-muted-foreground mt-1">
                 {appointmentsData.map(app =>
-                  `${app.client_name} (${new Date(app.date).toLocaleDateString()})`
+                  `${app.client_name} (${formatDate(new Date(app.date), { shortDate: true })})`
                 ).join(", ")}
               </p>
             </div>
@@ -258,8 +262,8 @@ export function DeleteAppointmentTypeDialog({
     } catch (err) {
       console.error("Error in handleDelete:", err);
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t('common.errorLabel'),
+        description: t('errors.unexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -272,15 +276,15 @@ export function DeleteAppointmentTypeDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle>{t('common.areYouSure')}</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete the appointment type
+            {t('settings.appointmentTypes.deleteConfirmation')}
             {appointmentType && <strong> "{appointmentType.name}"</strong>}.
-            This action cannot be undone.
+            {t('common.cannotBeUndone')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>{t('common.cancelButton')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isDeleting}
@@ -289,10 +293,10 @@ export function DeleteAppointmentTypeDialog({
             {isDeleting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Deleting...
+                {t('common.deleting')}
               </>
             ) : (
-              "Delete"
+              t('common.deleteButton')
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

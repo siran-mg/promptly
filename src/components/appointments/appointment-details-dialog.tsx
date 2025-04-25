@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslations } from "next-intl";
+import { useDateFormatter } from "@/hooks/use-date-formatter";
+import { useStatusFormatter } from "@/hooks/use-status-formatter";
 import {
   Calendar,
   Clock,
@@ -76,6 +78,9 @@ export function AppointmentDetailsDialog({
 }: AppointmentDetailsDialogProps) {
   const { toast } = useToast();
   const supabase = createClient();
+  const t = useTranslations();
+  const { formatDate, formatTime, formatDuration } = useDateFormatter();
+  const { translateStatus, getStatusVariant } = useStatusFormatter();
   const [status, setStatus] = useState<string>("scheduled");
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -160,9 +165,11 @@ export function AppointmentDetailsDialog({
         throw error;
       }
 
+      const translatedStatus = translateStatus(newStatus);
+
       toast({
-        title: "Status updated",
-        description: `Appointment status has been updated to ${newStatus}.`,
+        title: t('appointments.statusUpdated'),
+        description: t('appointments.statusUpdatedDescription', { status: translatedStatus }),
       });
 
       // Call the callback to update parent component state
@@ -172,8 +179,8 @@ export function AppointmentDetailsDialog({
     } catch (err: any) {
       console.error("Error updating appointment status:", err);
       toast({
-        title: "Error",
-        description: err?.message || "Could not update appointment status. Please try again.",
+        title: t('common.errorLabel'),
+        description: err?.message || t('appointments.errors.statusUpdateFailed'),
         variant: "destructive",
       });
       // Revert to original status
@@ -225,8 +232,8 @@ export function AppointmentDetailsDialog({
       }
 
       toast({
-        title: "Appointment updated",
-        description: "The appointment details have been updated successfully.",
+        title: t('appointments.updated'),
+        description: t('appointments.updatedDescription'),
       });
 
       // Exit edit mode
@@ -252,8 +259,8 @@ export function AppointmentDetailsDialog({
     } catch (err: any) {
       console.error("Error updating appointment:", err);
       toast({
-        title: "Error",
-        description: err?.message || "Could not update appointment details. Please try again.",
+        title: t('common.errorLabel'),
+        description: err?.message || t('appointments.errors.updateFailed'),
         variant: "destructive",
       });
     } finally {
@@ -263,8 +270,8 @@ export function AppointmentDetailsDialog({
 
   // Format date for display
   const appointmentDate = new Date(appointment.date);
-  const formattedDate = format(appointmentDate, "PPPP");
-  const formattedTime = format(appointmentDate, "p");
+  const formattedDate = formatDate(appointmentDate);
+  const formattedTime = formatTime(appointmentDate);
 
   // Handle dialog close - reset edit mode
   const handleOpenChange = (open: boolean) => {
@@ -297,7 +304,7 @@ export function AppointmentDetailsDialog({
                   disabled={isUpdating}
                 >
                   <X className="h-4 w-4 mr-1.5" />
-                  Cancel
+                  {t('common.cancelButton')}
                 </Button>
                 <Button
                   variant="ghost"
@@ -307,7 +314,7 @@ export function AppointmentDetailsDialog({
                   disabled={isUpdating}
                 >
                   <Save className="h-4 w-4 mr-1.5" />
-                  Save
+                  {t('common.save')}
                 </Button>
               </div>
             )}
@@ -320,12 +327,12 @@ export function AppointmentDetailsDialog({
                 onClick={() => setIsEditMode(true)}
               >
                 <Edit className="h-4 w-4 mr-1.5" />
-                Edit
+                {t('common.editButton')}
               </Button>
             )}
           </div>
           <DialogDescription className="text-center pt-2 pb-4">
-            Appointment details
+            {t('appointments.details')}
           </DialogDescription>
         </DialogHeader>
 
@@ -334,14 +341,14 @@ export function AppointmentDetailsDialog({
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
             <h3 className="text-sm font-medium flex items-center mb-3">
               <Calendar className="h-4 w-4 mr-2 text-primary" />
-              Appointment Details
+              {t('appointments.details')}
             </h3>
 
             <div className="space-y-3">
               {/* Type */}
               <div className="flex items-center">
                 <Tag className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-16">Type:</span>
+                <span className="text-sm font-medium w-20">{t('appointments.type')}:</span>
 
                 {!isEditMode ? (
                   <div className="flex items-center">
@@ -353,7 +360,7 @@ export function AppointmentDetailsDialog({
                     )}
                     <span className="text-sm">
                       {appointment.appointment_type?.name ||
-                       (appointment.appointment_type_id ? "Loading..." : "Not specified")}
+                       (appointment.appointment_type_id ? t('common.loading') : t('appointments.notSpecified'))}
                     </span>
                   </div>
                 ) : (
@@ -370,18 +377,18 @@ export function AppointmentDetailsDialog({
               {/* Date */}
               <div className="flex items-center">
                 <Calendar className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-16">Date:</span>
+                <span className="text-sm font-medium w-20">{t('appointments.date')}:</span>
                 <span className="text-sm">{formattedDate}</span>
               </div>
 
               {/* Time */}
               <div className="flex items-center">
                 <Clock className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-16">Time:</span>
+                <span className="text-sm font-medium w-20">{t('appointments.time')}:</span>
                 <span className="text-sm">{formattedTime}</span>
                 {appointment.appointment_type?.duration && (
                   <span className="text-muted-foreground text-sm ml-1">
-                    ({appointment.appointment_type.duration} minutes)
+                    ({formatDuration(appointment.appointment_type.duration)})
                   </span>
                 )}
               </div>
@@ -392,14 +399,14 @@ export function AppointmentDetailsDialog({
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
             <h3 className="text-sm font-medium mb-3 flex items-center">
               <User className="h-4 w-4 mr-2 text-primary" />
-              Contact Information
+              {t('appointments.contactInformation')}
             </h3>
 
             <div className="space-y-3">
               {/* Email */}
               <div className="flex items-center">
                 <Mail className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-16">Email:</span>
+                <span className="text-sm font-medium w-20">{t('common.email')}:</span>
 
                 {!isEditMode ? (
                   appointment.client_email ? (
@@ -410,7 +417,7 @@ export function AppointmentDetailsDialog({
                       {appointment.client_email}
                     </a>
                   ) : (
-                    <span className="text-sm text-muted-foreground">Not provided</span>
+                    <span className="text-sm text-muted-foreground">{t('common.notProvided')}</span>
                   )
                 ) : (
                   <div className="flex-1">
@@ -418,7 +425,7 @@ export function AppointmentDetailsDialog({
                       name="client_email"
                       value={appointmentData.client_email}
                       onChange={handleInputChange}
-                      placeholder="Email address"
+                      placeholder={t('appointments.emailPlaceholder')}
                       className="h-8 text-sm"
                     />
                   </div>
@@ -428,7 +435,7 @@ export function AppointmentDetailsDialog({
               {/* Phone */}
               <div className="flex items-center">
                 <Phone className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-16">Phone:</span>
+                <span className="text-sm font-medium w-20">{t('common.phone')}:</span>
 
                 {!isEditMode ? (
                   appointment.client_phone ? (
@@ -439,7 +446,7 @@ export function AppointmentDetailsDialog({
                       {appointment.client_phone}
                     </a>
                   ) : (
-                    <span className="text-sm text-muted-foreground">Not provided</span>
+                    <span className="text-sm text-muted-foreground">{t('common.notProvided')}</span>
                   )
                 ) : (
                   <div className="flex-1">
@@ -447,7 +454,7 @@ export function AppointmentDetailsDialog({
                       name="client_phone"
                       value={appointmentData.client_phone}
                       onChange={handleInputChange}
-                      placeholder="Phone number"
+                      placeholder={t('appointments.phonePlaceholder')}
                       className="h-8 text-sm"
                     />
                   </div>
@@ -458,13 +465,13 @@ export function AppointmentDetailsDialog({
               {isEditMode && (
                 <div className="flex items-center">
                   <User className="h-4 w-4 text-muted-foreground mr-2" />
-                  <span className="text-sm font-medium w-16">Name:</span>
+                  <span className="text-sm font-medium w-20">{t('common.name')}:</span>
                   <div className="flex-1">
                     <Input
                       name="client_name"
                       value={appointmentData.client_name}
                       onChange={handleInputChange}
-                      placeholder="Client name"
+                      placeholder={t('appointments.clientNamePlaceholder')}
                       className="h-8 text-sm"
                     />
                   </div>
@@ -477,11 +484,11 @@ export function AppointmentDetailsDialog({
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
             <h3 className="text-sm font-medium mb-3 flex items-center">
               <CheckCircle2 className="h-4 w-4 mr-2 text-primary" />
-              Appointment Status
+              {t('appointments.statusHeading')}
             </h3>
 
             <div className="flex items-center">
-              <span className="text-sm font-medium w-16">Status:</span>
+              <span className="text-sm font-medium w-20">{t('appointments.status')}:</span>
               <div className="flex-1">
                 <Select
                   value={status}
@@ -491,27 +498,22 @@ export function AppointmentDetailsDialog({
                   <SelectTrigger className="w-[140px] h-8 text-sm">
                     <SelectValue>
                       <Badge
-                        variant={
-                          status === "scheduled" ? "default" :
-                          status === "completed" ? "success" :
-                          status === "cancelled" ? "destructive" :
-                          "outline"
-                        }
+                        variant={getStatusVariant(status)}
                         className="font-normal"
                       >
-                        {status}
+                        {translateStatus(status)}
                       </Badge>
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="scheduled">
-                      <Badge variant="default" className="font-normal">scheduled</Badge>
+                      <Badge variant={getStatusVariant("scheduled")} className="font-normal">{translateStatus("scheduled")}</Badge>
                     </SelectItem>
                     <SelectItem value="completed">
-                      <Badge variant="success" className="font-normal">completed</Badge>
+                      <Badge variant={getStatusVariant("completed")} className="font-normal">{translateStatus("completed")}</Badge>
                     </SelectItem>
                     <SelectItem value="cancelled">
-                      <Badge variant="destructive" className="font-normal">cancelled</Badge>
+                      <Badge variant={getStatusVariant("cancelled")} className="font-normal">{translateStatus("cancelled")}</Badge>
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -524,7 +526,7 @@ export function AppointmentDetailsDialog({
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
               <h3 className="text-sm font-medium mb-3 flex items-center">
                 <FileText className="h-4 w-4 mr-2 text-primary" />
-                Notes
+                {t('appointments.notes')}
               </h3>
 
               {!isEditMode ? (
@@ -535,7 +537,7 @@ export function AppointmentDetailsDialog({
                     name="notes"
                     value={appointmentData.notes || ''}
                     onChange={handleInputChange}
-                    placeholder="Add notes about this appointment..."
+                    placeholder={t('appointments.notesPlaceholder')}
                     className="w-full min-h-[100px] text-sm p-2 rounded-md border border-input bg-background"
                   />
                 </div>
@@ -551,7 +553,7 @@ export function AppointmentDetailsDialog({
             onClick={onDelete}
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Delete Appointment
+            {t('appointments.delete')}
           </Button>
 
           <div className="flex gap-2">
@@ -561,14 +563,14 @@ export function AppointmentDetailsDialog({
                 onClick={onShare}
               >
                 <Share className="h-4 w-4 mr-2" />
-                Share
+                {t('common.share')}
               </Button>
             )}
             <Button
               variant="default"
               onClick={() => onOpenChange(false)}
             >
-              Close
+              {t('common.close')}
             </Button>
           </div>
         </DialogFooter>

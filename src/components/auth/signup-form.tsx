@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,7 @@ export function SignupForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const locale = useLocale();
   const supabase = createClient();
 
   const {
@@ -64,8 +66,8 @@ export function SignupForm() {
       // Profile will be created automatically via the database trigger
       // when the user is created
 
-      // Redirect to dashboard after successful signup
-      router.push("/dashboard");
+      // Redirect to localized dashboard after successful signup
+      router.push(`/${locale}/dashboard`);
       router.refresh();
     } catch (error) {
       console.error("Error signing up:", error);

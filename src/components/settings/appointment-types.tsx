@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslations } from "next-intl";
 import {
   Loader2, Plus, Pencil, Trash2, Check, Star, Clock,
   Calendar, Settings, FileText, Palette, CheckCircle, AlertCircle, Info,
@@ -59,6 +60,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
+  const t = useTranslations();
 
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
@@ -102,8 +104,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
         if (error) {
           console.error("Error fetching appointment types:", error);
           toast({
-            title: "Error",
-            description: "Could not load appointment types. Please try again.",
+            title: t('common.errorLabel'),
+            description: t('settings.appointmentTypes.errors.loadFailed'),
             variant: "destructive",
           });
           return;
@@ -128,8 +130,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
         .from("appointment_types")
         .insert({
           user_id: userId,
-          name: "Standard Appointment",
-          description: "Default appointment type",
+          name: t('settings.appointmentTypes.defaultType.name'),
+          description: t('settings.appointmentTypes.defaultType.description'),
           duration: 60,
           color: "#6366f1",
           is_default: true,
@@ -144,8 +146,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
 
       setAppointmentTypes([data]);
       toast({
-        title: "Default appointment type created",
-        description: "A standard appointment type has been created for you.",
+        title: t('settings.appointmentTypes.defaultType.createdTitle'),
+        description: t('settings.appointmentTypes.defaultType.createdDescription'),
       });
 
       // Open the edit dialog for the newly created default type
@@ -194,10 +196,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
     setIsDialogOpen(true);
 
     // Show a notification if this is the default appointment type with the generic name
-    if (type.is_default && type.name === "Standard Appointment") {
+    if (type.is_default && type.name === t('settings.appointmentTypes.defaultType.name')) {
       toast({
-        title: "Personalize your appointment type",
-        description: "We recommend renaming the default appointment type to match your business needs.",
+        title: t('settings.appointmentTypes.personalize.title'),
+        description: t('settings.appointmentTypes.personalize.description'),
         variant: "default",
       });
     }
@@ -243,8 +245,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       );
 
       toast({
-        title: "Default updated",
-        description: `"${type.name}" is now your default appointment type.`,
+        title: t('settings.appointmentTypes.defaultUpdated.title'),
+        description: t('settings.appointmentTypes.defaultUpdated.description', { name: type.name }),
       });
     } catch (err) {
       console.error("Error in handleSetDefault:", err);
@@ -315,8 +317,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       if (error) {
         console.error("Error deleting appointment type:", error);
         toast({
-          title: "Error",
-          description: "Could not delete appointment type. Please try again.",
+          title: t('common.errorLabel'),
+          description: t('settings.appointmentTypes.errors.deleteFailed'),
           variant: "destructive",
         });
         return false;
@@ -338,8 +340,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       }, 100);
 
       toast({
-        title: "Appointment type deleted",
-        description: "The appointment type has been deleted successfully.",
+        title: t('settings.appointmentTypes.deleted.title'),
+        description: t('settings.appointmentTypes.deleted.description'),
       });
 
       return true;
@@ -368,8 +370,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       if (updateError) {
         console.error("Error reassigning appointments:", updateError);
         toast({
-          title: "Error",
-          description: "Could not reassign appointments. Please try again.",
+          title: t('common.error'),
+          description: t('settings.appointmentTypes.errors.reassignFailed'),
           variant: "destructive",
         });
         return;
@@ -381,8 +383,11 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       // Show success message
       const targetType = appointmentTypes.find(t => t.id === reassignTargetTypeId);
       toast({
-        title: "Appointments reassigned",
-        description: `${appointmentsUsingType.length} appointment(s) reassigned to "${targetType?.name}" and the original type was deleted.`,
+        title: t('settings.appointmentTypes.reassigned.title'),
+        description: t('settings.appointmentTypes.reassigned.description', {
+          count: appointmentsUsingType.length,
+          name: targetType?.name || ''
+        }),
       });
     } catch (err) {
       console.error("Error in handleReassignAndDelete:", err);
@@ -407,10 +412,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
     e.preventDefault();
 
     // Check if the user is trying to save the default appointment type without renaming it
-    if (editingType?.is_default && formData.name === "Standard Appointment") {
+    if (editingType?.is_default && formData.name === t('settings.appointmentTypes.defaultType.name')) {
       toast({
-        title: "Personalization required",
-        description: "Please rename the default appointment type to something more specific for your business.",
+        title: t('settings.appointmentTypes.personalizationRequired.title'),
+        description: t('settings.appointmentTypes.personalizationRequired.description'),
         variant: "destructive",
       });
       return;
@@ -464,8 +469,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
         );
 
         toast({
-          title: "Appointment type updated",
-          description: "Your appointment type has been updated successfully.",
+          title: t('settings.appointmentTypes.updated.title'),
+          description: t('settings.appointmentTypes.updated.description'),
         });
       } else {
         // If setting this as default, first remove default from all others
@@ -508,8 +513,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
         });
 
         toast({
-          title: "Appointment type created",
-          description: "Your new appointment type has been created successfully.",
+          title: t('settings.appointmentTypes.created.title'),
+          description: t('settings.appointmentTypes.created.description'),
         });
       }
 
@@ -519,8 +524,8 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
     } catch (err: any) {
       console.error("Error saving appointment type:", err);
       toast({
-        title: "Save failed",
-        description: err?.message || "Could not save appointment type. Please try again.",
+        title: t('common.saveFailed'),
+        description: err?.message || t('settings.appointmentTypes.errors.saveFailed'),
         variant: "destructive",
       });
     } finally {
@@ -542,10 +547,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
         <div>
           <h3 className="text-xl font-medium flex items-center gap-2">
             <Calendar className="h-5 w-5 text-indigo-600" />
-            Appointment Types
+            {t('settings.appointmentTypes.title')}
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Create and manage different types of appointments with custom durations and fields
+            {t('settings.appointmentTypes.subtitle')}
           </p>
         </div>
         <PrimaryActionButton
@@ -553,7 +558,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
           icon={Plus}
           variant="indigo"
         >
-          Add Appointment Type
+          {t('settings.appointmentTypes.addType')}
         </PrimaryActionButton>
       </div>
 
@@ -562,9 +567,9 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
           <div className="h-1 bg-indigo-600"></div>
           <CardContent className="flex flex-col items-center justify-center py-12 px-6">
             <Calendar className="h-16 w-16 text-indigo-200 mb-4" />
-            <h3 className="text-lg font-medium mb-2">No appointment types yet</h3>
+            <h3 className="text-lg font-medium mb-2">{t('settings.appointmentTypes.empty.title')}</h3>
             <p className="text-muted-foreground mb-6 text-center max-w-md">
-              Appointment types help you organize your schedule and collect the right information from clients.
+              {t('settings.appointmentTypes.empty.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <PrimaryActionButton
@@ -572,7 +577,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                 icon={Plus}
                 variant="indigo"
               >
-                Create Custom Type
+                {t('settings.appointmentTypes.createCustomType')}
               </PrimaryActionButton>
               <Button
                 variant="outline"
@@ -583,7 +588,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                 className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 gap-2"
               >
                 <Plus className="h-4 w-4" />
-                Use Standard Template
+                {t('settings.appointmentTypes.useStandardTemplate')}
               </Button>
             </div>
           </CardContent>
@@ -594,20 +599,20 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
           <CardHeader className="pb-4">
             <CardTitle className="text-xl flex items-center gap-2">
               <Settings className="h-5 w-5 text-indigo-600" />
-              Manage Your Appointment Types
+              {t('settings.appointmentTypes.manage')}
             </CardTitle>
             <CardDescription className="text-base">
-              Click on a type to manage its custom fields and form settings
+              {t('settings.appointmentTypes.manageDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-indigo-50/50">
                 <TableRow>
-                  <TableHead className="font-medium">Name</TableHead>
-                  <TableHead className="font-medium">Duration</TableHead>
-                  <TableHead className="font-medium">Default</TableHead>
-                  <TableHead className="text-right font-medium">Actions</TableHead>
+                  <TableHead className="font-medium">{t('settings.appointmentTypes.table.name')}</TableHead>
+                  <TableHead className="font-medium">{t('settings.appointmentTypes.table.duration')}</TableHead>
+                  <TableHead className="font-medium">{t('settings.appointmentTypes.table.default')}</TableHead>
+                  <TableHead className="text-right font-medium">{t('settings.appointmentTypes.table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -616,7 +621,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                     key={type.id}
                     className="cursor-pointer hover:bg-indigo-50/30 group relative transition-colors"
                     onClick={() => onSelectType ? onSelectType(type.id) : router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}`)}
-                    title="Click to manage custom fields and form settings"
+                    title={t('settings.appointmentTypes.clickToManage')}
                   >
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-3">
@@ -628,7 +633,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                           <div className="flex items-center">
                             <span>{type.name}</span>
                             <span className="ml-2 text-xs text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              (Click to manage)
+                              {t('settings.appointmentTypes.clickToManageShort')}
                             </span>
                           </div>
                           {type.description && (
@@ -642,14 +647,14 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-indigo-600" />
-                        {type.duration} minutes
+                        {t('settings.appointmentTypes.durationDisplay', { minutes: type.duration })}
                       </div>
                     </TableCell>
                     <TableCell>
                       {type.is_default ? (
                         <span className="flex items-center text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md text-sm">
                           <CheckCircle className="h-4 w-4 mr-1" />
-                          Default Type
+                          {t('settings.appointmentTypes.defaultType')}
                         </span>
                       ) : (
                         <Button
@@ -662,7 +667,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                           className="h-7 text-xs hover:bg-indigo-50 hover:text-indigo-700"
                         >
                           <Star className="h-3 w-3 mr-1" />
-                          Set as default
+                          {t('settings.appointmentTypes.setAsDefault')}
                         </Button>
                       )}
                     </TableCell>
@@ -676,10 +681,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                             router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}&view=form`);
                           }}
                           className="h-8 w-8 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
-                          title="Customize form settings for this appointment type"
+                          title={t('settings.appointmentTypes.customizeFormSettings')}
                         >
                           <FileText className="h-4 w-4" />
-                          <span className="sr-only">Form Settings</span>
+                          <span className="sr-only">{t('settings.appointmentTypes.formSettings')}</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -689,10 +694,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                             handleEdit(type);
                           }}
                           className="h-8 w-8 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
-                          title="Edit appointment type"
+                          title={t('settings.appointmentTypes.editTypeTitle')}
                         >
                           <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
+                          <span className="sr-only">{t('common.editButton')}</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -705,10 +710,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                             ? 'text-gray-400 cursor-not-allowed'
                             : 'text-red-500 hover:text-red-700 hover:bg-red-50'}`}
                           disabled={type.is_default}
-                          title={type.is_default ? "Cannot delete default type" : "Delete appointment type"}
+                          title={type.is_default ? t('settings.appointmentTypes.cannotDeleteDefault') : t('settings.appointmentTypes.deleteType')}
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
+                          <span className="sr-only">{t('common.deleteButton')}</span>
                         </Button>
                       </div>
                     </TableCell>
@@ -729,27 +734,27 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                 editingType.is_default ? (
                   <>
                     <CheckCircle className="h-5 w-5 text-indigo-600" />
-                    Edit Default Appointment Type
+                    {t('settings.appointmentTypes.editDefaultType')}
                   </>
                 ) : (
                   <>
                     <Edit className="h-5 w-5 text-indigo-600" />
-                    Edit Appointment Type
+                    {t('settings.appointmentTypes.editType')}
                   </>
                 )
               ) : (
                 <>
                   <Plus className="h-5 w-5 text-indigo-600" />
-                  Add Appointment Type
+                  {t('settings.appointmentTypes.addType')}
                 </>
               )}
             </DialogTitle>
             <DialogDescription className="text-base">
               {editingType
                 ? editingType.is_default
-                  ? "Customize your default appointment type. This is the type that will be selected automatically when creating new appointments."
-                  : "Update the details of this appointment type."
-                : "Create a new type of appointment with custom duration."}
+                  ? t('settings.appointmentTypes.defaultTypeDescription')
+                  : t('settings.appointmentTypes.updateTypeDescription')
+                : t('settings.appointmentTypes.createTypeDescription')}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
@@ -757,7 +762,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium">Appointment Type Name</Label>
+                    <Label htmlFor="name" className="text-sm font-medium">{t('settings.appointmentTypes.form.name')}</Label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
                       <Input
@@ -765,21 +770,21 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        placeholder="e.g., Initial Consultation"
+                        placeholder={t('settings.appointmentTypes.form.namePlaceholder')}
                         required
-                        className={`pl-10 border-indigo-200 focus-visible:ring-indigo-500 ${editingType?.is_default && formData.name === "Standard Appointment" ? "border-destructive" : ""}`}
+                        className={`pl-10 border-indigo-200 focus-visible:ring-indigo-500 ${editingType?.is_default && formData.name === t('settings.appointmentTypes.defaultType.name') ? "border-destructive" : ""}`}
                       />
                     </div>
-                    {editingType?.is_default && formData.name === "Standard Appointment" && (
+                    {editingType?.is_default && formData.name === t('settings.appointmentTypes.defaultType.name') && (
                       <p className="text-xs text-destructive mt-1 flex items-center gap-1">
                         <AlertCircle className="h-3 w-3" />
-                        Please personalize the default appointment type name for your business.
+                        {t('settings.appointmentTypes.personalizationRequired.message')}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description" className="text-sm font-medium">Description (Optional)</Label>
+                    <Label htmlFor="description" className="text-sm font-medium">{t('settings.appointmentTypes.form.description')}</Label>
                     <div className="relative">
                       <FileText className="absolute left-3 top-3 h-4 w-4 text-indigo-600" />
                       <Textarea
@@ -787,18 +792,18 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        placeholder="Describe what this appointment type is for"
+                        placeholder={t('settings.appointmentTypes.form.descriptionPlaceholder')}
                         rows={3}
                         className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                       />
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      This description will be visible to clients when booking appointments
+                      {t('settings.appointmentTypes.form.descriptionHelp')}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="duration" className="text-sm font-medium">Duration (minutes)</Label>
+                    <Label htmlFor="duration" className="text-sm font-medium">{t('settings.appointmentTypes.form.duration')}</Label>
                     <div className="relative">
                       <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
                       <Input
@@ -815,12 +820,12 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                       />
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      How long this appointment type typically lasts
+                      {t('settings.appointmentTypes.form.durationHelp')}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="color" className="text-sm font-medium">Color</Label>
+                    <Label htmlFor="color" className="text-sm font-medium">{t('settings.appointmentTypes.form.color')}</Label>
                     <div className="flex items-center gap-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
                       <div
                         className="w-12 h-12 rounded-full border-4 border-white shadow-sm flex-shrink-0"
@@ -852,7 +857,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      This color will be used to identify this appointment type throughout the application
+                      {t('settings.appointmentTypes.form.colorHelp')}
                     </p>
                   </div>
 
@@ -866,13 +871,13 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                         className="h-4 w-4 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500"
                       />
                       <Label htmlFor="is_default" className="text-sm font-medium">
-                        Set as default appointment type
+                        {t('settings.appointmentTypes.form.setAsDefault')}
                       </Label>
                     </div>
                     <div className="relative group">
                       <Info className="h-4 w-4 text-indigo-400 cursor-help" />
                       <div className="absolute left-0 -top-8 w-48 p-2 bg-black text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                        This type will be pre-selected when clients book appointments
+                        {t('settings.appointmentTypes.form.defaultHelp')}
                       </div>
                     </div>
                   </div>
@@ -883,7 +888,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                   <div className="bg-indigo-50 p-3 border-b border-indigo-100">
                     <h4 className="font-medium flex items-center gap-2 text-indigo-700">
                       <Eye className="h-4 w-4" />
-                      Preview
+                      {t('settings.appointmentTypes.preview.title')}
                     </h4>
                   </div>
                   <div className="p-6 space-y-6">
@@ -894,28 +899,28 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                           style={{ backgroundColor: formData.color }}
                         ></div>
                         <div>
-                          <div className="font-medium text-lg">{formData.name || "Appointment Type"}</div>
+                          <div className="font-medium text-lg">{formData.name || t('settings.appointmentTypes.preview.defaultName')}</div>
                           {formData.description && (
                             <div className="text-sm text-muted-foreground">{formData.description}</div>
                           )}
                           <div className="text-xs text-muted-foreground flex items-center mt-1">
                             <Clock className="h-3 w-3 mr-1" />
-                            {formData.duration || 60} minutes
+                            {t('settings.appointmentTypes.preview.duration', { minutes: formData.duration || 60 })}
                           </div>
                         </div>
                       </div>
                     </div>
 
                     <div className="text-sm text-muted-foreground">
-                      This is how your appointment type will appear to clients in the booking form
+                      {t('settings.appointmentTypes.preview.description')}
                     </div>
 
                     {formData.is_default && (
                       <div className="bg-indigo-50 text-indigo-700 p-3 rounded-md flex items-start gap-2">
                         <CheckCircle className="h-5 w-5 text-indigo-600 mt-0.5" />
                         <div>
-                          <div className="font-medium">Default Appointment Type</div>
-                          <p className="text-sm">This type will be pre-selected when clients book appointments</p>
+                          <div className="font-medium">{t('settings.appointmentTypes.preview.defaultTitle')}</div>
+                          <p className="text-sm">{t('settings.appointmentTypes.preview.defaultDescription')}</p>
                         </div>
                       </div>
                     )}
@@ -931,16 +936,16 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                 disabled={isSaving}
                 className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
               >
-                Cancel
+                {t('common.cancelButton')}
               </Button>
               <PrimaryActionButton
                 type="submit"
                 disabled={isSaving}
                 isLoading={isSaving}
-                loadingText="Saving..."
+                loadingText={t('common.saving')}
                 variant="indigo"
               >
-                {editingType ? "Update Appointment Type" : "Create Appointment Type"}
+                {editingType ? t('settings.appointmentTypes.updateButton') : t('settings.appointmentTypes.createButton')}
               </PrimaryActionButton>
             </DialogFooter>
           </form>
@@ -965,24 +970,23 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       <Dialog open={isReassignDialogOpen} onOpenChange={setIsReassignDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Reassign Appointments</DialogTitle>
+            <DialogTitle>{t('settings.appointmentTypes.reassign.title')}</DialogTitle>
             <DialogDescription>
-              This appointment type is used by {appointmentsUsingType.length} appointment(s).
-              Please select another appointment type to reassign them to before deleting.
+              {t('settings.appointmentTypes.reassign.description', { count: appointmentsUsingType.length })}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 my-4">
             <div className="bg-destructive/10 p-4 rounded-md border border-destructive">
-              <h4 className="font-medium text-destructive mb-2">Appointments using this type:</h4>
+              <h4 className="font-medium text-destructive mb-2">{t('settings.appointmentTypes.reassign.appointmentsUsing')}</h4>
               <div className="max-h-48 overflow-y-auto">
                 <ul className="space-y-2">
                   {appointmentsUsingType.map(appointment => (
                     <li key={appointment.id} className="text-sm border-b pb-2">
-                      <div className="font-medium">{appointment.title || "Untitled Appointment"}</div>
+                      <div className="font-medium">{appointment.title || t('settings.appointmentTypes.untitledAppointment')}</div>
                       <div className="text-muted-foreground">
                         {new Date(appointment.scheduled_for).toLocaleString()} •
-                        {appointment.client_name || "No client name"}
+                        {appointment.client_name || t('settings.appointmentTypes.noClientName')}
                       </div>
                     </li>
                   ))}
@@ -991,13 +995,13 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reassignType">Select a new appointment type:</Label>
+              <Label htmlFor="reassignType">{t('settings.appointmentTypes.reassign.selectNew')}</Label>
               <Select
                 value={reassignTargetTypeId}
                 onValueChange={setReassignTargetTypeId}
               >
                 <SelectTrigger id="reassignType" className="w-full">
-                  <SelectValue placeholder="Select an appointment type" />
+                  <SelectValue placeholder={t('settings.appointmentTypes.reassign.selectPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {appointmentTypes
@@ -1022,7 +1026,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
               }}
               disabled={isReassigning}
             >
-              Cancel
+              {t('common.cancelButton')}
             </Button>
             <Button
               onClick={handleReassignAndDelete}
@@ -1031,10 +1035,10 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
               {isReassigning ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Reassigning...
+                  {t('settings.appointmentTypes.reassign.reassigning')}
                 </>
               ) : (
-                "Reassign and Delete"
+                t('settings.appointmentTypes.reassign.confirmButton')
               )}
             </Button>
           </DialogFooter>

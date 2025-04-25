@@ -7,6 +7,7 @@ import { Loader2, User, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from "next-intl";
 
 import {
   Dialog,
@@ -43,6 +44,7 @@ export function EditClientDialog({
   const { toast } = useToast();
   const supabase = createClient();
   const [isUpdating, setIsUpdating] = useState(false);
+  const t = useTranslations();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -101,8 +103,8 @@ export function EditClientDialog({
       }
 
       toast({
-        title: "Client updated",
-        description: `${client.name} has been successfully updated.`,
+        title: t('clients.edit.success'),
+        description: t('clients.edit.successDescription', { name: client.name }),
       });
 
       // Call the success callback to update the UI
@@ -111,8 +113,8 @@ export function EditClientDialog({
     } catch (err: any) {
       console.error("Error updating client:", err);
       toast({
-        title: "Error",
-        description: err?.message || "Could not update client. Please try again.",
+        title: t('common.errorLabel'),
+        description: err?.message || t('clients.edit.error'),
         variant: "destructive",
       });
     } finally {
@@ -124,15 +126,15 @@ export function EditClientDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Client</DialogTitle>
+          <DialogTitle>{t('clients.edit.title')}</DialogTitle>
           <DialogDescription>
-            Update client information. This will update all appointments for this client.
+            {t('clients.edit.description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{t('clients.form.fullName')}</Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -146,7 +148,7 @@ export function EditClientDialog({
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('clients.form.email')}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -161,7 +163,7 @@ export function EditClientDialog({
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone">{t('clients.form.phone')}</Label>
               <div className="relative">
                 <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -183,7 +185,7 @@ export function EditClientDialog({
               onClick={() => onOpenChange(false)}
               disabled={isUpdating}
             >
-              Cancel
+              {t('common.cancelButton')}
             </Button>
             <Button
               type="submit"
@@ -193,10 +195,10 @@ export function EditClientDialog({
               {isUpdating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
+                  {t('clients.edit.updating')}
                 </>
               ) : (
-                "Update Client"
+                t('clients.edit.update')
               )}
             </Button>
           </DialogFooter>

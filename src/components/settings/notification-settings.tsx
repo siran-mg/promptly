@@ -4,19 +4,20 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bell, BellRing } from "lucide-react";
 import { PushNotificationManager } from "@/components/notifications/push-notification-manager";
+import { useTranslations } from "next-intl";
 
 export function NotificationSettings() {
+  const t = useTranslations();
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BellRing className="h-5 w-5 text-indigo-600" />
-            Push Notifications
+            {t('settings.notificationSettings.pushNotifications')}
           </CardTitle>
           <CardDescription>
-            Receive notifications on your device when you get new appointments (enabled by default).
-            Note: Action buttons may not appear on all browsers and devices.
+            {t('settings.notificationSettings.pushNotificationsDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -28,15 +29,15 @@ export function NotificationSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5 text-indigo-600" />
-            Notification Preferences
+            {t('settings.notificationSettings.preferences')}
           </CardTitle>
           <CardDescription>
-            Choose which notifications you want to receive
+            {t('settings.notificationSettings.preferencesDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            More notification preferences will be available in a future update.
+            {t('settings.notificationSettings.comingSoon')}
           </p>
         </CardContent>
       </Card>

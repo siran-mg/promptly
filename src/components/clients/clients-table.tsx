@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { format } from "date-fns";
 import { Search, Mail, Phone, Calendar, Filter, Trash2, MoreHorizontal, Edit } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslations } from "next-intl";
+import { useDateFormatter } from "@/hooks/use-date-formatter";
 
 import {
   Table,
@@ -49,6 +50,8 @@ export function ClientsTable({ clients }: ClientsTableProps) {
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
+  const t = useTranslations();
+  const { formatDate, formatTime } = useDateFormatter();
 
   // Filter clients based on search query
   const filteredClients = clients.filter((client) => {
@@ -64,9 +67,9 @@ export function ClientsTable({ clients }: ClientsTableProps) {
   if (clients.length === 0) {
     return (
       <EmptyClientsState
-        title="No Clients Yet"
-        description="Your client list will grow as you book appointments"
-        buttonText="Create Your First Appointment"
+        title={t('clients.empty.title')}
+        description={t('clients.empty.description')}
+        buttonText={t('clients.empty.buttonText')}
       />
     );
   }
@@ -78,7 +81,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-500" />
           <Input
             type="search"
-            placeholder="Search by name, email, or phone..."
+            placeholder={t('clients.search.placeholder')}
             className="pl-10 h-10 border-indigo-200 focus-visible:ring-indigo-500"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -90,14 +93,14 @@ export function ClientsTable({ clients }: ClientsTableProps) {
           className="gap-2 h-10 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
           onClick={() => {
             toast({
-              title: "Filter Clients",
-              description: "Advanced filtering options coming soon.",
+              title: t('clients.filter.title'),
+              description: t('clients.filter.comingSoon'),
               variant: "default",
             });
           }}
         >
           <Filter className="h-4 w-4" />
-          Filter Clients
+          {t('clients.filter.button')}
         </Button>
       </div>
 
@@ -105,11 +108,11 @@ export function ClientsTable({ clients }: ClientsTableProps) {
         <Table>
           <TableHeader className="bg-indigo-50">
             <TableRow>
-              <TableHead className="text-indigo-700 font-semibold">Client</TableHead>
-              <TableHead className="text-indigo-700 font-semibold">Contact</TableHead>
-              <TableHead className="text-indigo-700 font-semibold">Appointments</TableHead>
-              <TableHead className="text-indigo-700 font-semibold">Last Appointment</TableHead>
-              <TableHead className="text-indigo-700 font-semibold w-[80px]">Actions</TableHead>
+              <TableHead className="text-indigo-700 font-semibold">{t('clients.table.client')}</TableHead>
+              <TableHead className="text-indigo-700 font-semibold">{t('clients.table.contact')}</TableHead>
+              <TableHead className="text-indigo-700 font-semibold">{t('clients.table.appointments')}</TableHead>
+              <TableHead className="text-indigo-700 font-semibold">{t('clients.table.lastAppointment')}</TableHead>
+              <TableHead className="text-indigo-700 font-semibold w-[80px]">{t('clients.table.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -118,8 +121,8 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                 <TableCell colSpan={5} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
                     <Search className="h-8 w-8 mb-2 text-indigo-300" />
-                    <p>No clients match your search criteria.</p>
-                    <p className="text-sm">Try adjusting your search terms.</p>
+                    <p>{t('clients.search.noResults')}</p>
+                    <p className="text-sm">{t('clients.search.adjustSearch')}</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -143,17 +146,19 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                   </TableCell>
                   <TableCell>
                     <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-200">
-                      {client.appointmentsCount} {client.appointmentsCount === 1 ? 'appointment' : 'appointments'}
+                      {client.appointmentsCount} {client.appointmentsCount === 1
+                        ? t('clients.appointmentCount.singular')
+                        : t('clients.appointmentCount.plural')}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     {client.lastAppointment ? (
                       <div className="flex flex-col">
-                        <span className="font-medium text-indigo-700">{format(new Date(client.lastAppointment), "MMM d, yyyy")}</span>
-                        <span className="text-xs text-muted-foreground">{format(new Date(client.lastAppointment), "h:mm a")}</span>
+                        <span className="font-medium text-indigo-700">{formatDate(new Date(client.lastAppointment), { shortDate: true })}</span>
+                        <span className="text-xs text-muted-foreground">{formatTime(new Date(client.lastAppointment))}</span>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground">None</span>
+                      <span className="text-muted-foreground">{t('clients.noAppointments')}</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -165,7 +170,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel className="text-indigo-700">Client Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel className="text-indigo-700">{t('clients.actions.title')}</DropdownMenuLabel>
                         <DropdownMenuItem
                           className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
                           onClick={() => {
@@ -181,7 +186,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                           }}
                         >
                           <Calendar className="mr-2 h-4 w-4 text-green-600" />
-                          Book New Appointment
+                          {t('clients.actions.bookAppointment')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
@@ -191,7 +196,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                           }}
                         >
                           <Edit className="mr-2 h-4 w-4 text-indigo-600" />
-                          Edit Client
+                          {t('clients.editClient')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
@@ -202,7 +207,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                           }}
                         >
                           <Trash2 className="mr-2 h-4 w-4 text-red-600" />
-                          Remove Client
+                          {t('clients.actions.remove')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

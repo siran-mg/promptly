@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslations } from "next-intl";
 import {
   Loader2, Plus, Pencil, Trash2, GripVertical, ArrowUp, ArrowDown,
   FormInput, Check, AlertTriangle, FileText, Calendar, Clock, List,
@@ -64,6 +65,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
   const { toast } = useToast();
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations();
 
   const [isLoading, setIsLoading] = useState(true);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
@@ -86,15 +88,15 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
 
   // Field type options
   const fieldTypes = [
-    { value: "text", label: "Text" },
-    { value: "textarea", label: "Text Area" },
-    { value: "number", label: "Number" },
-    { value: "email", label: "Email" },
-    { value: "phone", label: "Phone" },
-    { value: "date", label: "Date" },
-    { value: "time", label: "Time" },
-    { value: "select", label: "Dropdown" },
-    { value: "checkbox", label: "Checkbox" },
+    { value: "text", label: t('settings.formSettingsSection.fieldTypes.text') },
+    { value: "textarea", label: t('settings.formSettingsSection.fieldTypes.textarea') },
+    { value: "number", label: t('settings.formSettingsSection.fieldTypes.number') },
+    { value: "email", label: t('settings.formSettingsSection.fieldTypes.email') },
+    { value: "phone", label: t('settings.formSettingsSection.fieldTypes.phone') },
+    { value: "date", label: t('settings.formSettingsSection.fieldTypes.date') },
+    { value: "time", label: t('settings.formSettingsSection.fieldTypes.time') },
+    { value: "select", label: t('settings.formSettingsSection.fieldTypes.select') },
+    { value: "checkbox", label: t('settings.formSettingsSection.fieldTypes.checkbox') },
   ];
 
   // Fetch appointment type and custom fields
@@ -295,10 +297,10 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
 
       if (count && count > 0) {
         toast({
-          title: "Cannot delete",
+          title: t('settings.formSettingsSection.fieldErrors.cannotDelete'),
           description: (
             <div className="space-y-2">
-              <p>This field is used by {count} appointment(s). Please remove the data first.</p>
+              <p>{t('settings.formSettingsSection.fieldErrors.fieldInUse', { count })}</p>
               <div className="flex gap-2 mt-2">
                 <Button
                   size="sm"
@@ -308,7 +310,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                     router.push(`/dashboard/appointments?field=${fieldToDelete.name}`);
                   }}
                 >
-                  View Appointments
+                  {t('settings.formSettingsSection.viewAppointments')}
                 </Button>
               </div>
             </div>
@@ -328,8 +330,8 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
       if (error) {
         console.error("Error deleting custom field:", error);
         toast({
-          title: "Error",
-          description: "Could not delete custom field. Please try again.",
+          title: t('common.error'),
+          description: t('settings.formSettingsSection.fieldErrors.deleteError'),
           variant: "destructive",
         });
         return;
@@ -339,8 +341,8 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
       setCustomFields(prev => prev.filter(f => f.id !== fieldToDelete.id));
 
       toast({
-        title: "Custom field deleted",
-        description: "The custom field has been deleted successfully.",
+        title: t('settings.formSettingsSection.fieldDeleted'),
+        description: t('settings.formSettingsSection.fieldDeletedDescription'),
       });
     } catch (err) {
       console.error("Error in handleDelete:", err);
@@ -396,8 +398,8 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
         );
 
         toast({
-          title: "Custom field updated",
-          description: "Your custom field has been updated successfully.",
+          title: t('settings.formSettingsSection.fieldUpdated'),
+          description: t('settings.formSettingsSection.fieldUpdatedDescription'),
         });
       } else {
         // Create new custom field
@@ -420,8 +422,8 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
         setCustomFields(prev => [...prev, data]);
 
         toast({
-          title: "Custom field created",
-          description: "Your new custom field has been created successfully.",
+          title: t('settings.formSettingsSection.fieldCreated'),
+          description: t('settings.formSettingsSection.fieldCreatedDescription'),
         });
       }
 
@@ -431,8 +433,8 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
     } catch (err: any) {
       console.error("Error saving custom field:", err);
       toast({
-        title: "Save failed",
-        description: err?.message || "Could not save custom field. Please try again.",
+        title: t('settings.formSettingsSection.fieldErrors.saveFailed'),
+        description: err?.message || t('settings.formSettingsSection.fieldErrors.saveError'),
         variant: "destructive",
       });
     } finally {
@@ -444,7 +446,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
     return (
       <div className="flex flex-col justify-center items-center h-64 gap-4 p-6 bg-indigo-50/30 rounded-lg border border-indigo-100">
         <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
-        <p className="text-sm text-indigo-700 font-medium">Loading custom fields...</p>
+        <p className="text-sm text-indigo-700 font-medium">{t('settings.formSettingsSection.loading')}</p>
       </div>
     );
   }
@@ -454,9 +456,9 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
       <div className="flex flex-col justify-center items-center h-64 gap-4 p-6 bg-red-50/30 rounded-lg border border-red-100">
         <AlertTriangle className="h-10 w-10 text-red-500" />
         <div className="text-center">
-          <p className="font-medium text-red-700">Appointment type not found</p>
+          <p className="font-medium text-red-700">{t('settings.formSettingsSection.fieldErrors.typeNotFound')}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            The appointment type you're trying to manage may have been deleted or doesn't exist
+            {t('settings.formSettingsSection.fieldErrors.typeNotFoundDescription')}
           </p>
         </div>
         <Button
@@ -465,7 +467,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
           onClick={() => router.push("/dashboard/settings?tab=appointment-types")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Return to Appointment Types
+          {t('settings.appointmentTypes.backToTypes')}
         </Button>
       </div>
     );
@@ -476,10 +478,15 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <p className="text-sm text-indigo-600 font-medium">
-            {customFields.length} {customFields.length === 1 ? 'field' : 'fields'} configured
+            {t('settings.formSettingsSection.fieldsConfigured', {
+              count: customFields.length,
+              fields: customFields.length === 1
+                ? t('settings.formSettingsSection.fieldSingular')
+                : t('settings.formSettingsSection.fieldPlural')
+            })}
           </p>
           <p className="text-sm text-muted-foreground">
-            Add custom fields to collect additional information from clients
+            {t('settings.formSettingsSection.fieldsDescription')}
           </p>
         </div>
         <PrimaryActionButton
@@ -487,7 +494,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
           icon={Plus}
           variant="indigo"
         >
-          Add New Field
+          {t('settings.formSettingsSection.addNewField')}
         </PrimaryActionButton>
       </div>
 

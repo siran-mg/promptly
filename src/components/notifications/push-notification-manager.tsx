@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Bell, BellOff } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslations } from "next-intl";
 import {
   isPushNotificationSupported,
   registerServiceWorker,
@@ -22,6 +23,7 @@ export function PushNotificationManager() {
   const [enabled, setEnabled] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const { toast } = useToast();
+  const t = useTranslations();
 
   // Check if push notifications are supported and enabled
   useEffect(() => {
@@ -82,8 +84,8 @@ export function PushNotificationManager() {
 
               setEnabled(true);
               toast({
-                title: "Push notifications enabled",
-                description: "You will now receive push notifications for new appointments.",
+                title: t('notifications.push.enabled'),
+                description: t('notifications.push.enabledDescription'),
               });
             }
           } catch (error) {
@@ -143,14 +145,14 @@ export function PushNotificationManager() {
 
       setEnabled(true);
       toast({
-        title: "Push notifications enabled",
-        description: "You will now receive push notifications for new appointments.",
+        title: t('notifications.push.enabled'),
+        description: t('notifications.push.enabledDescription'),
       });
     } catch (error) {
       console.error("Error enabling push notifications:", error);
       toast({
-        title: "Error enabling push notifications",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
+        title: t('notifications.push.errorEnabling'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
         variant: "destructive",
       });
     } finally {
@@ -169,8 +171,8 @@ export function PushNotificationManager() {
         console.log("No active subscription found, considering notifications as disabled");
         setEnabled(false);
         toast({
-          title: "Push notifications disabled",
-          description: "You will no longer receive push notifications.",
+          title: t('notifications.push.disabled'),
+          description: t('notifications.push.disabledDescription'),
         });
         return;
       }
@@ -219,14 +221,14 @@ export function PushNotificationManager() {
 
       setEnabled(false);
       toast({
-        title: "Push notifications disabled",
-        description: "You will no longer receive push notifications.",
+        title: t('notifications.push.disabled'),
+        description: t('notifications.push.disabledDescription'),
       });
     } catch (error) {
       console.error("Error disabling push notifications:", error);
       toast({
-        title: "Error disabling push notifications",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
+        title: t('notifications.push.errorDisabling'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
         variant: "destructive",
       });
     } finally {
@@ -260,7 +262,7 @@ export function PushNotificationManager() {
         <div className="flex items-center space-x-2">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></div>
           <div className="text-sm text-muted-foreground">
-            Checking notification settings...
+            {t('notifications.push.checking')}
           </div>
         </div>
       </div>
@@ -273,7 +275,7 @@ export function PushNotificationManager() {
         <div className="flex items-center space-x-2">
           <BellOff className="h-5 w-5 text-amber-500" />
           <p className="text-sm text-amber-700">
-            Push notifications are not supported in your browser.
+            {t('notifications.push.notSupported')}
           </p>
         </div>
       </div>
@@ -295,23 +297,22 @@ export function PushNotificationManager() {
           ) : (
             <BellOff className="h-4 w-4 text-gray-500" />
           )}
-          Push Notifications
+          {t('notifications.push.title')}
         </Label>
       </div>
 
       {permission === "denied" && (
         <div className="rounded-lg border p-4 bg-amber-50 border-amber-200">
           <p className="text-sm text-amber-700">
-            Notification permission has been denied. Please enable notifications in your browser
-            settings to receive push notifications.
+            {t('notifications.push.permissionDenied')}
           </p>
         </div>
       )}
 
       <p className="text-sm text-muted-foreground">
         {enabled
-          ? "You will receive push notifications for new appointments and important updates."
-          : "Push notifications are enabled by default. Toggle this switch to manage your notification preferences."}
+          ? t('notifications.push.enabledInfo')
+          : t('notifications.push.defaultInfo')}
       </p>
     </div>
   );

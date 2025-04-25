@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarClock, Users, CheckCircle, Clock, Calendar, UserCheck, Award, TrendingUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface StatsOverviewProps {
   totalAppointments: number;
@@ -16,6 +17,7 @@ export function StatsOverview({
   totalClients,
   completionRate,
 }: StatsOverviewProps) {
+  const t = useTranslations();
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card className="overflow-hidden border-indigo-100 hover:shadow-md transition-all duration-200">
@@ -26,10 +28,10 @@ export function StatsOverview({
               <Calendar className="h-8 w-8 text-indigo-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Bookings</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('dashboard.stats.totalBookings')}</p>
               <div className="flex items-baseline gap-1">
                 <h3 className="text-3xl font-bold">{totalAppointments}</h3>
-                <span className="text-xs text-muted-foreground">appointments</span>
+                <span className="text-xs text-muted-foreground">{t('dashboard.stats.appointments')}</span>
               </div>
             </div>
           </div>
@@ -44,10 +46,10 @@ export function StatsOverview({
               <Clock className="h-8 w-8 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Coming Up</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('dashboard.stats.comingUp')}</p>
               <div className="flex items-baseline gap-1">
                 <h3 className="text-3xl font-bold">{upcomingAppointments}</h3>
-                <span className="text-xs text-muted-foreground">scheduled</span>
+                <span className="text-xs text-muted-foreground">{t('dashboard.stats.scheduled')}</span>
               </div>
             </div>
           </div>
@@ -62,10 +64,10 @@ export function StatsOverview({
               <UserCheck className="h-8 w-8 text-green-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Client Base</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('dashboard.stats.clientBase')}</p>
               <div className="flex items-baseline gap-1">
                 <h3 className="text-3xl font-bold">{totalClients}</h3>
-                <span className="text-xs text-muted-foreground">unique clients</span>
+                <span className="text-xs text-muted-foreground">{t('dashboard.stats.uniqueClients')}</span>
               </div>
             </div>
           </div>
@@ -80,10 +82,10 @@ export function StatsOverview({
               <Award className="h-8 w-8 text-amber-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Success Rate</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('dashboard.stats.successRate')}</p>
               <div className="flex items-baseline gap-1">
                 <h3 className="text-3xl font-bold">{completionRate}%</h3>
-                <span className="text-xs text-muted-foreground">completed</span>
+                <span className="text-xs text-muted-foreground">{t('dashboard.stats.completed')}</span>
               </div>
             </div>
           </div>

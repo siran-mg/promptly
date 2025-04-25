@@ -9,6 +9,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Database } from "@/types/supabase";
 import { PrimaryActionButton } from "@/components/ui/primary-action-button";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ interface FormSettingsPerType {
 export function FormSettingsPerType({ appointmentTypeId, appointmentType }: FormSettingsPerTypeProps) {
   const { toast } = useToast();
   const supabase = createClient();
+  const t = useTranslations();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -73,16 +75,16 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
         if (globalError && globalError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
           console.error("Error fetching global form settings:", globalError);
           toast({
-            title: "Error",
-            description: "Could not load global form settings. Please try again.",
+            title: t('common.errorLabel'),
+            description: t('settings.appointmentTypes.errors.loadGlobalFailed'),
             variant: "destructive",
           });
           return;
         }
 
         setGlobalSettings(globalData || {
-          form_title: "Book an Appointment",
-          form_description: "Fill out the form below to schedule your appointment.",
+          form_title: t('settings.appointmentTypes.defaultTitle'),
+          form_description: t('settings.appointmentTypes.defaultDescription'),
           logo_url: "",
           accent_color: "#6366f1",
         });
@@ -98,8 +100,8 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
         if (typeError && typeError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
           console.error("Error fetching type-specific form settings:", typeError);
           toast({
-            title: "Error",
-            description: "Could not load form settings for this appointment type. Please try again.",
+            title: t('common.errorLabel'),
+            description: t('settings.appointmentTypes.errors.loadTypeFailed'),
             variant: "destructive",
           });
           return;
@@ -109,8 +111,8 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
         if (typeData) {
           setUseGlobalSettings(false);
           setFormData({
-            form_title: typeData.form_title || appointmentType?.name || "Book an Appointment",
-            form_description: typeData.form_description || "Fill out the form below to schedule your appointment.",
+            form_title: typeData.form_title || appointmentType?.name || t('settings.appointmentTypes.defaultTitle'),
+            form_description: typeData.form_description || t('settings.appointmentTypes.defaultDescription'),
             logo_url: typeData.logo_url || "",
             accent_color: typeData.accent_color || appointmentType?.color || "#6366f1",
           });
@@ -118,8 +120,8 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
           // Otherwise, use global settings as a starting point
           setUseGlobalSettings(true);
           setFormData({
-            form_title: globalData?.form_title || "Book an Appointment",
-            form_description: globalData?.form_description || "Fill out the form below to schedule your appointment.",
+            form_title: globalData?.form_title || t('settings.appointmentTypes.defaultTitle'),
+            form_description: globalData?.form_description || t('settings.appointmentTypes.defaultDescription'),
             logo_url: globalData?.logo_url || "",
             accent_color: appointmentType?.color || globalData?.accent_color || "#6366f1",
           });
@@ -154,8 +156,8 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
     const fileType = file.type;
     if (!fileType.startsWith("image/")) {
       toast({
-        title: "Invalid file type",
-        description: "Please upload an image file (JPEG, PNG, etc.)",
+        title: t('settings.formSettings.errors.invalidFileType'),
+        description: t('settings.formSettings.errors.invalidFileTypeDescription'),
         variant: "destructive",
       });
       return;
@@ -165,8 +167,8 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
     const maxSize = 2 * 1024 * 1024; // 2MB
     if (file.size > maxSize) {
       toast({
-        title: "File too large",
-        description: "Please upload an image smaller than 2MB",
+        title: t('settings.formSettings.errors.fileTooLarge'),
+        description: t('settings.formSettings.errors.fileTooLargeDescription'),
         variant: "destructive",
       });
       return;
@@ -179,8 +181,8 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
-          title: "Authentication error",
-          description: "Please log in again to upload a logo.",
+          title: t('settings.formSettings.errors.authError'),
+          description: t('settings.formSettings.errors.authErrorDescription'),
           variant: "destructive",
         });
         return;
@@ -236,14 +238,14 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
       setFormData((prev) => ({ ...prev, logo_url: publicUrl }));
 
       toast({
-        title: "Logo uploaded",
-        description: "Your logo has been uploaded successfully.",
+        title: t('settings.formSettings.logoUploaded'),
+        description: t('settings.formSettings.logoUploadedDescription'),
       });
     } catch (err: any) {
       console.error("Error uploading logo:", err);
       toast({
-        title: "Upload failed",
-        description: err?.message || "Could not upload logo. Please try again.",
+        title: t('settings.formSettings.errors.uploadFailed'),
+        description: err?.message || t('settings.formSettings.errors.uploadFailedDescription'),
         variant: "destructive",
       });
     } finally {
@@ -279,8 +281,8 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
         }
 
         toast({
-          title: "Settings saved",
-          description: "This appointment type will now use global form settings.",
+          title: t('settings.appointmentTypes.settingsSaved'),
+          description: t('settings.appointmentTypes.usingGlobalSettings'),
         });
       } else {
         // First check if a record already exists
@@ -331,25 +333,25 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
         }
 
         toast({
-          title: "Settings saved",
-          description: "Your form settings for this appointment type have been saved successfully.",
+          title: t('settings.appointmentTypes.settingsSaved'),
+          description: t('settings.appointmentTypes.typeSettingsSaved'),
         });
       }
     } catch (err: any) {
       console.error("Error saving form settings:", err);
 
       // Provide more specific error messages
-      let errorMessage = "Could not save form settings. Please try again.";
+      let errorMessage = t('settings.appointmentTypes.errors.saveFailedDescription');
 
       // Check for specific error codes or messages
       if (err?.code === "23505") {
-        errorMessage = "A record with this appointment type already exists. Try refreshing the page.";
+        errorMessage = t('settings.appointmentTypes.errors.duplicateRecord');
       } else if (err?.message) {
         errorMessage = err.message;
       }
 
       toast({
-        title: "Save failed",
+        title: t('settings.appointmentTypes.errors.saveFailed'),
         description: errorMessage,
         variant: "destructive",
       });
@@ -362,7 +364,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
     return (
       <div className="flex flex-col justify-center items-center h-64 gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
-        <p className="text-muted-foreground">Loading form settings...</p>
+        <p className="text-muted-foreground">{t('settings.formSettings.loading')}</p>
       </div>
     );
   }
@@ -375,14 +377,14 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
           className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
           <Palette className="h-4 w-4" />
-          Customize Form
+          {t('settings.appointmentTypes.customizeForm')}
         </TabsTrigger>
         <TabsTrigger
           value="preview"
           className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
           <Eye className="h-4 w-4" />
-          Preview
+          {t('settings.appointmentTypes.previewTab')}
         </TabsTrigger>
       </TabsList>
 
@@ -392,10 +394,10 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
           <CardHeader className="pb-4">
             <CardTitle className="text-xl flex items-center gap-2">
               <Palette className="h-5 w-5 text-indigo-600" />
-              Customize Form
+              {t('settings.appointmentTypes.customizeForm')}
             </CardTitle>
             <CardDescription className="text-base">
-              Configure the appearance and content of your booking form
+              {t('settings.appointmentTypes.formCustomizationDescription')}
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -724,10 +726,10 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
           <CardHeader className="pb-4">
             <CardTitle className="text-xl flex items-center gap-2">
               <Eye className="h-5 w-5 text-indigo-600" />
-              Form Preview
+              {t('settings.appointmentTypes.formPreview')}
             </CardTitle>
             <CardDescription className="text-base">
-              Preview how your booking form will appear to clients for this appointment type
+              {t('settings.appointmentTypes.previewDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-8">

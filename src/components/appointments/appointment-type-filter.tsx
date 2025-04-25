@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Filter, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +30,7 @@ export function AppointmentTypeFilter({ appointmentTypes, activeTypeId }: Appoin
   const router = useRouter();
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const t = useTranslations();
 
   // Initialize selected types from activeTypeId
   useEffect(() => {
@@ -85,11 +87,11 @@ export function AppointmentTypeFilter({ appointmentTypes, activeTypeId }: Appoin
             : "border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"}`}
         >
           <Filter className="h-4 w-4" />
-          Filter by Type
+          {t('appointments.filter.byType')}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="text-indigo-700">Appointment Types</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-indigo-700">{t('appointments.filter.appointmentTypes')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {appointmentTypes.map((type) => (
           <DropdownMenuItem
@@ -128,14 +130,14 @@ export function AppointmentTypeFilter({ appointmentTypes, activeTypeId }: Appoin
               router.push('/dashboard/appointments');
             }}
           >
-            Clear
+            {t('appointments.filter.clear')}
           </Button>
           <Button
             size="sm"
             className="bg-amber-600 hover:bg-amber-700 text-white text-xs"
             onClick={applyFilters}
           >
-            Apply Filters
+            {t('appointments.filter.apply')}
           </Button>
         </div>
       </DropdownMenuContent>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import {
   AlertDialog,
@@ -42,6 +43,7 @@ export function DeleteClientDialog({
   const { toast } = useToast();
   const supabase = createClient();
   const [isDeleting, setIsDeleting] = useState(false);
+  const t = useTranslations();
 
   const handleDelete = async () => {
     if (!client) return;
@@ -62,7 +64,7 @@ export function DeleteClientDialog({
       if (appointments && appointments.length > 0) {
         // Delete appointment field values first
         const appointmentIds = appointments.map(app => app.id);
-        
+
         // Delete field values for these appointments
         const { error: fieldValuesError } = await supabase
           .from("appointment_field_values")
@@ -86,8 +88,8 @@ export function DeleteClientDialog({
       }
 
       toast({
-        title: "Client removed",
-        description: `${client.name} has been successfully removed along with all their appointments.`,
+        title: t('clients.delete.success'),
+        description: t('clients.delete.successDescription', { name: client.name }),
       });
 
       // Call the success callback to update the UI
@@ -95,8 +97,8 @@ export function DeleteClientDialog({
     } catch (err: any) {
       console.error("Error removing client:", err);
       toast({
-        title: "Error",
-        description: err?.message || "Could not remove client. Please try again.",
+        title: t('common.errorLabel'),
+        description: err?.message || t('clients.delete.error'),
         variant: "destructive",
       });
     } finally {
@@ -109,23 +111,23 @@ export function DeleteClientDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Remove Client</AlertDialogTitle>
+          <AlertDialogTitle>{t('clients.delete.title')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to remove this client? This will delete all their appointments and cannot be undone.
+            {t('clients.delete.description')}
             {client && (
               <div className="mt-2 p-3 bg-muted rounded-md">
                 <p className="font-medium">{client.name}</p>
                 <p className="text-sm text-muted-foreground">{client.email}</p>
                 <p className="text-sm text-muted-foreground">{client.phone}</p>
                 <p className="text-sm mt-1">
-                  <span className="text-destructive font-medium">{client.appointmentsCount}</span> appointment(s) will be deleted
+                  <span className="text-destructive font-medium">{client.appointmentsCount}</span> {t('clients.delete.appointmentsWillBeDeleted')}
                 </p>
               </div>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>{t('common.cancelButton')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -137,10 +139,10 @@ export function DeleteClientDialog({
             {isDeleting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Removing...
+                {t('clients.delete.removing')}
               </>
             ) : (
-              "Remove Client"
+              t('clients.delete.confirm')
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

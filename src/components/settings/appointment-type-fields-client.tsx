@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileText, FormInput, Palette } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { PrimaryActionButton } from "@/components/ui/primary-action-button";
+import { useTranslations } from "next-intl";
 
 interface AppointmentTypeFieldsClientProps {
   appointmentTypeId: string;
@@ -20,6 +21,7 @@ export function AppointmentTypeFieldsClient({
   showBackButton = true
 }: AppointmentTypeFieldsClientProps) {
   const router = useRouter();
+  const t = useTranslations();
 
   const handleBack = () => {
     if (onBack) {
@@ -39,7 +41,7 @@ export function AppointmentTypeFieldsClient({
             className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Appointment Types
+            {t('settings.appointmentTypes.backToTypes')}
           </Button>
 
           <PrimaryActionButton
@@ -47,7 +49,7 @@ export function AppointmentTypeFieldsClient({
             onClick={() => router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${appointmentTypeId}&view=form`)}
             icon={Palette}
           >
-            Form Appearance Settings
+            {t('settings.appointmentTypes.formCustomization')}
           </PrimaryActionButton>
         </div>
       )}
@@ -56,10 +58,10 @@ export function AppointmentTypeFieldsClient({
         <div>
           <h2 className="text-xl font-medium flex items-center gap-2">
             <FormInput className="h-5 w-5 text-indigo-600" />
-            Custom Fields for {appointmentTypeName}
+            {t('settings.appointmentTypes.customFieldsFor', { name: appointmentTypeName })}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Create and manage custom fields that clients will fill out when booking this appointment type
+            {t('settings.appointmentTypes.customFieldsDescription')}
           </p>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface FilterTagProps {
   label: string;
@@ -13,6 +14,7 @@ interface FilterTagProps {
 
 export function FilterTag({ label, value, paramName, paramValue, onClear }: FilterTagProps) {
   const router = useRouter();
+  const t = useTranslations();
 
   const handleClear = () => {
     if (onClear) {
@@ -50,7 +52,7 @@ export function FilterTag({ label, value, paramName, paramValue, onClear }: Filt
       <button
         onClick={handleClear}
         className="ml-1 bg-amber-200 hover:bg-amber-300 rounded-full p-0.5 transition-colors"
-        aria-label={`Remove ${label} filter`}
+        aria-label={t('appointments.filter.removeFilter', { label })}
       >
         <X className="h-3 w-3 text-amber-800" />
       </button>

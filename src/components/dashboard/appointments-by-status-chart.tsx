@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useStatusFormatter } from "@/hooks/use-status-formatter";
 
 interface StatusData {
   status: string;
@@ -16,6 +18,8 @@ interface AppointmentsByStatusChartProps {
 
 export function AppointmentsByStatusChart({ data }: AppointmentsByStatusChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const t = useTranslations();
+  const { translateStatus } = useStatusFormatter();
 
   useEffect(() => {
     if (!svgRef.current || data.length === 0) return;
@@ -86,7 +90,7 @@ export function AppointmentsByStatusChart({ data }: AppointmentsByStatusChartPro
         tooltip.transition()
           .duration(200)
           .style("opacity", 0.9);
-        tooltip.html(`${d.data.status}: ${d.data.count} (${Math.round(d.data.count / d3.sum(data, d => d.count) * 100)}%)`)
+        tooltip.html(`${translateStatus(d.data.status)}: ${d.data.count} (${Math.round(d.data.count / d3.sum(data, d => d.count) * 100)}%)`)
           .style("left", (event.pageX + 10) + "px")
           .style("top", (event.pageY - 28) + "px");
       })
@@ -107,7 +111,7 @@ export function AppointmentsByStatusChart({ data }: AppointmentsByStatusChartPro
       .attr("text-anchor", "middle")
       .attr("font-size", "12px")
       .attr("fill", "white")
-      .text(d => d.data.count > 0 ? d.data.status : "");
+      .text(d => d.data.count > 0 ? translateStatus(d.data.status) : "");
 
     // Add legend
     const legend = svg.selectAll(".legend")
@@ -126,7 +130,7 @@ export function AppointmentsByStatusChart({ data }: AppointmentsByStatusChartPro
       .attr("x", 20)
       .attr("y", 10)
       .attr("font-size", "12px")
-      .text(d => `${d.status} (${d.count})`);
+      .text(d => `${translateStatus(d.status)} (${d.count})`);
 
     // Clean up tooltip on unmount
     return () => {
@@ -139,10 +143,10 @@ export function AppointmentsByStatusChart({ data }: AppointmentsByStatusChartPro
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <PieChart className="h-5 w-5 text-indigo-600" />
-          Appointment Status
+          {t('dashboard.charts.appointmentStatus')}
         </CardTitle>
         <CardDescription>
-          See the breakdown of completed, scheduled, and canceled bookings
+          {t('dashboard.charts.statusDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center">

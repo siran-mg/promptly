@@ -18,6 +18,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { NavItemWithBadge } from "@/components/ui/nav-item-with-badge";
 import { useNotifications } from "@/contexts/notifications-context";
+import LanguageSwitcher from "@/components/language-switcher";
+import { useTranslations } from "next-intl";
 
 interface NavItem {
   title: string;
@@ -31,6 +33,7 @@ export function DashboardNav() {
   const pathname = usePathname();
   const supabase = createClient();
   const { unreadCount } = useNotifications();
+  const t = useTranslations();
   const [userProfile, setUserProfile] = useState<{
     full_name?: string;
     email?: string;
@@ -40,32 +43,32 @@ export function DashboardNav() {
   // Define navigation items
   const navItems = [
     {
-      title: "Overview",
+      title: t('dashboard.overview'),
       href: "/dashboard",
       icon: BarChart3,
       activePaths: ["/dashboard$"]
     },
     {
-      title: "Appointments",
+      title: t('dashboard.appointments'),
       href: "/dashboard/appointments",
       icon: CalendarClock,
       activePaths: ["/dashboard/appointments"]
     },
     {
-      title: "Notifications",
+      title: t('dashboard.notifications'),
       href: "/dashboard/notifications",
       icon: Bell,
       ...(unreadCount > 0 ? { badge: unreadCount } : {}),
       activePaths: ["/dashboard/notifications"]
     },
     {
-      title: "Clients",
+      title: t('dashboard.clients'),
       href: "/dashboard/clients",
       icon: Users,
       activePaths: ["/dashboard/clients"]
     },
     {
-      title: "Settings",
+      title: t('dashboard.settings'),
       href: "/dashboard/settings",
       icon: Settings,
       activePaths: ["/dashboard/settings"]
@@ -126,14 +129,14 @@ export function DashboardNav() {
         <div className="w-8 h-8 rounded-md bg-indigo-600 flex items-center justify-center">
           <CalendarClock className="h-5 w-5 text-white" />
         </div>
-        <div className="font-bold text-lg">Coachly</div>
+        <div className="font-bold text-lg">{t('common.appName')}</div>
       </div>
 
       {/* Navigation Items */}
       <nav className="flex-1 py-6 px-3">
         <div className="mb-2 px-3">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Main Menu
+            {t('common.mainMenu')}
           </p>
         </div>
 
@@ -186,7 +189,7 @@ export function DashboardNav() {
         {/* Quick Actions Section */}
         <div className="mt-8 mb-2 px-3">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Quick Actions
+            {t('common.quickActions')}
           </p>
         </div>
 
@@ -201,11 +204,11 @@ export function DashboardNav() {
                   <div className="p-1 rounded-md text-muted-foreground">
                     <CalendarDays className="h-5 w-5" />
                   </div>
-                  <span>New Appointment</span>
+                  <span>{t('dashboard.newAppointment')}</span>
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p>Create a new appointment</p>
+                <p>{t('dashboard.createNewAppointment')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -220,11 +223,11 @@ export function DashboardNav() {
                   <div className="p-1 rounded-md text-muted-foreground">
                     <Share className="h-5 w-5" />
                   </div>
-                  <span>Share Booking Form</span>
+                  <span>{t('dashboard.shareBookingForm')}</span>
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p>Share your booking form with clients</p>
+                <p>{t('dashboard.shareBookingFormDescription')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -240,7 +243,7 @@ export function DashboardNav() {
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">
-              {userProfile?.full_name || userProfile?.email || 'User'}
+              {userProfile?.full_name || userProfile?.email || t('common.user')}
             </p>
             {userProfile?.email && (
               <p className="text-xs text-muted-foreground truncate">{userProfile.email}</p>
@@ -248,7 +251,7 @@ export function DashboardNav() {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-2">
           <Button
             variant="outline"
             size="sm"
@@ -257,7 +260,7 @@ export function DashboardNav() {
           >
             <Link href="/dashboard/settings?tab=profile">
               <User className="h-4 w-4 mr-1" />
-              Profile
+              {t('common.profile')}
             </Link>
           </Button>
 
@@ -265,6 +268,13 @@ export function DashboardNav() {
             variant="outline"
             className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
           />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="text-xs text-muted-foreground">
+            {t('settings.general.language')}
+          </div>
+          <LanguageSwitcher />
         </div>
       </div>
     </div>

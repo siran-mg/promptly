@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useDateFormatter } from "@/hooks/use-date-formatter";
 
 interface MonthData {
   month: string;
@@ -16,6 +18,8 @@ interface AppointmentsByMonthChartProps {
 
 export function AppointmentsByMonthChart({ data }: AppointmentsByMonthChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const t = useTranslations();
+  const { formatMonthYear } = useDateFormatter();
 
   useEffect(() => {
     if (!svgRef.current || data.length === 0) return;
@@ -90,7 +94,7 @@ export function AppointmentsByMonthChart({ data }: AppointmentsByMonthChartProps
         tooltip.transition()
           .duration(200)
           .style("opacity", 0.9);
-        tooltip.html(`${d.month}: ${d.count} appointments`)
+        tooltip.html(`${d.month}: ${d.count} ${t('dashboard.charts.appointments')}`)
           .style("left", (event.pageX + 10) + "px")
           .style("top", (event.pageY - 28) + "px");
       })
@@ -123,10 +127,10 @@ export function AppointmentsByMonthChart({ data }: AppointmentsByMonthChartProps
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-indigo-600" />
-          Monthly Booking Trends
+          {t('dashboard.charts.monthlyTrends')}
         </CardTitle>
         <CardDescription>
-          See how your appointment volume changes over time
+          {t('dashboard.charts.monthlyDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>

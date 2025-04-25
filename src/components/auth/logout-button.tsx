@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase";
+import { useTranslations } from "next-intl";
 
 interface LogoutButtonProps {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
@@ -15,6 +16,7 @@ export function LogoutButton({ variant = "ghost", className }: LogoutButtonProps
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations();
 
   const handleLogout = async () => {
     setIsLoading(true);
@@ -38,10 +40,10 @@ export function LogoutButton({ variant = "ghost", className }: LogoutButtonProps
       size="sm"
       className={className}
     >
-      {isLoading ? "Logging out..." : (
+      {isLoading ? t('auth.loggingOut') : (
         <>
           <LogOut className="h-4 w-4 mr-1" />
-          Logout
+          {t('common.logoutButton')}
         </>
       )}
     </Button>

@@ -12,6 +12,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { AppointmentTypeFieldsClient } from "./appointment-type-fields-client";
 import { AppointmentTypeFormClient } from "./appointment-type-form-client";
 import { Database } from "@/types/supabase";
+import { useTranslations } from "next-intl";
 
 interface SettingsTabsProps {
   profileSettings: React.ReactNode;
@@ -28,6 +29,7 @@ export function SettingsTabs({ profileSettings, formSettings, notificationSettin
   const searchParams = useSearchParams();
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations();
 
   useEffect(() => {
     const getUserId = async () => {
@@ -99,28 +101,28 @@ export function SettingsTabs({ profileSettings, formSettings, notificationSettin
           className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
           <User className="h-4 w-4" />
-          Profile
+          {t('settings.profile')}
         </TabsTrigger>
         <TabsTrigger
           value="form"
           className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
           <Settings className="h-4 w-4" />
-          Form Settings
+          {t('settings.formSettingsMenu')}
         </TabsTrigger>
         <TabsTrigger
           value="notifications"
           className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
           <Bell className="h-4 w-4" />
-          Notifications
+          {t('settings.notifications')}
         </TabsTrigger>
         <TabsTrigger
           value="appointment-types"
           className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
           <Calendar className="h-4 w-4" />
-          Appointment Types
+          {t('settings.appointmentTypesMenu')}
         </TabsTrigger>
       </TabsList>
 
@@ -133,10 +135,10 @@ export function SettingsTabs({ profileSettings, formSettings, notificationSettin
           <div>
             <h3 className="text-lg font-medium flex items-center gap-2">
               <Share className="h-5 w-5 text-indigo-600" />
-              Share Your Booking Form
+              {t('settings.formSettingsSection.shareForm')}
             </h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Generate a unique link that clients can use to book appointments with you
+              {t('settings.formSettingsSection.shareFormDescription')}
             </p>
           </div>
           {userId && <ShareFormButton userId={userId} className="indigo" />}
