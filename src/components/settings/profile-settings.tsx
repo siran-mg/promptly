@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase";
 // We're using a custom Profile interface instead of the Database type
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Mail, User as UserIcon, Globe, Calendar, CheckCircle, AlertCircle, Save } from "lucide-react";
+import { Loader2, Mail, User as UserIcon, Globe, Calendar, CheckCircle, AlertCircle, Save, Upload, Camera } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,8 @@ export function ProfileSettings() {
   const [_, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     full_name: "",
     website: "",
@@ -63,6 +65,11 @@ export function ProfileSettings() {
               website: profileData.website || "",
               avatar_url: profileData.avatar_url || "",
             });
+
+            // Check if avatar_url is undefined (column might not exist)
+            if (profileData.avatar_url === undefined) {
+              console.log('avatar_url column might not exist in the profiles table');
+            }
           }
         }
       } catch (error) {
@@ -80,6 +87,68 @@ export function ProfileSettings() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAvatarClick = () => {
+    // Trigger the hidden file input
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingAvatar(true);
+
+      // Create a FormData object to send the file
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Send the file to our API endpoint
+      const response = await fetch('/api/profile/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to upload avatar');
+      }
+
+      // Update the form data with the new avatar URL
+      setFormData(prev => ({ ...prev, avatar_url: result.avatar_url }));
+
+      // Check if there was a warning about the profile not being updated
+      if (result.warning) {
+        toast({
+          title: "Avatar uploaded",
+          description: "Your profile picture was uploaded but couldn't be saved to your profile. It will be visible until you refresh the page.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Avatar updated",
+          description: "Your profile picture has been updated successfully.",
+        });
+      }
+    } catch (err: any) {
+      console.error('Error uploading avatar:', err);
+      toast({
+        title: "Upload failed",
+        description: err.message || "Could not upload profile picture. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingAvatar(false);
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -87,18 +156,40 @@ export function ProfileSettings() {
     try {
       if (!user) return;
 
+      // Prepare update data without avatar_url first
+      const updateData: any = {
+        full_name: formData.full_name,
+        website: formData.website,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Only include avatar_url if it has a value
+      if (formData.avatar_url) {
+        updateData.avatar_url = formData.avatar_url;
+      }
+
       const { error } = await supabase
         .from("profiles")
-        .update({
-          full_name: formData.full_name,
-          website: formData.website,
-          avatar_url: formData.avatar_url,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq("id", user.id);
 
       if (error) {
-        throw error;
+        // If the error is about the avatar_url column, try again without it
+        if (error.message && error.message.includes("avatar_url")) {
+          console.log('Retrying update without avatar_url field');
+          delete updateData.avatar_url;
+
+          const { error: retryError } = await supabase
+            .from("profiles")
+            .update(updateData)
+            .eq("id", user.id);
+
+          if (retryError) {
+            throw retryError;
+          }
+        } else {
+          throw error;
+        }
       }
 
       toast({
@@ -178,12 +269,41 @@ export function ProfileSettings() {
         <CardContent className="space-y-8">
           {/* Profile Avatar Section */}
           <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b">
-            <Avatar className="h-24 w-24 border-2 border-indigo-100">
-              <AvatarImage src={formData.avatar_url || ""} alt={formData.full_name || user.email || ""} />
-              <AvatarFallback className="bg-indigo-100 text-indigo-700 text-xl">
-                {formData.full_name ? formData.full_name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarUpload}
+              disabled={uploadingAvatar}
+            />
+
+            {/* Avatar with upload functionality */}
+            <div
+              className="relative cursor-pointer group"
+              onClick={handleAvatarClick}
+            >
+              <Avatar className="h-24 w-24 border-2 border-indigo-100">
+                <AvatarImage src={formData.avatar_url || ""} alt={formData.full_name || user.email || ""} />
+                <AvatarFallback className="bg-indigo-100 text-indigo-700 text-xl">
+                  {formData.full_name ? formData.full_name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+
+              {/* Overlay on hover */}
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                <Camera className="h-8 w-8 text-white" />
+              </div>
+
+              {/* Loading spinner */}
+              {uploadingAvatar && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full">
+                  <Loader2 className="h-8 w-8 text-white animate-spin" />
+                </div>
+              )}
+            </div>
+
             <div className="space-y-2 text-center sm:text-left">
               <h3 className="font-medium text-lg">{formData.full_name || "Your Name"}</h3>
               <p className="text-muted-foreground">{user.email}</p>
@@ -192,14 +312,20 @@ export function ProfileSettings() {
                 variant="outline"
                 size="sm"
                 className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
-                onClick={() => {
-                  toast({
-                    title: "Avatar Upload",
-                    description: "Avatar upload functionality is coming soon.",
-                  });
-                }}
+                onClick={handleAvatarClick}
+                disabled={uploadingAvatar}
               >
-                Update Profile Picture
+                {uploadingAvatar ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Update Profile Picture
+                  </>
+                )}
               </Button>
             </div>
           </div>
