@@ -14,8 +14,12 @@ import {
   Trash2,
   Share,
   CheckCircle2,
-  FileText
+  FileText,
+  Edit,
+  Save,
+  X
 } from "lucide-react";
+
 import { Database } from "@/types/supabase";
 
 import {
@@ -28,6 +32,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -35,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AppointmentTypeSelector } from "./appointment-type-selector";
 
 type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
   appointment_type?: {
@@ -71,13 +78,71 @@ export function AppointmentDetailsDialog({
   const supabase = createClient();
   const [status, setStatus] = useState<string>("scheduled");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [appointmentData, setAppointmentData] = useState<{
+    client_name: string;
+    client_email: string;
+    client_phone: string;
+    notes: string | null;
+    appointment_type_id: string | null;
+  }>({
+    client_name: '',
+    client_email: '',
+    client_phone: '',
+    notes: null,
+    appointment_type_id: null
+  });
+  const [appointmentTypes, setAppointmentTypes] = useState<any[]>([]);
+  const [isLoadingTypes, setIsLoadingTypes] = useState(false);
 
-  // Update status when appointment changes
+  // Update status and form data when appointment changes
   useEffect(() => {
     if (appointment) {
       setStatus(appointment.status);
+      setAppointmentData({
+        client_name: appointment.client_name,
+        client_email: appointment.client_email || '',
+        client_phone: appointment.client_phone || '',
+        notes: appointment.notes,
+        appointment_type_id: appointment.appointment_type_id
+      });
     }
   }, [appointment]);
+
+  // Fetch appointment types when in edit mode
+  useEffect(() => {
+    if (isEditMode && isOpen) {
+      fetchAppointmentTypes();
+    }
+  }, [isEditMode, isOpen]);
+
+  const fetchAppointmentTypes = async () => {
+    if (!appointment) return;
+
+    setIsLoadingTypes(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("appointment_types")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("is_default", { ascending: false })
+        .order("name");
+
+      if (error) {
+        console.error("Error fetching appointment types:", error);
+        return;
+      }
+
+      setAppointmentTypes(data || []);
+    } catch (err) {
+      console.error("Error fetching appointment types:", err);
+    } finally {
+      setIsLoadingTypes(false);
+    }
+  };
 
   if (!appointment) return null;
 
@@ -118,20 +183,148 @@ export function AppointmentDetailsDialog({
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setAppointmentData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleAppointmentTypeChange = (typeId: string) => {
+    setAppointmentData(prev => ({
+      ...prev,
+      appointment_type_id: typeId || null // Convert empty string to null
+    }));
+  };
+
+  const handleSaveChanges = async () => {
+    if (!appointment) return;
+
+    setIsUpdating(true);
+
+    try {
+      // Prepare the data to update, ensuring appointment_type_id is null if it's an empty string
+      const updateData = {
+        client_name: appointmentData.client_name,
+        client_email: appointmentData.client_email,
+        client_phone: appointmentData.client_phone,
+        notes: appointmentData.notes,
+        appointment_type_id: appointmentData.appointment_type_id || null
+      };
+
+      console.log("Updating appointment with data:", updateData);
+
+      const { error } = await supabase
+        .from("appointments")
+        .update(updateData)
+        .eq("id", appointment.id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Appointment updated",
+        description: "The appointment details have been updated successfully.",
+      });
+
+      // Exit edit mode
+      setIsEditMode(false);
+
+      // Update the local appointment object to reflect changes
+      appointment.client_name = appointmentData.client_name;
+      appointment.client_email = appointmentData.client_email;
+      appointment.client_phone = appointmentData.client_phone;
+      appointment.notes = appointmentData.notes;
+      appointment.appointment_type_id = appointmentData.appointment_type_id || null;
+
+      // If appointment type was removed, also remove the appointment_type object
+      if (!appointment.appointment_type_id) {
+        appointment.appointment_type = null;
+      }
+
+      // Call the callback to update parent component state
+      if (onStatusChange) {
+        // We're reusing the status change callback to trigger a refresh
+        onStatusChange(appointment.id, status);
+      }
+    } catch (err: any) {
+      console.error("Error updating appointment:", err);
+      toast({
+        title: "Error",
+        description: err?.message || "Could not update appointment details. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   // Format date for display
   const appointmentDate = new Date(appointment.date);
   const formattedDate = format(appointmentDate, "PPPP");
   const formattedTime = format(appointmentDate, "p");
 
+  // Handle dialog close - reset edit mode
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // Reset edit mode when closing
+      setIsEditMode(false);
+    }
+    onOpenChange(open);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-center text-xl font-bold">
-            <User className="h-5 w-5 mr-2 text-primary" />
-            {appointment.client_name}
-          </DialogTitle>
-          <DialogDescription className="text-center pt-2">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <User className="h-5 w-5 mr-2 text-primary" />
+              <DialogTitle className="text-xl font-bold">
+                {appointment.client_name}
+              </DialogTitle>
+            </div>
+
+            {isEditMode && (
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-3"
+                  onClick={() => setIsEditMode(false)}
+                  disabled={isUpdating}
+                >
+                  <X className="h-4 w-4 mr-1.5" />
+                  Cancel
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-3 text-primary"
+                  onClick={handleSaveChanges}
+                  disabled={isUpdating}
+                >
+                  <Save className="h-4 w-4 mr-1.5" />
+                  Save
+                </Button>
+              </div>
+            )}
+
+            {!isEditMode && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-3 text-primary"
+                onClick={() => setIsEditMode(true)}
+              >
+                <Edit className="h-4 w-4 mr-1.5" />
+                Edit
+              </Button>
+            )}
+          </div>
+          <DialogDescription className="text-center pt-2 pb-4">
             Appointment details
           </DialogDescription>
         </DialogHeader>
@@ -139,7 +332,7 @@ export function AppointmentDetailsDialog({
         <div className="space-y-4 py-2">
           {/* Appointment details card */}
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-            <h3 className="text-sm font-medium mb-3 flex items-center">
+            <h3 className="text-sm font-medium flex items-center mb-3">
               <Calendar className="h-4 w-4 mr-2 text-primary" />
               Appointment Details
             </h3>
@@ -149,15 +342,29 @@ export function AppointmentDetailsDialog({
               <div className="flex items-center">
                 <Tag className="h-4 w-4 text-muted-foreground mr-2" />
                 <span className="text-sm font-medium w-16">Type:</span>
-                <div className="flex items-center">
-                  {appointment.appointment_type?.color && (
-                    <div
-                      className="w-3 h-3 rounded-full mr-2"
-                      style={{ backgroundColor: appointment.appointment_type.color }}
+
+                {!isEditMode ? (
+                  <div className="flex items-center">
+                    {appointment.appointment_type?.color && (
+                      <div
+                        className="w-3 h-3 rounded-full mr-2"
+                        style={{ backgroundColor: appointment.appointment_type.color }}
+                      />
+                    )}
+                    <span className="text-sm">
+                      {appointment.appointment_type?.name ||
+                       (appointment.appointment_type_id ? "Loading..." : "Not specified")}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex-1">
+                    <AppointmentTypeSelector
+                      value={appointmentData.appointment_type_id || ''}
+                      onChange={handleAppointmentTypeChange}
+                      userId={appointment.user_id}
                     />
-                  )}
-                  <span className="text-sm">{appointment.appointment_type?.name || "Not specified"}</span>
-                </div>
+                  </div>
+                )}
               </div>
 
               {/* Date */}
@@ -189,29 +396,78 @@ export function AppointmentDetailsDialog({
             </h3>
 
             <div className="space-y-3">
-              {appointment.client_email && (
-                <div className="flex items-center">
-                  <Mail className="h-4 w-4 text-muted-foreground mr-2" />
-                  <span className="text-sm font-medium w-16">Email:</span>
-                  <a
-                    href={`mailto:${appointment.client_email}`}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    {appointment.client_email}
-                  </a>
-                </div>
-              )}
+              {/* Email */}
+              <div className="flex items-center">
+                <Mail className="h-4 w-4 text-muted-foreground mr-2" />
+                <span className="text-sm font-medium w-16">Email:</span>
 
-              {appointment.client_phone && (
+                {!isEditMode ? (
+                  appointment.client_email ? (
+                    <a
+                      href={`mailto:${appointment.client_email}`}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      {appointment.client_email}
+                    </a>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Not provided</span>
+                  )
+                ) : (
+                  <div className="flex-1">
+                    <Input
+                      name="client_email"
+                      value={appointmentData.client_email}
+                      onChange={handleInputChange}
+                      placeholder="Email address"
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Phone */}
+              <div className="flex items-center">
+                <Phone className="h-4 w-4 text-muted-foreground mr-2" />
+                <span className="text-sm font-medium w-16">Phone:</span>
+
+                {!isEditMode ? (
+                  appointment.client_phone ? (
+                    <a
+                      href={`tel:${appointment.client_phone}`}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      {appointment.client_phone}
+                    </a>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Not provided</span>
+                  )
+                ) : (
+                  <div className="flex-1">
+                    <Input
+                      name="client_phone"
+                      value={appointmentData.client_phone}
+                      onChange={handleInputChange}
+                      placeholder="Phone number"
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Name - only in edit mode */}
+              {isEditMode && (
                 <div className="flex items-center">
-                  <Phone className="h-4 w-4 text-muted-foreground mr-2" />
-                  <span className="text-sm font-medium w-16">Phone:</span>
-                  <a
-                    href={`tel:${appointment.client_phone}`}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    {appointment.client_phone}
-                  </a>
+                  <User className="h-4 w-4 text-muted-foreground mr-2" />
+                  <span className="text-sm font-medium w-16">Name:</span>
+                  <div className="flex-1">
+                    <Input
+                      name="client_name"
+                      value={appointmentData.client_name}
+                      onChange={handleInputChange}
+                      placeholder="Client name"
+                      className="h-8 text-sm"
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -230,39 +486,32 @@ export function AppointmentDetailsDialog({
                 <Select
                   value={status}
                   onValueChange={handleStatusChange}
-                  disabled={isUpdating}
+                  disabled={isUpdating || isEditMode}
                 >
-                  <SelectTrigger className="w-[140px]">
+                  <SelectTrigger className="w-[140px] h-8 text-sm">
                     <SelectValue>
-                      <div className="flex items-center">
-                        <Badge
-                          variant={
-                            status === "scheduled" ? "default" :
-                            status === "completed" ? "success" :
-                            status === "cancelled" ? "destructive" :
-                            "outline"
-                          }
-                        >
-                          {status}
-                        </Badge>
-                      </div>
+                      <Badge
+                        variant={
+                          status === "scheduled" ? "default" :
+                          status === "completed" ? "success" :
+                          status === "cancelled" ? "destructive" :
+                          "outline"
+                        }
+                        className="font-normal"
+                      >
+                        {status}
+                      </Badge>
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="scheduled">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="default">scheduled</Badge>
-                      </div>
+                      <Badge variant="default" className="font-normal">scheduled</Badge>
                     </SelectItem>
                     <SelectItem value="completed">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="success">completed</Badge>
-                      </div>
+                      <Badge variant="success" className="font-normal">completed</Badge>
                     </SelectItem>
                     <SelectItem value="cancelled">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="destructive">cancelled</Badge>
-                      </div>
+                      <Badge variant="destructive" className="font-normal">cancelled</Badge>
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -270,14 +519,27 @@ export function AppointmentDetailsDialog({
             </div>
           </div>
 
-          {/* Notes if available */}
-          {appointment.notes && (
+          {/* Notes section - always show in edit mode */}
+          {(appointment.notes || isEditMode) && (
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
               <h3 className="text-sm font-medium mb-3 flex items-center">
                 <FileText className="h-4 w-4 mr-2 text-primary" />
                 Notes
               </h3>
-              <p className="text-sm whitespace-pre-wrap pl-6">{appointment.notes}</p>
+
+              {!isEditMode ? (
+                <p className="text-sm whitespace-pre-wrap pl-6">{appointment.notes}</p>
+              ) : (
+                <div className="pl-6">
+                  <textarea
+                    name="notes"
+                    value={appointmentData.notes || ''}
+                    onChange={handleInputChange}
+                    placeholder="Add notes about this appointment..."
+                    className="w-full min-h-[100px] text-sm p-2 rounded-md border border-input bg-background"
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>
