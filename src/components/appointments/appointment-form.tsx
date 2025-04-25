@@ -289,7 +289,9 @@ export function AppointmentForm({
           } else {
             // Send push notification if the in-app notification was created successfully
             try {
-              await fetch('/api/push/send', {
+              console.log("Sending push notification for new appointment");
+
+              const pushResponse = await fetch('/api/push/send', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -302,6 +304,9 @@ export function AppointmentForm({
                   tag: 'new-appointment',
                 }),
               });
+
+              const pushResult = await pushResponse.json();
+              console.log("Push notification result:", pushResult);
             } catch (pushError) {
               console.error("Error sending push notification:", pushError);
               // Continue anyway as the main appointment and notification were created

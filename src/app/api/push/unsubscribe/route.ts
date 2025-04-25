@@ -8,9 +8,9 @@ export async function POST(request: Request) {
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
-    // Get current user
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // Get current user (using getUser for security)
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const { data: subscriptions, error: fetchError } = await supabase
       .from('push_subscriptions')
       .select('*')
-      .eq('user_id', session.user.id);
+      .eq('user_id', user.id);
 
     if (fetchError) {
       console.error('Error fetching push subscriptions:', fetchError);

@@ -42,7 +42,7 @@ self.addEventListener('push', (event) => {
     };
 
     event.waitUntil(
-      self.registration.showNotification(data.title || 'Coachly Notification', options)
+      self.registration.showNotification(data.title || 'Promptly Notification', options)
     );
   } catch (error) {
     console.error('Error showing notification:', error);
