@@ -5,7 +5,7 @@ import { AppointmentsCalendar } from "./appointments-calendar";
 import { Database } from "@/types/supabase";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, CalendarClock } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,10 +76,9 @@ export function AppointmentsCalendarClient({
 
   return (
     <>
-      {/* Only show filters and search if there are appointments */}
-      {appointments.length > 0 ? (
-        <>
-          {/* Active filters display */}
+      {/* Always show filters and search when there are appointments in the database */}
+      <>
+        {/* Active filters display */}
           {(activeTypeId || activeFieldName) && (
             <div className="bg-indigo-50 p-4 rounded-md flex items-center justify-between mb-4 border border-indigo-100">
               <div className="flex items-center gap-2">
@@ -160,16 +159,25 @@ export function AppointmentsCalendarClient({
             )}
           </div>
 
-          {/* Show "No results" message when search returns empty */}
-          {filteredAppointments.length === 0 && searchQuery && (
-            <div className="bg-amber-50 p-6 rounded-md text-center my-6 border border-amber-200">
-              <Search className="h-8 w-8 text-amber-500 mx-auto mb-2" />
-              <h3 className="text-lg font-medium text-amber-800 mb-1">No matching appointments</h3>
-              <p className="text-amber-700">Try adjusting your search terms or clear filters to see more results.</p>
+          {/* Show appropriate message when no appointments are found */}
+          {filteredAppointments.length === 0 && (
+            <div className={`p-6 rounded-md text-center my-6 border ${searchQuery || activeTypeId || activeFieldName ? 'bg-amber-50 border-amber-200' : 'bg-indigo-50 border-indigo-200'}`}>
+              {searchQuery || activeTypeId || activeFieldName ? (
+                <>
+                  <Search className="h-8 w-8 text-amber-500 mx-auto mb-2" />
+                  <h3 className="text-lg font-medium text-amber-800 mb-1">No matching appointments</h3>
+                  <p className="text-amber-700">Try adjusting your search terms or clear filters to see more results.</p>
+                </>
+              ) : (
+                <>
+                  <CalendarClock className="h-8 w-8 text-indigo-400 mx-auto mb-2" />
+                  <h3 className="text-lg font-medium text-indigo-700 mb-1">No appointments yet</h3>
+                  <p className="text-indigo-600">Create your first appointment to get started.</p>
+                </>
+              )}
             </div>
           )}
-        </>
-      ) : null}
+      </>
 
       <AppointmentsCalendar
         appointments={filteredAppointments}

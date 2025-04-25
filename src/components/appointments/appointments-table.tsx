@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { MoreHorizontal, Search, Share, Copy, Check, Loader2, Trash2, Eye, Plus, Filter } from "lucide-react";
+import { MoreHorizontal, Search, Share, Copy, Check, Loader2, Trash2, Eye, Plus, Filter, CalendarClock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 // No longer need supabase client as we're using the API endpoint
@@ -92,7 +92,7 @@ export function AppointmentsTable({
     setFilteredAppointmentsList(filtered);
   }, [appointments, searchQuery]);
 
-  // If no appointments, show empty state
+  // If no appointments at all, show empty state
   if (appointments.length === 0) {
     return (
       <EmptyAppointmentsState
@@ -103,8 +103,7 @@ export function AppointmentsTable({
 
   return (
     <div className="space-y-4">
-      {/* Only show filters and search if there are appointments */}
-      {appointments.length > 0 && (
+      {/* Always show filters and search when there are appointments in the database */}
         <>
           {/* Active filters display */}
           {(activeTypeId || activeFieldName) && (
@@ -187,7 +186,6 @@ export function AppointmentsTable({
             )}
           </div>
         </>
-      )}
 
       <div className="rounded-md border border-indigo-100 overflow-hidden shadow-sm">
         <Table>
@@ -206,9 +204,19 @@ export function AppointmentsTable({
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
-                    <Search className="h-8 w-8 mb-2 text-indigo-300" />
-                    <p>No appointments match your search criteria.</p>
-                    <p className="text-sm">Try adjusting your filters or search terms.</p>
+                    {searchQuery || activeTypeId || activeFieldName ? (
+                      <>
+                        <Search className="h-8 w-8 mb-2 text-amber-500" />
+                        <p className="text-amber-800 font-medium">No appointments match your search criteria.</p>
+                        <p className="text-sm text-amber-700">Try adjusting your filters or search terms.</p>
+                      </>
+                    ) : (
+                      <>
+                        <CalendarClock className="h-8 w-8 mb-2 text-indigo-300" />
+                        <p>You don't have any appointments yet.</p>
+                        <p className="text-sm">Create your first appointment to get started.</p>
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
