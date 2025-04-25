@@ -157,22 +157,34 @@ export function ShareDialog({
   const initializeNewTokenForm = () => {
     setTokenName('Default Link');
 
-    // Initialize selected types
+    // Initialize selected types - only select the default type or the specified defaultTypeId
     const initialSelectedTypes: Record<string, boolean> = {};
+
+    // Find the default appointment type
+    const defaultAppointmentType = appointmentTypes.find(type => type.is_default);
+
+    // By default, no appointment types are checked
     appointmentTypes.forEach(type => {
-      initialSelectedTypes[type.id] = defaultTypeId ? type.id === defaultTypeId : true;
+      // If defaultTypeId is provided, only select that type
+      if (defaultTypeId) {
+        initialSelectedTypes[type.id] = type.id === defaultTypeId;
+      }
+      // Otherwise, only select the default appointment type if it exists
+      else if (defaultAppointmentType) {
+        initialSelectedTypes[type.id] = type.id === defaultAppointmentType.id;
+      }
+      // If no default type exists, don't select any
+      else {
+        initialSelectedTypes[type.id] = false;
+      }
     });
     setSelectedTypes(initialSelectedTypes);
 
     // Set default type
     if (defaultTypeId) {
       setDefaultType(defaultTypeId);
-    } else {
-      // Find the default appointment type
-      const defaultType = appointmentTypes.find(type => type.is_default);
-      if (defaultType) {
-        setDefaultType(defaultType.id);
-      }
+    } else if (defaultAppointmentType) {
+      setDefaultType(defaultAppointmentType.id);
     }
   };
 

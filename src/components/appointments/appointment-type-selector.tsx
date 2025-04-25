@@ -1,17 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, ChevronsUpDown, Clock } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown, Clock, X } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { Database } from "@/types/supabase";
 
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -39,6 +36,8 @@ export function AppointmentTypeSelector({
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredTypes, setFilteredTypes] = useState<AppointmentType[]>([]);
   const supabase = createClient();
 
   // Initialize the appointment type selector
@@ -73,20 +72,25 @@ export function AppointmentTypeSelector({
 
         setAppointmentTypes(typesToUse);
 
-        // If no value is selected and we have types, select the default one
-        if (!value && data && data.length > 0) {
-          const defaultType = data.find(type => type.is_default) || data[0];
-          onChange(defaultType.id);
-        } else if (value) {
+        // If a value is already selected, verify it exists in the fetched types
+        if (value) {
           // Verify that the value exists in the fetched types
           const typeExists = data?.some(type => type.id === value);
           if (!typeExists) {
-            // If the selected type doesn't exist in the fetched data, select the default
-            const defaultType = data?.find(type => type.is_default) || data?.[0];
-            if (defaultType) {
-              onChange(defaultType.id);
-            }
+            // If the selected type doesn't exist in the fetched data, clear the selection
+            onChange("");
           }
+        }
+        // If no value is selected, check if there's a default type
+        else if (data && data.length > 0) {
+          // Look for a default appointment type
+          const defaultType = data.find(type => type.is_default);
+
+          // If there's a default type, select it
+          if (defaultType) {
+            onChange(defaultType.id);
+          }
+          // Otherwise, don't select anything automatically
         }
       } catch (err) {
         console.error("Error in fetchAppointmentTypes:", err);
@@ -97,6 +101,16 @@ export function AppointmentTypeSelector({
 
     fetchAppointmentTypes();
   }, [supabase, userId, value, onChange, allowedTypes]);
+
+  // Filter appointment types based on search query
+  useEffect(() => {
+    const filtered = appointmentTypes.filter(type =>
+      searchQuery === "" ||
+      type.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (type.description && type.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+    setFilteredTypes(filtered);
+  }, [searchQuery, appointmentTypes]);
 
   // Find the selected appointment type
   const selectedType = appointmentTypes.find(type => type.id === value);
@@ -123,7 +137,7 @@ export function AppointmentTypeSelector({
             <div className="flex items-center">
               {selectedType.color && (
                 <div
-                  className="w-3 h-3 rounded-full mr-2"
+                  className="w-4 h-4 rounded-full mr-2.5 flex-shrink-0 border border-gray-200"
                   style={{ backgroundColor: selectedType.color }}
                 />
               )}
@@ -136,49 +150,88 @@ export function AppointmentTypeSelector({
           ) : (
             "Select appointment type"
           )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <div className="flex items-center">
+            {selectedType && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange("");
+                }}
+                className="mr-1 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label="Clear selection"
+              >
+                <X className="h-3 w-3 text-muted-foreground" />
+              </button>
+            )}
+            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+          </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput placeholder="Search appointment types..." />
-          <CommandEmpty>No appointment type found.</CommandEmpty>
-          <CommandGroup>
-            {appointmentTypes.map((type) => (
-              <CommandItem
-                key={type.id}
-                value={type.id}
-                onSelect={() => {
-                  onChange(type.id);
-                  setOpen(false);
-                }}
-              >
-                <div className="flex items-center w-full">
-                  {type.color && (
-                    <div
-                      className="w-3 h-3 rounded-full mr-2"
-                      style={{ backgroundColor: type.color }}
-                    />
-                  )}
-                  <span>{type.name}</span>
-                  <span className="ml-2 text-muted-foreground flex items-center text-xs">
-                    <Clock className="h-3 w-3 mr-1" />
-                    {type.duration} min
-                  </span>
-                  {type.is_default && (
-                    <span className="ml-auto text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                      Default
+      <PopoverContent className="w-full p-0 shadow-lg border-gray-200">
+        <Command shouldFilter={false} className="rounded-md">
+          <CommandInput
+            placeholder="Search appointment types..."
+            value={searchQuery}
+            onValueChange={setSearchQuery}
+            className="px-4 py-3"
+          />
+          {searchQuery !== "" && filteredTypes.length === 0 && (
+            <div className="px-4 py-6 text-center text-sm text-muted-foreground font-medium border-t border-b">
+              No appointment type found matching "<span className="text-primary font-semibold">{searchQuery}</span>"
+            </div>
+          )}
+          <CommandGroup className="max-h-[300px] overflow-y-auto">
+            {appointmentTypes.length === 0 && (
+              <div className="px-4 py-6 text-center text-sm text-muted-foreground font-medium">
+                No appointment types available.
+              </div>
+            )}
+
+            {filteredTypes
+              .map((type) => (
+                <button
+                  key={type.id}
+                  type="button"
+                  className="w-full text-left flex items-center justify-between px-4 py-2.5 hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer transition-colors"
+                  onClick={() => {
+                    // If this type is already selected, deselect it
+                    if (value === type.id) {
+                      onChange("");
+                    } else {
+                      onChange(type.id);
+                    }
+                    setOpen(false);
+                  }}
+                >
+                  <div className="flex items-center w-full">
+                    {type.color && (
+                      <div
+                        className="w-4 h-4 rounded-full mr-2.5 flex-shrink-0 border border-gray-200"
+                        style={{ backgroundColor: type.color }}
+                      />
+                    )}
+                    <span>{type.name}</span>
+                    <span className="ml-2 text-muted-foreground flex items-center text-xs">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {type.duration} min
                     </span>
+                    {type.is_default && (
+                      <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                        Default
+                      </span>
+                    )}
+                  </div>
+                  {value === type.id ? (
+                    <div className="flex items-center ml-auto group">
+                      <span className="text-xs text-muted-foreground mr-1.5 opacity-0 group-hover:opacity-100 transition-opacity">Click to deselect</span>
+                      <Check className="h-4 w-4 flex-shrink-0 text-primary" />
+                    </div>
+                  ) : (
+                    <Check className="ml-auto h-4 w-4 flex-shrink-0 text-primary opacity-0" />
                   )}
-                </div>
-                <Check
-                  className={cn(
-                    "ml-auto h-4 w-4",
-                    value === type.id ? "opacity-100" : "opacity-0"
-                  )}
-                />
-              </CommandItem>
-            ))}
+                </button>
+              ))}
           </CommandGroup>
         </Command>
       </PopoverContent>
