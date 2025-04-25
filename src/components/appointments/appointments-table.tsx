@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { MoreHorizontal, Search, Share, Loader2, Trash2, Eye, Plus, Filter, CalendarClock, Copy, Check } from "lucide-react";
+import { MoreHorizontal, Share, Loader2, Trash2, Eye, Copy, Check, CalendarClock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 // No longer need supabase client as we're using the API endpoint
 import { Database } from "@/types/supabase";
 import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
 import { AppointmentDetailsDialog } from "./appointment-details-dialog";
+import { AppointmentFilterBar } from "./appointment-filter-bar";
+import { NoMatchingAppointments } from "./no-matching-appointments";
 import { EmptyAppointmentsState } from "./empty-appointments-state";
 import {
   Dialog,
@@ -97,104 +99,32 @@ export function AppointmentsTable({
     setFilteredAppointmentsList(filtered);
   }, [appointments, searchQuery]);
 
-  // If no appointments at all, show empty state
-  if (appointments.length === 0) {
-    return (
-      <EmptyAppointmentsState
-        onButtonClick={() => window.location.href = '/dashboard/appointments/new'}
-      />
-    );
-  }
-
+  // Only show filter bar if there are appointments or active filters
   return (
     <div className="space-y-4">
-      {/* Always show filters and search when there are appointments in the database */}
-        <>
-          {/* Active filters display */}
-          {(activeTypeId || activeFieldName) && (
-            <div className="bg-indigo-50 p-4 rounded-md flex items-center justify-between mb-4 border border-indigo-100">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-indigo-700">Active filters:</span>
-                {activeTypeId && (
-                  <div className="bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-full flex items-center shadow-sm">
-                    <span className="mr-1">Type:</span>
-                    <span className="font-medium">
-                      {appointmentTypes.find(t => t.id === activeTypeId)?.name || 'Unknown Type'}
-                    </span>
-                  </div>
-                )}
-                {activeFieldName && (
-                  <div className="bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-full flex items-center shadow-sm">
-                    <span className="mr-1">Field:</span>
-                    <span className="font-medium">{activeFieldName}</span>
-                  </div>
-                )}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
-                onClick={() => {
-                  // Use client-side navigation to clear filters
-                  window.location.href = '/dashboard/appointments';
-                }}
-              >
-                Clear Filters
-              </Button>
-            </div>
-          )}
+      {/* Only show filter bar if there are appointments or active filters */}
+      {(appointments.length > 0 || activeTypeId || activeFieldName || searchQuery) && (
+        <AppointmentFilterBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          appointmentTypes={appointmentTypes}
+          activeTypeId={activeTypeId}
+          activeFieldName={activeFieldName}
+        />
+      )}
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-500" />
-              <Input
-                type="search"
-                placeholder="Search by client name, email, or phone..."
-                className="pl-10 h-10 border-indigo-200 focus-visible:ring-indigo-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-
-            {appointmentTypes.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2 h-10 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">
-                    <Filter className="h-4 w-4" />
-                    Filter by Type
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel className="text-indigo-700">Appointment Types</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {appointmentTypes.map((type) => (
-                    <DropdownMenuItem
-                      key={type.id}
-                      className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
-                      onClick={() => {
-                        window.location.href = `/dashboard/appointments?type=${type.id}`;
-                      }}
-                    >
-                      <div className="flex items-center w-full">
-                        {type.color && (
-                          <div
-                            className="w-3 h-3 rounded-full mr-2"
-                            style={{ backgroundColor: type.color }}
-                          />
-                        )}
-                        <span>{type.name}</span>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </>
-
-      <div className="rounded-md border border-indigo-100 overflow-hidden shadow-sm">
-        <Table>
-          <TableHeader className="bg-indigo-50">
+      {/* Show appropriate content based on state */}
+      {appointments.length === 0 && !activeTypeId && !activeFieldName && !searchQuery ? (
+        // No appointments and no filters - show empty state
+        <EmptyAppointmentsState />
+      ) : filteredAppointmentsList.length === 0 ? (
+        // Appointments exist but none match the filter - show no matching message
+        <NoMatchingAppointments />
+      ) : (
+        // Show appointments table
+        <div className="rounded-md border border-indigo-100 overflow-hidden shadow-sm">
+          <Table>
+            <TableHeader className="bg-indigo-50">
             <TableRow>
               <TableHead className="text-indigo-700 font-semibold">Client</TableHead>
               <TableHead className="text-indigo-700 font-semibold">Date & Time</TableHead>
@@ -205,28 +135,7 @@ export function AppointmentsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAppointmentsList.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
-                  <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
-                    {searchQuery || activeTypeId || activeFieldName ? (
-                      <>
-                        <Search className="h-8 w-8 mb-2 text-amber-500" />
-                        <p className="text-amber-800 font-medium">No appointments match your search criteria.</p>
-                        <p className="text-sm text-amber-700">Try adjusting your filters or search terms.</p>
-                      </>
-                    ) : (
-                      <>
-                        <CalendarClock className="h-8 w-8 mb-2 text-indigo-300" />
-                        <p>You don't have any appointments yet.</p>
-                        <p className="text-sm">Create your first appointment to get started.</p>
-                      </>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredAppointmentsList.map((appointment) => (
+            {filteredAppointmentsList.map((appointment) => (
                 <TableRow
                   key={appointment.id}
                   className="cursor-pointer hover:bg-indigo-50/30 transition-colors"
@@ -386,10 +295,11 @@ export function AppointmentsTable({
                   </TableCell>
                 </TableRow>
               ))
-            )}
+            }
           </TableBody>
         </Table>
       </div>
+      )}
 
       {/* Share Dialog */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>

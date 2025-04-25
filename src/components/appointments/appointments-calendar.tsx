@@ -146,10 +146,7 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
     setIsCreateDialogOpen(false);
   }, [selectedSlot, router]);
 
-  // If no appointments, show empty state
-  if (appointments.length === 0) {
-    return <EmptyAppointmentsState onButtonClick={() => router.push('/dashboard/appointments/new')} />;
-  }
+  // Empty state is handled in the parent component
 
   // Custom event component to show status and type
   const EventComponent = ({ event }: { event: CalendarEvent }) => (

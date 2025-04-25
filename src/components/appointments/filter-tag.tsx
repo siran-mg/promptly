@@ -1,0 +1,40 @@
+"use client";
+
+import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+interface FilterTagProps {
+  label: string;
+  value: string;
+  paramName: string;
+  onClear?: () => void;
+}
+
+export function FilterTag({ label, value, paramName, onClear }: FilterTagProps) {
+  const router = useRouter();
+
+  const handleClear = () => {
+    if (onClear) {
+      onClear();
+    } else {
+      // Remove this filter from the URL and navigate
+      const url = new URL(window.location.href);
+      url.searchParams.delete(paramName);
+      router.push(url.pathname + url.search);
+    }
+  };
+
+  return (
+    <div className="bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full flex items-center shadow-sm">
+      <span className="mr-1 text-xs">{label}:</span>
+      <span className="text-xs font-medium mr-1">{value}</span>
+      <button
+        onClick={handleClear}
+        className="ml-1 bg-amber-200 hover:bg-amber-300 rounded-full p-0.5 transition-colors"
+        aria-label={`Remove ${label} filter`}
+      >
+        <X className="h-3 w-3 text-amber-800" />
+      </button>
+    </div>
+  );
+}
