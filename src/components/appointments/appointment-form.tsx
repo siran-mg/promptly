@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { AppointmentTypeSelector } from "./appointment-type-selector";
 import { CustomFields } from "./custom-fields";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +50,7 @@ export function AppointmentForm({
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
+  const t = useTranslations();
 
   console.log('AppointmentForm initialized with:', { userId, accentColor, defaultTypeId });
 
@@ -222,16 +224,16 @@ export function AppointmentForm({
       if (error) {
         console.error("Error creating appointment:", error);
         toast({
-          title: "Error",
-          description: "Could not create appointment. Please try again.",
+          title: t('appointments.form.error'),
+          description: t('appointments.form.createError'),
           variant: "destructive",
         });
         return;
       }
 
       toast({
-        title: "Success",
-        description: "Your appointment has been scheduled.",
+        title: t('appointments.form.success'),
+        description: t('appointments.form.successMessage'),
       });
 
       // If we have custom fields, save them
@@ -368,8 +370,8 @@ export function AppointmentForm({
     } catch (err) {
       console.error("Error submitting form:", err);
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t('appointments.form.error'),
+        description: t('appointments.form.unexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -382,7 +384,7 @@ export function AppointmentForm({
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4 pt-6">
           <div className="space-y-2">
-            <Label htmlFor="clientName">Your Name</Label>
+            <Label htmlFor="clientName">{t('appointments.form.yourName')}</Label>
             <Input
               id="clientName"
               name="clientName"
@@ -393,7 +395,7 @@ export function AppointmentForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="clientEmail">Email</Label>
+            <Label htmlFor="clientEmail">{t('appointments.form.email')}</Label>
             <Input
               id="clientEmail"
               name="clientEmail"
@@ -405,7 +407,7 @@ export function AppointmentForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="clientPhone">Phone Number</Label>
+            <Label htmlFor="clientPhone">{t('appointments.form.phoneNumber')}</Label>
             <Input
               id="clientPhone"
               name="clientPhone"
@@ -418,7 +420,7 @@ export function AppointmentForm({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Date</Label>
+              <Label>{t('appointments.form.date')}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -432,7 +434,7 @@ export function AppointmentForm({
                     {formData.date ? (
                       format(formData.date, "PPP")
                     ) : (
-                      <span>Pick a date</span>
+                      <span>{t('appointments.form.pickDate')}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -448,7 +450,7 @@ export function AppointmentForm({
             </div>
 
             <div className="space-y-2">
-              <Label>Time</Label>
+              <Label>{t('appointments.form.time')}</Label>
               <TimePicker
                 value={formData.time}
                 onChange={handleTimeChange}
@@ -459,7 +461,7 @@ export function AppointmentForm({
           {/* Only show appointment type selector if there are appointment types and it's not hidden */}
           {hasAppointmentTypes && !hideAppointmentTypes && (
             <div className="space-y-2">
-              <Label>Appointment Type</Label>
+              <Label>{t('appointments.form.appointmentType')}</Label>
               <AppointmentTypeSelector
                 value={formData.appointmentTypeId}
                 onChange={(value) => {
@@ -494,7 +496,7 @@ export function AppointmentForm({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes (Optional)</Label>
+            <Label htmlFor="notes">{t('appointments.form.notes')}</Label>
             <Textarea
               id="notes"
               name="notes"
@@ -512,7 +514,7 @@ export function AppointmentForm({
             disabled={isSubmitting}
             style={{ backgroundColor: accentColor }}
           >
-            {isSubmitting ? "Scheduling..." : "Schedule Appointment"}
+            {isSubmitting ? t('appointments.form.scheduling') : t('appointments.form.scheduleAppointment')}
           </Button>
         </CardFooter>
       </form>

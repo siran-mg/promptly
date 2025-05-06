@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
 import {
   Loader2, Upload, Palette, Type, FileText, Image, Save, Eye,
-  Link, Trash2, RefreshCw, Calendar, Check, Info
+  Trash2, RefreshCw, Check
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Database } from "@/types/supabase";
@@ -411,10 +411,10 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                 />
                 <div className="flex-1">
                   <Label htmlFor="use-global-settings" className="font-medium text-sm">
-                    Use global form settings
+                    {t('settings.appointmentTypes.useGlobalSettings')}
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    When enabled, this appointment type will use the same form settings as your global form
+                    {t('settings.appointmentTypes.useGlobalSettingsDescription')}
                   </p>
                 </div>
               </div>
@@ -424,11 +424,11 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                   <div className="space-y-4">
                     <h3 className="font-medium text-lg flex items-center gap-2">
                       <Type className="h-5 w-5 text-indigo-600" />
-                      Text Content
+                      {t('settings.appointmentTypes.textContent')}
                     </h3>
 
                     <div className="space-y-2">
-                      <Label htmlFor="form_title" className="text-sm font-medium">Form Title</Label>
+                      <Label htmlFor="form_title" className="text-sm font-medium">{t('settings.appointmentTypes.formTitle')}</Label>
                       <div className="relative">
                         <Type className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
                         <Input
@@ -436,18 +436,18 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                           name="form_title"
                           value={formData.form_title}
                           onChange={handleChange}
-                          placeholder="Book an Appointment"
+                          placeholder={t('settings.appointmentTypes.defaultTitle')}
                           className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                           required
                         />
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        This title appears at the top of your booking form
+                        {t('settings.appointmentTypes.formTitleHelp')}
                       </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="form_description" className="text-sm font-medium">Form Description</Label>
+                      <Label htmlFor="form_description" className="text-sm font-medium">{t('settings.appointmentTypes.formDescription')}</Label>
                       <div className="relative">
                         <FileText className="absolute left-3 top-3 h-4 w-4 text-indigo-600" />
                         <Textarea
@@ -455,13 +455,13 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                           name="form_description"
                           value={formData.form_description}
                           onChange={handleChange}
-                          placeholder="Fill out the form below to schedule your appointment."
+                          placeholder={t('settings.appointmentTypes.defaultDescription')}
                           className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                           rows={3}
                         />
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        A brief description that appears below the title
+                        {t('settings.appointmentTypes.formDescriptionHelp')}
                       </p>
                     </div>
                   </div>
@@ -469,11 +469,11 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                   <div className="space-y-4">
                     <h3 className="font-medium text-lg flex items-center gap-2">
                       <Image className="h-5 w-5 text-indigo-600" />
-                      Brand Identity
+                      {t('settings.appointmentTypes.brandIdentity')}
                     </h3>
 
                     <div className="space-y-2">
-                      <Label htmlFor="logo" className="text-sm font-medium">Company Logo</Label>
+                      <Label htmlFor="logo" className="text-sm font-medium">{t('settings.appointmentTypes.companyLogo')}</Label>
                       <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
                         <div className="flex items-center justify-center w-32 h-32 bg-white rounded-lg border-2 border-dashed border-indigo-200 overflow-hidden">
                           {formData.logo_url ? (
@@ -485,7 +485,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                           ) : (
                             <div className="flex flex-col items-center justify-center text-center p-4">
                               <Image className="w-8 h-8 text-indigo-300 mb-2" />
-                              <p className="text-xs text-muted-foreground">No logo uploaded</p>
+                              <p className="text-xs text-muted-foreground">{t('settings.appointmentTypes.noLogo')}</p>
                             </div>
                           )}
                         </div>
@@ -497,7 +497,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                               className="flex items-center justify-center flex-1 h-10 px-4 py-2 text-sm font-medium text-indigo-700 bg-white border border-indigo-300 rounded-md shadow-sm hover:bg-indigo-50 cursor-pointer transition-colors"
                             >
                               <Upload className="w-4 h-4 mr-2" />
-                              {isUploading ? "Uploading..." : "Upload Logo"}
+                              {isUploading ? t('settings.appointmentTypes.uploading') : t('settings.appointmentTypes.uploadLogo')}
                             </Label>
                             {formData.logo_url && (
                               <Button
@@ -529,21 +529,21 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                                     setFormData((prev) => ({ ...prev, logo_url: "" }));
 
                                     toast({
-                                      title: "Logo removed",
-                                      description: "Your logo has been removed successfully.",
+                                      title: t('settings.appointmentTypes.logoRemoved'),
+                                      description: t('settings.appointmentTypes.logoRemovedDescription'),
                                     });
                                   } catch (err: any) {
                                     console.error("Error removing logo:", err);
                                     toast({
-                                      title: "Error",
-                                      description: err?.message || "Could not remove logo. Please try again.",
+                                      title: t('common.errorLabel'),
+                                      description: err?.message || t('settings.appointmentTypes.errors.removeLogoFailed'),
                                       variant: "destructive",
                                     });
                                   }
                                 }}
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
-                                Remove Logo
+                                {t('settings.appointmentTypes.removeLogo')}
                               </Button>
                             )}
                           </div>
@@ -556,11 +556,11 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                             disabled={isUploading}
                           />
                           <div className="text-sm space-y-1">
-                            <p className="font-medium">Logo requirements:</p>
+                            <p className="font-medium">{t('settings.appointmentTypes.logoRequirements')}</p>
                             <ul className="text-xs text-muted-foreground space-y-1">
-                              <li>• Recommended size: 200x200 pixels</li>
-                              <li>• Maximum file size: 2MB</li>
-                              <li>• Supported formats: PNG, JPG, SVG</li>
+                              <li>• {t('settings.appointmentTypes.logoSize')}</li>
+                              <li>• {t('settings.appointmentTypes.logoMaxSize')}</li>
+                              <li>• {t('settings.appointmentTypes.logoFormats')}</li>
                             </ul>
                           </div>
                         </div>
@@ -571,11 +571,11 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                   <div className="space-y-4">
                     <h3 className="font-medium text-lg flex items-center gap-2">
                       <Palette className="h-5 w-5 text-indigo-600" />
-                      Color Scheme
+                      {t('settings.appointmentTypes.colorScheme')}
                     </h3>
 
                     <div className="space-y-2">
-                      <Label htmlFor="accent_color" className="text-sm font-medium">Accent Color</Label>
+                      <Label htmlFor="accent_color" className="text-sm font-medium">{t('settings.appointmentTypes.accentColor')}</Label>
                       <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
                         <div
                           className="w-16 h-16 rounded-full border-4 border-white shadow-sm flex-shrink-0"
@@ -605,11 +605,11 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                             </div>
                           </div>
                           <div className="text-sm space-y-1">
-                            <p className="font-medium">This color will be used for:</p>
+                            <p className="font-medium">{t('settings.appointmentTypes.colorUsage')}</p>
                             <ul className="text-xs text-muted-foreground space-y-1">
-                              <li>• Buttons and call-to-action elements</li>
-                              <li>• Highlights and accents throughout the form</li>
-                              <li>• Selected states and interactive elements</li>
+                              <li>• {t('settings.appointmentTypes.colorButtons')}</li>
+                              <li>• {t('settings.appointmentTypes.colorHighlights')}</li>
+                              <li>• {t('settings.appointmentTypes.colorInteractive')}</li>
                             </ul>
                           </div>
                         </div>
@@ -623,7 +623,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                 <div className="bg-indigo-50/50 p-6 rounded-lg border border-indigo-100">
                   <div className="flex items-center gap-2 mb-4">
                     <Check className="h-5 w-5 text-indigo-600" />
-                    <h4 className="font-medium text-indigo-700">Using Global Form Settings</h4>
+                    <h4 className="font-medium text-indigo-700">{t('settings.appointmentTypes.usingGlobalSettings')}</h4>
                   </div>
 
                   <div className="bg-white p-4 rounded-lg border border-indigo-100 mb-4">
@@ -681,7 +681,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                   </div>
 
                   <p className="text-sm text-muted-foreground">
-                    To customize this appointment type's form separately, toggle off "Use global form settings" above
+                    {t('settings.appointmentTypes.customizeGlobalToggle')}
                   </p>
                 </div>
               )}
@@ -696,24 +696,24 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                     accent_color: "#6366f1"
                   });
                   toast({
-                    title: "Colors reset",
-                    description: "Accent color has been reset to default.",
+                    title: t('settings.appointmentTypes.colorsReset'),
+                    description: t('settings.appointmentTypes.colorsResetDescription'),
                   });
                 }}
                 className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-                Reset to Default
+                {t('settings.appointmentTypes.resetToDefault')}
               </Button>
               <PrimaryActionButton
                 type="submit"
                 disabled={isSaving}
                 isLoading={isSaving}
-                loadingText="Saving Changes..."
+                loadingText={t('common.savingChanges')}
                 icon={Save}
                 variant="indigo"
               >
-                Save Form Settings
+                {t('settings.appointmentTypes.saveFormSettings')}
               </PrimaryActionButton>
             </CardFooter>
           </form>
@@ -745,7 +745,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
           <CardFooter className="border-t bg-gray-50/50 py-4">
             <div className="w-full flex flex-col gap-2">
               <p className="text-sm text-muted-foreground">
-                This is how your form will appear to clients when they book this appointment type
+                {t('settings.appointmentTypes.previewClientView')}
               </p>
               <div className="flex items-center gap-2 text-sm">
                 <div
