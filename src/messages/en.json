@@ -189,6 +189,20 @@
     "time": "Time",
     "duration": "Duration",
     "type": "Type",
+    "typeSelector": {
+      "placeholder": "Select appointment type",
+      "searchPlaceholder": "Search appointment types...",
+      "noMatchingType": "No appointment type found matching \"{query}\"",
+      "noTypesAvailable": "No appointment types available.",
+      "defaultLabel": "Default",
+      "clickToDeselect": "Click to deselect"
+    },
+    "timePicker": {
+      "selectTime": "Select time",
+      "timeFormat": "HH:MM",
+      "businessHours": "Business Hours",
+      "otherTimes": "Other Times"
+    },
     "status": "Status",
     "client": "Client",
     "notes": "Notes",
@@ -755,6 +769,24 @@
         "time": "Time",
         "select": "Dropdown",
         "checkbox": "Checkbox"
+      },
+      "customFields": {
+        "updateDescription": "Update the details of this custom field",
+        "createDescription": "Create a new custom field to collect additional information from clients",
+        "fieldLabel": "Field Label",
+        "fieldLabelPlaceholder": "e.g., Medical History",
+        "fieldLabelHelp": "This is the label clients will see on the booking form",
+        "fieldTypePlaceholder": "Select field type",
+        "fieldTypeHelp": "Choose the type of input field that best suits your needs",
+        "optionsLabel": "Options (one per line)",
+        "optionsPlaceholder": "Option 1\nOption 2\nOption 3",
+        "optionsHelp": "Enter each option on a new line",
+        "placeholderLabel": "Placeholder Text (Optional)",
+        "placeholderTextPlaceholder": "e.g., Enter your medical history",
+        "placeholderHelp": "Text that appears in the field before the client enters a value",
+        "defaultValueLabel": "Default Value (Optional)",
+        "defaultValuePlaceholder": "e.g., None",
+        "defaultValueHelp": "Pre-filled value that will appear in the field"
       },
       "loading": "Loading custom fields...",
       "fieldsConfigured": "{count} {fields} configured",

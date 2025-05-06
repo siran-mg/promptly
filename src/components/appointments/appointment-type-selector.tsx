@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Check, ChevronsUpDown, Clock, X } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { Database } from "@/types/supabase";
+import { useTranslations } from "next-intl";
 
 import {
   Command,
@@ -39,6 +40,7 @@ export function AppointmentTypeSelector({
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredTypes, setFilteredTypes] = useState<AppointmentType[]>([]);
   const supabase = createClient();
+  const t = useTranslations();
 
   // Initialize the appointment type selector
 
@@ -148,7 +150,7 @@ export function AppointmentTypeSelector({
               </span>
             </div>
           ) : (
-            "Select appointment type"
+            t('appointments.typeSelector.placeholder')
           )}
           <div className="flex items-center">
             {selectedType && (
@@ -171,20 +173,20 @@ export function AppointmentTypeSelector({
       <PopoverContent className="w-full p-0 shadow-lg border-gray-200">
         <Command shouldFilter={false} className="rounded-md">
           <CommandInput
-            placeholder="Search appointment types..."
+            placeholder={t('appointments.typeSelector.searchPlaceholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
             className="px-4 py-3"
           />
           {searchQuery !== "" && filteredTypes.length === 0 && (
             <div className="px-4 py-6 text-center text-sm text-muted-foreground font-medium border-t border-b">
-              No appointment type found matching "<span className="text-primary font-semibold">{searchQuery}</span>"
+              {t('appointments.typeSelector.noMatchingType', { query: searchQuery })}
             </div>
           )}
           <CommandGroup className="max-h-[300px] overflow-y-auto">
             {appointmentTypes.length === 0 && (
               <div className="px-4 py-6 text-center text-sm text-muted-foreground font-medium">
-                No appointment types available.
+                {t('appointments.typeSelector.noTypesAvailable')}
               </div>
             )}
 
@@ -218,13 +220,13 @@ export function AppointmentTypeSelector({
                     </span>
                     {type.is_default && (
                       <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                        Default
+                        {t('appointments.typeSelector.defaultLabel')}
                       </span>
                     )}
                   </div>
                   {value === type.id ? (
                     <div className="flex items-center ml-auto group">
-                      <span className="text-xs text-muted-foreground mr-1.5 opacity-0 group-hover:opacity-100 transition-opacity">Click to deselect</span>
+                      <span className="text-xs text-muted-foreground mr-1.5 opacity-0 group-hover:opacity-100 transition-opacity">{t('appointments.typeSelector.clickToDeselect')}</span>
                       <Check className="h-4 w-4 flex-shrink-0 text-primary" />
                     </div>
                   ) : (

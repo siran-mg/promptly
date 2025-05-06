@@ -189,6 +189,20 @@
     "time": "Heure",
     "duration": "Durée",
     "type": "Type",
+    "typeSelector": {
+      "placeholder": "Sélectionner le type de rendez-vous",
+      "searchPlaceholder": "Rechercher des types de rendez-vous...",
+      "noMatchingType": "Aucun type de rendez-vous trouvé correspondant à \"{query}\"",
+      "noTypesAvailable": "Aucun type de rendez-vous disponible.",
+      "defaultLabel": "Par défaut",
+      "clickToDeselect": "Cliquer pour désélectionner"
+    },
+    "timePicker": {
+      "selectTime": "Sélectionner l'heure",
+      "timeFormat": "HH:MM",
+      "businessHours": "Heures de bureau",
+      "otherTimes": "Autres horaires"
+    },
     "status": "Statut",
     "client": "Client",
     "notes": "Notes",
@@ -755,6 +769,24 @@
         "time": "Heure",
         "select": "Liste déroulante",
         "checkbox": "Case à cocher"
+      },
+      "customFields": {
+        "updateDescription": "Mettre à jour les détails de ce champ personnalisé",
+        "createDescription": "Créer un nouveau champ personnalisé pour collecter des informations supplémentaires auprès des clients",
+        "fieldLabel": "Étiquette du champ",
+        "fieldLabelPlaceholder": "ex., Antécédents médicaux",
+        "fieldLabelHelp": "C'est l'étiquette que les clients verront sur le formulaire de réservation",
+        "fieldTypePlaceholder": "Sélectionner le type de champ",
+        "fieldTypeHelp": "Choisissez le type de champ qui convient le mieux à vos besoins",
+        "optionsLabel": "Options (une par ligne)",
+        "optionsPlaceholder": "Option 1\nOption 2\nOption 3",
+        "optionsHelp": "Entrez chaque option sur une nouvelle ligne",
+        "placeholderLabel": "Texte d'exemple (Optionnel)",
+        "placeholderTextPlaceholder": "ex., Entrez vos antécédents médicaux",
+        "placeholderHelp": "Texte qui apparaît dans le champ avant que le client n'entre une valeur",
+        "defaultValueLabel": "Valeur par défaut (Optionnel)",
+        "defaultValuePlaceholder": "ex., Aucun",
+        "defaultValueHelp": "Valeur pré-remplie qui apparaîtra dans le champ"
       },
       "loading": "Chargement des champs personnalisés...",
       "fieldsConfigured": "{count} {fields} configurés",

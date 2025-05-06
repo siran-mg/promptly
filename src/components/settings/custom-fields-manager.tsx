@@ -643,8 +643,8 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
             </DialogTitle>
             <DialogDescription className="text-base">
               {editingField
-                ? "Update the details of this custom field"
-                : "Create a new custom field to collect additional information from clients"}
+                ? t('settings.formSettingsSection.customFields.updateDescription')
+                : t('settings.formSettingsSection.customFields.createDescription')}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
@@ -652,7 +652,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="label" className="text-sm font-medium">Field Label</Label>
+                    <Label htmlFor="label" className="text-sm font-medium">{t('settings.formSettingsSection.customFields.fieldLabel')}</Label>
                     <div className="relative">
                       <FormInput className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
                       <Input
@@ -660,24 +660,24 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         name="label"
                         value={formData.label}
                         onChange={handleChange}
-                        placeholder="e.g., Medical History"
+                        placeholder={t('settings.formSettingsSection.customFields.fieldLabelPlaceholder')}
                         className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                         required
                       />
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      This is the label clients will see on the booking form
+                      {t('settings.formSettingsSection.customFields.fieldLabelHelp')}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="type" className="text-sm font-medium">Field Type</Label>
+                    <Label htmlFor="type" className="text-sm font-medium">{t('settings.formSettingsSection.fieldType')}</Label>
                     <Select
                       value={formData.type}
                       onValueChange={(value) => handleSelectChange("type", value)}
                     >
                       <SelectTrigger className="border-indigo-200 focus:ring-indigo-500">
-                        <SelectValue placeholder="Select field type" />
+                        <SelectValue placeholder={t('settings.formSettingsSection.customFields.fieldTypePlaceholder')} />
                       </SelectTrigger>
                       <SelectContent>
                         {fieldTypes.map((type) => {
@@ -708,13 +708,13 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">
-                      Choose the type of input field that best suits your needs
+                      {t('settings.formSettingsSection.customFields.fieldTypeHelp')}
                     </p>
                   </div>
 
                   {formData.type === "select" && (
                     <div className="space-y-2">
-                      <Label htmlFor="options" className="text-sm font-medium">Options (one per line)</Label>
+                      <Label htmlFor="options" className="text-sm font-medium">{t('settings.formSettingsSection.customFields.optionsLabel')}</Label>
                       <div className="relative">
                         <List className="absolute left-3 top-3 h-4 w-4 text-indigo-600" />
                         <Textarea
@@ -722,45 +722,45 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                           name="options"
                           value={formData.options}
                           onChange={handleChange}
-                          placeholder="Option 1&#10;Option 2&#10;Option 3"
+                          placeholder={t('settings.formSettingsSection.customFields.optionsPlaceholder')}
                           rows={4}
                           className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
                           required
                         />
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Enter each option on a new line
+                        {t('settings.formSettingsSection.customFields.optionsHelp')}
                       </p>
                     </div>
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="placeholder" className="text-sm font-medium">Placeholder Text (Optional)</Label>
+                    <Label htmlFor="placeholder" className="text-sm font-medium">{t('settings.formSettingsSection.customFields.placeholderLabel')}</Label>
                     <Input
                       id="placeholder"
                       name="placeholder"
                       value={formData.placeholder}
                       onChange={handleChange}
-                      placeholder="e.g., Enter your medical history"
+                      placeholder={t('settings.formSettingsSection.customFields.placeholderTextPlaceholder')}
                       className="border-indigo-200 focus-visible:ring-indigo-500"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Text that appears in the field before the client enters a value
+                      {t('settings.formSettingsSection.customFields.placeholderHelp')}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="default_value" className="text-sm font-medium">Default Value (Optional)</Label>
+                    <Label htmlFor="default_value" className="text-sm font-medium">{t('settings.formSettingsSection.customFields.defaultValueLabel')}</Label>
                     <Input
                       id="default_value"
                       name="default_value"
                       value={formData.default_value}
                       onChange={handleChange}
-                      placeholder="e.g., None"
+                      placeholder={t('settings.formSettingsSection.customFields.defaultValuePlaceholder')}
                       className="border-indigo-200 focus-visible:ring-indigo-500"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Pre-filled value that will appear in the field
+                      {t('settings.formSettingsSection.customFields.defaultValueHelp')}
                     </p>
                   </div>
 
