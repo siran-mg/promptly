@@ -284,36 +284,36 @@ export function AppointmentDetailsDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader className="pb-0">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
             <div className="flex items-center">
-              <User className="h-5 w-5 mr-2 text-primary" />
-              <DialogTitle className="text-xl font-bold">
+              <User className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-primary" />
+              <DialogTitle className="text-lg sm:text-xl font-bold truncate">
                 {appointment.client_name}
               </DialogTitle>
             </div>
 
             {isEditMode && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 self-end">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 px-3"
+                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm"
                   onClick={() => setIsEditMode(false)}
                   disabled={isUpdating}
                 >
-                  <X className="h-4 w-4 mr-1.5" />
+                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
                   {t('common.cancelButton')}
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 px-3 text-primary"
+                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm text-primary"
                   onClick={handleSaveChanges}
                   disabled={isUpdating}
                 >
-                  <Save className="h-4 w-4 mr-1.5" />
+                  <Save className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
                   {t('common.save')}
                 </Button>
               </div>
@@ -323,42 +323,42 @@ export function AppointmentDetailsDialog({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 px-3 text-primary"
+                className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm text-primary self-end"
                 onClick={() => setIsEditMode(true)}
               >
-                <Edit className="h-4 w-4 mr-1.5" />
+                <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
                 {t('common.editButton')}
               </Button>
             )}
           </div>
-          <DialogDescription className="text-center pt-2 pb-4">
+          <DialogDescription className="text-center text-xs sm:text-sm pt-2 pb-3 sm:pb-4">
             {t('appointments.details')}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
+        <div className="space-y-3 sm:space-y-4 py-1 sm:py-2">
           {/* Appointment details card */}
-          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-            <h3 className="text-sm font-medium flex items-center mb-3">
-              <Calendar className="h-4 w-4 mr-2 text-primary" />
+          <div className="bg-primary/5 p-3 sm:p-4 rounded-lg border border-primary/20">
+            <h3 className="text-xs sm:text-sm font-medium flex items-center mb-2 sm:mb-3">
+              <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-primary" />
               {t('appointments.details')}
             </h3>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {/* Type */}
               <div className="flex items-center">
-                <Tag className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-20">{t('appointments.type')}:</span>
+                <Tag className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground mr-1.5 sm:mr-2" />
+                <span className="text-xs sm:text-sm font-medium w-16 sm:w-20">{t('appointments.type')}:</span>
 
                 {!isEditMode ? (
                   <div className="flex items-center">
                     {appointment.appointment_type?.color && (
                       <div
-                        className="w-3 h-3 rounded-full mr-2"
+                        className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full mr-1.5 sm:mr-2"
                         style={{ backgroundColor: appointment.appointment_type.color }}
                       />
                     )}
-                    <span className="text-sm">
+                    <span className="text-xs sm:text-sm">
                       {appointment.appointment_type?.name ||
                        (appointment.appointment_type_id ? t('common.loading') : t('appointments.notSpecified'))}
                     </span>
@@ -376,18 +376,18 @@ export function AppointmentDetailsDialog({
 
               {/* Date */}
               <div className="flex items-center">
-                <Calendar className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-20">{t('appointments.date')}:</span>
-                <span className="text-sm">{formattedDate}</span>
+                <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground mr-1.5 sm:mr-2" />
+                <span className="text-xs sm:text-sm font-medium w-16 sm:w-20">{t('appointments.date')}:</span>
+                <span className="text-xs sm:text-sm">{formattedDate}</span>
               </div>
 
               {/* Time */}
               <div className="flex items-center">
-                <Clock className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-20">{t('appointments.time')}:</span>
-                <span className="text-sm">{formattedTime}</span>
+                <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground mr-1.5 sm:mr-2" />
+                <span className="text-xs sm:text-sm font-medium w-16 sm:w-20">{t('appointments.time')}:</span>
+                <span className="text-xs sm:text-sm">{formattedTime}</span>
                 {appointment.appointment_type?.duration && (
-                  <span className="text-muted-foreground text-sm ml-1">
+                  <span className="text-muted-foreground text-xs sm:text-sm ml-1">
                     ({formatDuration(appointment.appointment_type.duration)})
                   </span>
                 )}
@@ -396,28 +396,28 @@ export function AppointmentDetailsDialog({
           </div>
 
           {/* Contact information card */}
-          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-            <h3 className="text-sm font-medium mb-3 flex items-center">
-              <User className="h-4 w-4 mr-2 text-primary" />
+          <div className="bg-primary/5 p-3 sm:p-4 rounded-lg border border-primary/20">
+            <h3 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center">
+              <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-primary" />
               {t('appointments.contactInformation')}
             </h3>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {/* Email */}
               <div className="flex items-center">
-                <Mail className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-20">{t('common.email')}:</span>
+                <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground mr-1.5 sm:mr-2" />
+                <span className="text-xs sm:text-sm font-medium w-16 sm:w-20">{t('common.email')}:</span>
 
                 {!isEditMode ? (
                   appointment.client_email ? (
                     <a
                       href={`mailto:${appointment.client_email}`}
-                      className="text-sm text-primary hover:underline"
+                      className="text-xs sm:text-sm text-primary hover:underline truncate"
                     >
                       {appointment.client_email}
                     </a>
                   ) : (
-                    <span className="text-sm text-muted-foreground">{t('common.notProvided')}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{t('common.notProvided')}</span>
                   )
                 ) : (
                   <div className="flex-1">
@@ -426,7 +426,7 @@ export function AppointmentDetailsDialog({
                       value={appointmentData.client_email}
                       onChange={handleInputChange}
                       placeholder={t('appointments.emailPlaceholder')}
-                      className="h-8 text-sm"
+                      className="h-7 sm:h-8 text-xs sm:text-sm"
                     />
                   </div>
                 )}
@@ -434,19 +434,19 @@ export function AppointmentDetailsDialog({
 
               {/* Phone */}
               <div className="flex items-center">
-                <Phone className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-sm font-medium w-20">{t('common.phone')}:</span>
+                <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground mr-1.5 sm:mr-2" />
+                <span className="text-xs sm:text-sm font-medium w-16 sm:w-20">{t('common.phone')}:</span>
 
                 {!isEditMode ? (
                   appointment.client_phone ? (
                     <a
                       href={`tel:${appointment.client_phone}`}
-                      className="text-sm text-primary hover:underline"
+                      className="text-xs sm:text-sm text-primary hover:underline"
                     >
                       {appointment.client_phone}
                     </a>
                   ) : (
-                    <span className="text-sm text-muted-foreground">{t('common.notProvided')}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{t('common.notProvided')}</span>
                   )
                 ) : (
                   <div className="flex-1">
@@ -455,7 +455,7 @@ export function AppointmentDetailsDialog({
                       value={appointmentData.client_phone}
                       onChange={handleInputChange}
                       placeholder={t('appointments.phonePlaceholder')}
-                      className="h-8 text-sm"
+                      className="h-7 sm:h-8 text-xs sm:text-sm"
                     />
                   </div>
                 )}
@@ -464,15 +464,15 @@ export function AppointmentDetailsDialog({
               {/* Name - only in edit mode */}
               {isEditMode && (
                 <div className="flex items-center">
-                  <User className="h-4 w-4 text-muted-foreground mr-2" />
-                  <span className="text-sm font-medium w-20">{t('common.name')}:</span>
+                  <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground mr-1.5 sm:mr-2" />
+                  <span className="text-xs sm:text-sm font-medium w-16 sm:w-20">{t('common.name')}:</span>
                   <div className="flex-1">
                     <Input
                       name="client_name"
                       value={appointmentData.client_name}
                       onChange={handleInputChange}
                       placeholder={t('appointments.clientNamePlaceholder')}
-                      className="h-8 text-sm"
+                      className="h-7 sm:h-8 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
@@ -481,25 +481,25 @@ export function AppointmentDetailsDialog({
           </div>
 
           {/* Status card */}
-          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-            <h3 className="text-sm font-medium mb-3 flex items-center">
-              <CheckCircle2 className="h-4 w-4 mr-2 text-primary" />
+          <div className="bg-primary/5 p-3 sm:p-4 rounded-lg border border-primary/20">
+            <h3 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center">
+              <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-primary" />
               {t('appointments.statusHeading')}
             </h3>
 
             <div className="flex items-center">
-              <span className="text-sm font-medium w-20">{t('appointments.status')}:</span>
+              <span className="text-xs sm:text-sm font-medium w-16 sm:w-20">{t('appointments.status')}:</span>
               <div className="flex-1">
                 <Select
                   value={status}
                   onValueChange={handleStatusChange}
                   disabled={isUpdating || isEditMode}
                 >
-                  <SelectTrigger className="w-[140px] h-8 text-sm">
+                  <SelectTrigger className="w-[120px] sm:w-[140px] h-7 sm:h-8 text-xs sm:text-sm">
                     <SelectValue>
                       <Badge
                         variant={getStatusVariant(status)}
-                        className="font-normal"
+                        className="font-normal text-xs"
                       >
                         {translateStatus(status)}
                       </Badge>
@@ -507,13 +507,13 @@ export function AppointmentDetailsDialog({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="scheduled">
-                      <Badge variant={getStatusVariant("scheduled")} className="font-normal">{translateStatus("scheduled")}</Badge>
+                      <Badge variant={getStatusVariant("scheduled")} className="font-normal text-xs">{translateStatus("scheduled")}</Badge>
                     </SelectItem>
                     <SelectItem value="completed">
-                      <Badge variant={getStatusVariant("completed")} className="font-normal">{translateStatus("completed")}</Badge>
+                      <Badge variant={getStatusVariant("completed")} className="font-normal text-xs">{translateStatus("completed")}</Badge>
                     </SelectItem>
                     <SelectItem value="cancelled">
-                      <Badge variant={getStatusVariant("cancelled")} className="font-normal">{translateStatus("cancelled")}</Badge>
+                      <Badge variant={getStatusVariant("cancelled")} className="font-normal text-xs">{translateStatus("cancelled")}</Badge>
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -523,22 +523,22 @@ export function AppointmentDetailsDialog({
 
           {/* Notes section - always show in edit mode */}
           {(appointment.notes || isEditMode) && (
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-              <h3 className="text-sm font-medium mb-3 flex items-center">
-                <FileText className="h-4 w-4 mr-2 text-primary" />
+            <div className="bg-primary/5 p-3 sm:p-4 rounded-lg border border-primary/20">
+              <h3 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center">
+                <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-primary" />
                 {t('appointments.notes')}
               </h3>
 
               {!isEditMode ? (
-                <p className="text-sm whitespace-pre-wrap pl-6">{appointment.notes}</p>
+                <p className="text-xs sm:text-sm whitespace-pre-wrap pl-4 sm:pl-6">{appointment.notes}</p>
               ) : (
-                <div className="pl-6">
+                <div className="pl-4 sm:pl-6">
                   <textarea
                     name="notes"
                     value={appointmentData.notes || ''}
                     onChange={handleInputChange}
                     placeholder={t('appointments.notesPlaceholder')}
-                    className="w-full min-h-[100px] text-sm p-2 rounded-md border border-input bg-background"
+                    className="w-full min-h-[80px] sm:min-h-[100px] text-xs sm:text-sm p-2 rounded-md border border-input bg-background"
                   />
                 </div>
               )}
@@ -546,28 +546,30 @@ export function AppointmentDetailsDialog({
           )}
         </div>
 
-        <DialogFooter className="flex justify-between mt-4">
+        <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0 mt-3 sm:mt-4">
           <Button
             variant="outline"
-            className="text-destructive border-destructive/30 hover:bg-destructive/10"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10 text-xs sm:text-sm h-8 sm:h-9 w-full sm:w-auto"
             onClick={onDelete}
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
             {t('appointments.delete')}
           </Button>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             {onShare && (
               <Button
                 variant="outline"
+                className="text-xs sm:text-sm h-8 sm:h-9 flex-1 sm:flex-none"
                 onClick={onShare}
               >
-                <Share className="h-4 w-4 mr-2" />
+                <Share className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                 {t('common.share')}
               </Button>
             )}
             <Button
               variant="default"
+              className="text-xs sm:text-sm h-8 sm:h-9 flex-1 sm:flex-none"
               onClick={() => onOpenChange(false)}
             >
               {t('common.close')}

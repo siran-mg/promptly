@@ -84,28 +84,31 @@ export default async function AppointmentsPage({
       <DashboardHeader
         heading={
           <span className="flex items-center gap-2">
-            <CalendarClock className="h-6 w-6 text-indigo-600" />
+            <CalendarClock className="h-5 w-5 md:h-6 md:w-6 text-indigo-600" />
             {t("title")}
           </span>
         }
         text={t("description")}
       >
-        <Link href="/dashboard/appointments/new">
-          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 transition-colors">
+        <Link href="/dashboard/appointments/new" className="w-full sm:w-auto">
+          <Button
+            size="sm"
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 transition-colors"
+          >
             <Plus className="mr-2 h-4 w-4" />
             {t("new")}
           </Button>
         </Link>
       </DashboardHeader>
-      <div className="mt-6">
+      <div className="mt-4 md:mt-6">
         <Tabs defaultValue="calendar" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4 p-1">
-            <TabsTrigger value="calendar" className="flex items-center gap-2 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">
-              <Calendar className="h-4 w-4" />
+          <TabsList className="grid w-full grid-cols-2 mb-3 md:mb-4 p-1">
+            <TabsTrigger value="calendar" className="flex items-center justify-center gap-1 md:gap-2 py-1.5 text-sm data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">
+              <Calendar className="h-3.5 w-3.5 md:h-4 md:w-4" />
               {t("calendar")}
             </TabsTrigger>
-            <TabsTrigger value="list" className="flex items-center gap-2 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">
-              <List className="h-4 w-4" />
+            <TabsTrigger value="list" className="flex items-center justify-center gap-1 md:gap-2 py-1.5 text-sm data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">
+              <List className="h-3.5 w-3.5 md:h-4 md:w-4" />
               {t("list")}
             </TabsTrigger>
           </TabsList>

@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { Database } from "@/types/supabase";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { useDateFormatter } from "@/hooks/use-date-formatter";
 
 import {
   AlertDialog,
@@ -37,6 +38,8 @@ export function DeleteAppointmentDialog({
   const supabase = createClient();
   const [isDeleting, setIsDeleting] = useState(false);
   const t = useTranslations();
+  const locale = useLocale();
+  const { formatDate, formatTime } = useDateFormatter();
 
   const handleDelete = async () => {
     if (!appointment) return;
@@ -86,34 +89,48 @@ export function DeleteAppointmentDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t('appointments.delete')}</AlertDialogTitle>
-          <AlertDialogDescription>
+      <AlertDialogContent className="p-4 sm:p-6 max-w-[90vw] sm:max-w-md">
+        <AlertDialogHeader className="space-y-2">
+          <AlertDialogTitle className="text-lg sm:text-xl flex items-center justify-center sm:justify-start text-destructive">
+            {t('appointments.delete')}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-xs sm:text-sm">
             {t('appointments.deleteConfirm')} {t('common.cannotBeUndone')}
             {appointment && (
-              <div className="mt-2 p-3 bg-muted rounded-md">
-                <p className="font-medium">{appointment.client_name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {appointment.date && new Date(appointment.date).toLocaleString()}
+              <div className="mt-2 p-2 sm:p-3 bg-muted rounded-md shadow-sm">
+                <p className="font-medium text-sm sm:text-base truncate flex items-center">
+                  <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-destructive" />
+                  {appointment.client_name}
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground pl-5 sm:pl-6">
+                  {appointment.date && (
+                    <>
+                      {formatDate(new Date(appointment.date))} • {formatTime(new Date(appointment.date))}
+                    </>
+                  )}
                 </p>
               </div>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>{t('common.cancelButton')}</AlertDialogCancel>
+        <AlertDialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-0 mt-4">
+          <AlertDialogCancel
+            disabled={isDeleting}
+            className="mt-2 sm:mt-0 text-xs sm:text-sm h-9 sm:h-10 w-full sm:w-auto"
+          >
+            {t('common.cancelButton')}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
               handleDelete();
             }}
             disabled={isDeleting}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 text-xs sm:text-sm h-9 sm:h-10 w-full sm:w-auto font-medium"
           >
             {isDeleting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
                 {t('common.deleting')}
               </>
             ) : (

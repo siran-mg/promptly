@@ -36,9 +36,9 @@ export function ActiveFiltersDisplay({
   };
 
   return (
-    <div className="bg-amber-50 p-4 rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border border-amber-200">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-medium text-amber-800">{t('appointments.filter.activeFilters')}:</span>
+    <div className="bg-amber-50 p-3 md:p-4 rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-3 border border-amber-200">
+      <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+        <span className="text-xs md:text-sm font-medium text-amber-800">{t('appointments.filter.activeFilters')}:</span>
         {activeTypeId && activeTypeId.split(',').map(typeId => (
           <FilterTag
             key={typeId}
@@ -58,7 +58,7 @@ export function ActiveFiltersDisplay({
       </div>
       <Button
         size="sm"
-        className="bg-amber-600 hover:bg-amber-700 text-white transition-colors font-medium"
+        className="w-full sm:w-auto mt-2 sm:mt-0 bg-amber-600 hover:bg-amber-700 text-white transition-colors font-medium text-xs md:text-sm py-1 h-auto md:h-9"
         onClick={clearAllFilters}
       >
         {t('appointments.filter.clearAll')}

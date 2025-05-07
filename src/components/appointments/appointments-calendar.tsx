@@ -178,62 +178,72 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
   // We're using CSS to handle day name translations and date-fns for month names
 
   // Custom event component to show status and type
-  const EventComponent = ({ event }: { event: CalendarEvent }) => (
-    <div className="flex flex-col h-full">
-      <div className="text-sm font-semibold text-white">{event.title}</div>
-      <div className="text-xs mt-1 flex items-center gap-1 text-white/90">
-        <span className="font-medium">
-          {format(
-            event.start,
-            currentLocale === "fr" ? "HH:mm" : "h:mm a",
-            { locale: currentDateFnsLocale }
-          )}
-        </span>
-        {event.typeColor && (
-          <div className="flex items-center gap-1 ml-1">
+  const EventComponent = ({ event }: { event: CalendarEvent }) => {
+    // Determine if this is a small event (less than 30 minutes or on month view)
+    const isSmallEvent = view === 'month' ||
+      (new Date(event.end).getTime() - new Date(event.start).getTime()) < 30 * 60 * 1000;
+
+    return (
+      <div className="flex flex-col h-full">
+        <div className="text-xs md:text-sm font-semibold text-white truncate">{event.title}</div>
+        {!isSmallEvent && (
+          <div className="text-[10px] md:text-xs mt-1 flex items-center gap-1 text-white/90">
+            <span className="font-medium">
+              {format(
+                event.start,
+                currentLocale === "fr" ? "HH:mm" : "h:mm a",
+                { locale: currentDateFnsLocale }
+              )}
+            </span>
+            {event.typeColor && (
+              <div className="flex items-center gap-1 ml-1">
+                <div
+                  className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-white/30"
+                />
+                <span className="text-[10px] md:text-xs font-medium truncate">{event.typeName}</span>
+              </div>
+            )}
+          </div>
+        )}
+        {!isSmallEvent && (
+          <div className="mt-auto pt-1">
             <div
-              className="w-3 h-3 rounded-full bg-white/30"
-            />
-            <span className="text-xs font-medium">{event.typeName}</span>
+              className={`text-[10px] md:text-xs font-medium px-1 md:px-1.5 py-0.5 rounded-sm inline-flex items-center ${
+                event.status === "scheduled" ? "bg-white/20 text-white" :
+                event.status === "completed" ? "bg-emerald-200 text-emerald-800" :
+                event.status === "cancelled" ? "bg-red-200 text-red-800" :
+                "bg-white/20 text-white"
+              }`}
+            >
+              <span className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full mr-0.5 md:mr-1 ${
+                event.status === "scheduled" ? "bg-white" :
+                event.status === "completed" ? "bg-emerald-500" :
+                event.status === "cancelled" ? "bg-red-500" :
+                "bg-white"
+              }`}></span>
+              {event.status === "scheduled" ? t('appointments.upcoming') :
+              event.status === "completed" ? t('appointments.completed') :
+              event.status === "cancelled" ? t('appointments.cancelled') :
+              event.status}
+            </div>
           </div>
         )}
       </div>
-      <div className="mt-auto pt-1">
-        <div
-          className={`text-xs font-medium px-1.5 py-0.5 rounded-sm inline-flex items-center ${
-            event.status === "scheduled" ? "bg-white/20 text-white" :
-            event.status === "completed" ? "bg-emerald-200 text-emerald-800" :
-            event.status === "cancelled" ? "bg-red-200 text-red-800" :
-            "bg-white/20 text-white"
-          }`}
-        >
-          <span className={`w-1.5 h-1.5 rounded-full mr-1 ${
-            event.status === "scheduled" ? "bg-white" :
-            event.status === "completed" ? "bg-emerald-500" :
-            event.status === "cancelled" ? "bg-red-500" :
-            "bg-white"
-          }`}></span>
-          {event.status === "scheduled" ? t('appointments.upcoming') :
-           event.status === "completed" ? t('appointments.completed') :
-           event.status === "cancelled" ? t('appointments.cancelled') :
-           event.status}
-        </div>
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <>
-      <div className="space-y-3">
-        <div className="flex items-center text-sm bg-indigo-50 p-3 rounded-md border border-indigo-100">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-indigo-600 flex items-center justify-center">
-              <Plus className="h-3 w-3 text-white" />
+      <div className="space-y-2 md:space-y-3">
+        <div className="flex items-center text-xs md:text-sm bg-indigo-50 p-2 md:p-3 rounded-md border border-indigo-100">
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <div className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full bg-indigo-600 flex items-center justify-center">
+              <Plus className="h-2.5 w-2.5 md:h-3 md:w-3 text-white" />
             </div>
-            <span className="text-indigo-700 font-medium">{t('appointments.newAppointment.click')}</span>
+            <span className="text-indigo-700 font-medium text-xs md:text-sm">{t('appointments.newAppointment.click')}</span>
           </div>
         </div>
-        <div className="h-[700px] bg-white rounded-md overflow-hidden">
+        <div className="h-[500px] md:h-[700px] bg-white rounded-md overflow-hidden">
           <Calendar
             localizer={localizer}
             events={events}
@@ -259,30 +269,42 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
               toolbar: (toolbarProps) => {
                 const viewNames = ['month', 'week', 'day'] as const;
                 return (
-                  <div className="rbc-toolbar">
-                    <span className="rbc-btn-group">
-                      <button type="button" onClick={() => toolbarProps.onNavigate('TODAY')}>
+                  <div className="rbc-toolbar flex flex-col md:flex-row gap-2 md:gap-0">
+                    <span className="rbc-btn-group flex">
+                      <button
+                        type="button"
+                        onClick={() => toolbarProps.onNavigate('TODAY')}
+                        className="text-xs md:text-sm py-1 md:py-1.5"
+                      >
                         {t('appointments.newAppointment.today')}
                       </button>
-                      <button type="button" onClick={() => toolbarProps.onNavigate('PREV')}>
+                      <button
+                        type="button"
+                        onClick={() => toolbarProps.onNavigate('PREV')}
+                        className="text-xs md:text-sm py-1 md:py-1.5"
+                      >
                         <span className="mr-1">←</span> {t('appointments.newAppointment.prev')}
                       </button>
-                      <button type="button" onClick={() => toolbarProps.onNavigate('NEXT')}>
+                      <button
+                        type="button"
+                        onClick={() => toolbarProps.onNavigate('NEXT')}
+                        className="text-xs md:text-sm py-1 md:py-1.5"
+                      >
                         {t('appointments.newAppointment.next')} <span className="ml-1">→</span>
                       </button>
                     </span>
-                    <span className="rbc-toolbar-label">
+                    <span className="rbc-toolbar-label order-first md:order-none">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-indigo-50 cursor-pointer transition-colors">
-                            <CalendarIcon className="h-4 w-4 text-indigo-600 flex-shrink-0" />
-                            <span className="font-semibold text-indigo-700">
+                          <div className="inline-flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 rounded-md hover:bg-indigo-50 cursor-pointer transition-colors">
+                            <CalendarIcon className="h-3.5 w-3.5 md:h-4 md:w-4 text-indigo-600 flex-shrink-0" />
+                            <span className="font-semibold text-indigo-700 text-xs md:text-sm truncate">
                               {format(
                                 toolbarProps.date,
                                 view === 'month' ? 'MMMM yyyy' :
                                 view === 'week' ?
-                                  (currentLocale === 'fr' ? "'Semaine du' d MMMM yyyy" : "'Week of' MMMM d, yyyy") :
-                                currentLocale === 'fr' ? 'EEEE d MMMM yyyy' : 'EEEE, MMMM d, yyyy',
+                                  (currentLocale === 'fr' ? "'Semaine du' d MMM yyyy" : "'Week of' MMM d, yyyy") :
+                                currentLocale === 'fr' ? 'EEEE d MMM yyyy' : 'EEE, MMM d, yyyy',
                                 { locale: currentDateFnsLocale }
                               )}
                             </span>
@@ -297,13 +319,13 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
                         </PopoverContent>
                       </Popover>
                     </span>
-                    <span className="rbc-btn-group">
+                    <span className="rbc-btn-group flex">
                       {viewNames.map((name) => (
                         <button
                           key={name}
                           type="button"
                           onClick={() => toolbarProps.onView(name)}
-                          className={view === name ? 'rbc-active' : ''}
+                          className={`text-xs md:text-sm py-1 md:py-1.5 ${view === name ? 'rbc-active' : ''}`}
                         >
                           {name === 'month' ? t('appointments.month') :
                            name === 'week' ? t('appointments.week') :

@@ -27,14 +27,14 @@ export function AppointmentFilterBar({
   activeFieldName,
 }: AppointmentFilterBarProps) {
   return (
-    <div className="space-y-4 mb-4">
+    <div className="space-y-3 md:space-y-4 mb-3 md:mb-4">
       <ActiveFiltersDisplay
         activeTypeId={activeTypeId}
         activeFieldName={activeFieldName}
         appointmentTypes={appointmentTypes}
       />
 
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3">
         <AppointmentSearch
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}

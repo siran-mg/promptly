@@ -82,21 +82,21 @@ export function AppointmentTypeFilter({ appointmentTypes, activeTypeId }: Appoin
       <DropdownMenuTrigger asChild>
         <Button
           variant={selectedTypes.length > 0 ? "default" : "outline"}
-          className={`gap-2 h-10 ${selectedTypes.length > 0
+          className={`gap-1 md:gap-2 h-9 md:h-10 text-xs md:text-sm ${selectedTypes.length > 0
             ? "bg-amber-600 hover:bg-amber-700 text-white"
             : "border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"}`}
         >
-          <Filter className="h-4 w-4" />
+          <Filter className="h-3.5 w-3.5 md:h-4 md:w-4" />
           {t('appointments.filter.byType')}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="text-indigo-700">{t('appointments.filter.appointmentTypes')}</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-[280px] sm:w-56">
+        <DropdownMenuLabel className="text-indigo-700 text-sm">{t('appointments.filter.appointmentTypes')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {appointmentTypes.map((type) => (
           <DropdownMenuItem
             key={type.id}
-            className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
+            className="hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer text-sm"
             onClick={(e) => {
               e.preventDefault();
               handleTypeToggle(type.id);
@@ -114,7 +114,7 @@ export function AppointmentTypeFilter({ appointmentTypes, activeTypeId }: Appoin
                   style={{ backgroundColor: type.color }}
                 />
               )}
-              <span>{type.name}</span>
+              <span className="truncate">{type.name}</span>
             </div>
           </DropdownMenuItem>
         ))}
@@ -123,7 +123,7 @@ export function AppointmentTypeFilter({ appointmentTypes, activeTypeId }: Appoin
           <Button
             variant="outline"
             size="sm"
-            className="text-xs"
+            className="text-xs h-8"
             onClick={() => {
               setSelectedTypes([]);
               setIsOpen(false);
@@ -134,7 +134,7 @@ export function AppointmentTypeFilter({ appointmentTypes, activeTypeId }: Appoin
           </Button>
           <Button
             size="sm"
-            className="bg-amber-600 hover:bg-amber-700 text-white text-xs"
+            className="bg-amber-600 hover:bg-amber-700 text-white text-xs h-8"
             onClick={applyFilters}
           >
             {t('appointments.filter.apply')}

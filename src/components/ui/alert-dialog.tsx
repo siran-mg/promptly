@@ -6,7 +6,29 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
-const AlertDialog = AlertDialogPrimitive.Root
+// Create a custom AlertDialog component that fixes the body style issue
+import { fixBodyStyle } from "@/lib/fix-body-style";
+
+// Create a wrapper around the AlertDialog component
+const AlertDialog = ({ children, onOpenChange, ...props }: AlertDialogPrimitive.AlertDialogProps) => (
+  <AlertDialogPrimitive.Root
+    onOpenChange={(open) => {
+      // Call the original onOpenChange if provided
+      if (onOpenChange) {
+        onOpenChange(open);
+      }
+
+      // If the dialog is closing, fix the body style
+      if (!open) {
+        // Use setTimeout to ensure this runs after the dialog's internal state changes
+        setTimeout(fixBodyStyle, 100);
+      }
+    }}
+    {...props}
+  >
+    {children}
+  </AlertDialogPrimitive.Root>
+)
 
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 

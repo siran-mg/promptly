@@ -4,6 +4,7 @@ import "../globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
+import { BodyStyleFixer } from "@/components/body-style-fixer";
 import { locales, defaultLocale } from '@/config/locales';
 
 const inter = Inter({
@@ -65,6 +66,8 @@ export default async function LocaleLayout({
     <html lang={locale} suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
+          {/* Add the BodyStyleFixer to fix pointer-events issues */}
+          <BodyStyleFixer />
           <div className="flex min-h-screen flex-col">
             {children}
           </div>
