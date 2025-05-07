@@ -109,10 +109,10 @@ export function DeleteClientDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="max-w-[90vw] sm:max-w-md p-4 sm:p-6">
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('clients.delete.title')}</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-lg sm:text-xl">{t('clients.delete.title')}</AlertDialogTitle>
+          <AlertDialogDescription className="text-xs sm:text-sm">
             {t('clients.delete.description')}
             {client && (
               <div className="mt-2 p-3 bg-muted rounded-md">
@@ -126,19 +126,24 @@ export function DeleteClientDialog({
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>{t('common.cancelButton')}</AlertDialogCancel>
+        <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+          <AlertDialogCancel
+            disabled={isDeleting}
+            className="w-full sm:w-auto h-9 text-sm"
+          >
+            {t('common.cancelButton')}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
               handleDelete();
             }}
             disabled={isDeleting}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 w-full sm:w-auto h-9 text-sm"
           >
             {isDeleting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                 {t('clients.delete.removing')}
               </>
             ) : (

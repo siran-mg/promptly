@@ -124,77 +124,78 @@ export function EditClientDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-[90vw] sm:max-w-[425px] p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>{t('clients.edit.title')}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg sm:text-xl">{t('clients.edit.title')}</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
             {t('clients.edit.description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-3 sm:py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">{t('clients.form.fullName')}</Label>
+              <Label htmlFor="name" className="text-sm">{t('clients.form.fullName')}</Label>
               <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="pl-10"
+                  className="pl-10 h-9 text-sm"
                   required
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">{t('clients.form.email')}</Label>
+              <Label htmlFor="email" className="text-sm">{t('clients.form.email')}</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
                   name="email"
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="pl-10"
+                  className="pl-10 h-9 text-sm"
                   required
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">{t('clients.form.phone')}</Label>
+              <Label htmlFor="phone" className="text-sm">{t('clients.form.phone')}</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="phone"
                   name="phone"
                   type="tel"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="pl-10"
+                  className="pl-10 h-9 text-sm"
                   required
                 />
               </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isUpdating}
+              className="w-full sm:w-auto h-9 text-sm"
             >
               {t('common.cancelButton')}
             </Button>
             <Button
               type="submit"
               disabled={isUpdating}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-indigo-600 hover:bg-indigo-700 w-full sm:w-auto h-9 text-sm"
             >
               {isUpdating ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                   {t('clients.edit.updating')}
                 </>
               ) : (
