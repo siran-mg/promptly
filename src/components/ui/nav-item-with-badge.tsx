@@ -11,6 +11,7 @@ interface NavItemWithBadgeProps {
   icon: LucideIcon;
   badgeCount?: number;
   activePaths?: string[];
+  onClick?: () => void;
 }
 
 export function NavItemWithBadge({
@@ -19,6 +20,7 @@ export function NavItemWithBadge({
   icon: Icon,
   badgeCount,
   activePaths = [],
+  onClick,
 }: NavItemWithBadgeProps) {
   const pathname = usePathname();
 
@@ -59,6 +61,7 @@ export function NavItemWithBadge({
   return (
     <NavigationLink
       href={href}
+      onClick={onClick}
       className={cn(
         "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
         isActive

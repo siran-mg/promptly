@@ -66,6 +66,8 @@
     "login": "Login",
     "signup": "Sign Up",
     "mainMenu": "Main Menu",
+    "menu": "Menu",
+    "dashboard": "Dashboard",
     "quickActions": "Quick Actions",
     "forgotPassword": "Forgot Password",
     "resetPassword": "Reset Password",
@@ -114,6 +116,8 @@
     "custom": "Custom"
   },
   "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
     "loginTitle": "Log in to your account",
     "loginSubtitle": "Enter your email and password to access your account",
     "signupTitle": "Create an account",

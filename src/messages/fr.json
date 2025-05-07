@@ -66,6 +66,8 @@
     "login": "Connexion",
     "signup": "S'inscrire",
     "mainMenu": "Menu Principal",
+    "menu": "Menu",
+    "dashboard": "Tableau de bord",
     "quickActions": "Actions Rapides",
     "forgotPassword": "Mot de passe oublié",
     "resetPassword": "Réinitialiser le mot de passe",
@@ -114,6 +116,8 @@
     "custom": "Personnalisé"
   },
   "auth": {
+    "login": "Connexion",
+    "signup": "S'inscrire",
     "loginTitle": "Connectez-vous à votre compte",
     "loginSubtitle": "Entrez votre email et mot de passe pour accéder à votre compte",
     "signupTitle": "Créer un compte",

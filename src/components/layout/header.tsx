@@ -6,11 +6,14 @@ import { CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { MobileHeaderNav } from "@/components/layout/mobile-header-nav";
+import { useTranslations } from "next-intl";
 
 export function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClient();
+  const t = useTranslations();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -36,30 +39,39 @@ export function Header() {
         <div className="flex items-center gap-2">
           <CalendarClock className="h-6 w-6" />
           <Link href="/" className="text-xl font-bold">
-            Coachly
+            {t('common.appName')}
           </Link>
         </div>
-        <nav className="flex items-center gap-4">
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-4">
           {!isLoading && (
             isAuthenticated ? (
               <>
                 <Link href="/dashboard">
-                  <Button variant="ghost">Dashboard</Button>
+                  <Button variant="ghost">{t('common.dashboard')}</Button>
                 </Link>
                 <LogoutButton />
               </>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost">Login</Button>
+                  <Button variant="ghost">{t('auth.login')}</Button>
                 </Link>
                 <Link href="/signup">
-                  <Button>Sign Up</Button>
+                  <Button className="bg-indigo-600 hover:bg-indigo-700">{t('auth.signup')}</Button>
                 </Link>
               </>
             )
           )}
         </nav>
+
+        {/* Mobile Navigation */}
+        {!isLoading && (
+          <div className="md:hidden">
+            <MobileHeaderNav isAuthenticated={isAuthenticated} />
+          </div>
+        )}
       </div>
     </header>
   );

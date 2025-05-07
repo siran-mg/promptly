@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import {
   Loader2, Upload, Share, ExternalLink, Palette, Type, FileText,
-  Image, Save, Eye, Link, Check, Trash2, RefreshCw, Calendar
+  Image, Save, Eye, Link, Trash2, RefreshCw, Calendar
 } from "lucide-react";
 import { PrimaryActionButton } from "@/components/ui/primary-action-button";
 import { useToast } from "@/components/ui/use-toast";
