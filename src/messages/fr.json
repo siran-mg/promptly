@@ -117,6 +117,12 @@
     "loginSubtitle": "Entrez votre email et mot de passe pour accéder à votre compte",
     "signupTitle": "Créer un compte",
     "signupSubtitle": "Entrez vos informations pour créer un nouveau compte",
+    "welcomeBack": "Bon retour",
+    "enterCredentials": "Entrez vos identifiants pour accéder à votre compte",
+    "createAccount": "Créer un compte",
+    "enterDetails": "Entrez vos informations pour créer un nouveau compte",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "alreadyHaveAccountQuestion": "Vous avez déjà un compte ?",
     "forgotPasswordTitle": "Mot de passe oublié ?",
     "forgotPasswordSubtitle": "Entrez votre email et nous vous enverrons un lien de réinitialisation",
     "resetPasswordTitle": "Réinitialiser votre mot de passe",
@@ -136,7 +142,22 @@
     "accountCreated": "Compte créé avec succès",
     "resetLinkSent": "Lien de réinitialisation envoyé à votre email",
     "passwordReset": "Mot de passe réinitialisé avec succès",
-    "loggingOut": "Déconnexion en cours..."
+    "loggingOut": "Déconnexion en cours...",
+    "loginForm": {
+      "email": "Email",
+      "password": "Mot de passe",
+      "forgotPassword": "Mot de passe oublié ?",
+      "loginButton": "Se connecter",
+      "loggingIn": "Connexion en cours..."
+    },
+    "signupForm": {
+      "name": "Nom",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "signupButton": "S'inscrire",
+      "creatingAccount": "Création du compte en cours..."
+    }
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -328,7 +349,8 @@
     "empty": {
       "title": "Pas encore de clients",
       "description": "Votre liste de clients s'agrandira au fur et à mesure que vous prendrez des rendez-vous",
-      "buttonText": "Créer votre premier rendez-vous"
+      "buttonText": "Créer votre premier rendez-vous",
+      "addFirstClient": "Ajouter votre premier client"
     },
     "search": {
       "placeholder": "Rechercher par nom, email ou téléphone...",

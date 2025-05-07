@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ export function LoginForm() {
   const router = useRouter();
   const locale = useLocale();
   const supabase = createClient();
+  const t = useTranslations("auth");
 
   const {
     register,
@@ -72,16 +73,16 @@ export function LoginForm() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('loginForm.email')}</Label>
             <Input id="email" type="email" {...register("email")} />
             {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('loginForm.password')}</Label>
               <Button variant="link" className="h-auto p-0 text-sm" asChild>
-                <a href="/forgot-password">Forgot password?</a>
+                <a href="/forgot-password">{t('loginForm.forgotPassword')}</a>
               </Button>
             </div>
             <Input id="password" type="password" {...register("password")} />
@@ -97,10 +98,10 @@ export function LoginForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Logging in...
+                {t('loginForm.loggingIn')}
               </>
             ) : (
-              "Log In"
+              t('loginForm.loginButton')
             )}
           </Button>
         </CardFooter>

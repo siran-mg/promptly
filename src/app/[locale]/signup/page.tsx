@@ -1,9 +1,14 @@
-import Link from "next/link";
+"use client";
+
+import { useTranslations } from "next-intl";
+import { Link } from "@/app/i18n";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { SignupForm } from "@/components/auth/signup-form";
 
 export default function SignupPage() {
+  const t = useTranslations("auth");
+
   return (
     <>
       <Header />
@@ -12,20 +17,20 @@ export default function SignupPage() {
           <div className="space-y-6">
             <div className="space-y-2 text-center">
               <h1 className="text-3xl font-bold tracking-tighter">
-                Create an Account
+                {t("createAccount")}
               </h1>
               <p className="text-gray-500 dark:text-gray-400">
-                Enter your details to create a new account
+                {t("enterDetails")}
               </p>
             </div>
             <SignupForm />
             <div className="text-center text-sm">
-              Already have an account?{" "}
+              {t("alreadyHaveAccountQuestion")}{" "}
               <Link
                 href="/login"
                 className="font-medium text-primary underline-offset-4 hover:underline"
               >
-                Log in
+                {t("loginButton")}
               </Link>
             </div>
           </div>

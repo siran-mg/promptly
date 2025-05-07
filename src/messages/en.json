@@ -117,6 +117,12 @@
     "loginSubtitle": "Enter your email and password to access your account",
     "signupTitle": "Create an account",
     "signupSubtitle": "Enter your details to create a new account",
+    "welcomeBack": "Welcome Back",
+    "enterCredentials": "Enter your credentials to access your account",
+    "createAccount": "Create an Account",
+    "enterDetails": "Enter your details to create a new account",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccountQuestion": "Already have an account?",
     "forgotPasswordTitle": "Forgot your password?",
     "forgotPasswordSubtitle": "Enter your email and we'll send you a reset link",
     "resetPasswordTitle": "Reset your password",
@@ -136,7 +142,22 @@
     "accountCreated": "Account created successfully",
     "resetLinkSent": "Password reset link sent to your email",
     "passwordReset": "Password reset successfully",
-    "loggingOut": "Logging out..."
+    "loggingOut": "Logging out...",
+    "loginForm": {
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "loginButton": "Log in",
+      "loggingIn": "Logging in..."
+    },
+    "signupForm": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "signupButton": "Sign up",
+      "creatingAccount": "Creating account..."
+    }
   },
   "dashboard": {
     "title": "Dashboard",
@@ -328,7 +349,8 @@
     "empty": {
       "title": "No Clients Yet",
       "description": "Your client list will grow as you book appointments",
-      "buttonText": "Create Your First Appointment"
+      "buttonText": "Create Your First Appointment",
+      "addFirstClient": "Add Your First Client"
     },
     "search": {
       "placeholder": "Search by name, email, or phone...",
