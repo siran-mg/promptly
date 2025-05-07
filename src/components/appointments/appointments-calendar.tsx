@@ -12,9 +12,10 @@ import fr from "date-fns/locale/fr";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { Database } from "@/types/supabase";
-import { Plus, CalendarClock } from "lucide-react";
+import { Plus, CalendarClock, Calendar as CalendarIcon } from "lucide-react";
 import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
 import { AppointmentDetailsDialog } from "./appointment-details-dialog";
+import { SimpleDatePicker } from "./simple-date-picker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +25,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { EmptyAppointmentsState } from "./empty-appointments-state";
 
 // Import the CSS for react-big-calendar
@@ -266,14 +272,30 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
                       </button>
                     </span>
                     <span className="rbc-toolbar-label">
-                      {format(
-                        toolbarProps.date,
-                        view === 'month' ? 'MMMM yyyy' :
-                        view === 'week' ?
-                          (currentLocale === 'fr' ? "'Semaine du' d MMMM yyyy" : "'Week of' MMMM d, yyyy") :
-                        currentLocale === 'fr' ? 'EEEE d MMMM yyyy' : 'EEEE, MMMM d, yyyy',
-                        { locale: currentDateFnsLocale }
-                      )}
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-indigo-50 cursor-pointer transition-colors">
+                            <CalendarIcon className="h-4 w-4 text-indigo-600 flex-shrink-0" />
+                            <span className="font-semibold text-indigo-700">
+                              {format(
+                                toolbarProps.date,
+                                view === 'month' ? 'MMMM yyyy' :
+                                view === 'week' ?
+                                  (currentLocale === 'fr' ? "'Semaine du' d MMMM yyyy" : "'Week of' MMMM d, yyyy") :
+                                currentLocale === 'fr' ? 'EEEE d MMMM yyyy' : 'EEEE, MMMM d, yyyy',
+                                { locale: currentDateFnsLocale }
+                              )}
+                            </span>
+                          </div>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="center" sideOffset={4}>
+                          <SimpleDatePicker
+                            selected={toolbarProps.date}
+                            onSelect={(date: Date) => toolbarProps.onNavigate('DATE', date)}
+                            className="rounded-md border"
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </span>
                     <span className="rbc-btn-group">
                       {viewNames.map((name) => (
