@@ -22,15 +22,38 @@ export function NavItemWithBadge({
 }: NavItemWithBadgeProps) {
   const pathname = usePathname();
 
+  // Extract the path without the locale prefix for comparison
+  const pathWithoutLocale = pathname.split('/').slice(2).join('/');
+  const hrefWithoutLocale = href.startsWith('/') ? href.substring(1) : href;
+
+  // Special case for dashboard
+  const isDashboard = href === '/dashboard' && (
+    pathname.endsWith('/dashboard') ||
+    pathname.split('/').length === 3 && pathname.endsWith('dashboard')
+  );
+
   // Check if this item is active
   const isActive =
+    isDashboard ||
     pathname === href ||
+    // Check if the pathname matches any of the active paths
     activePaths.some(path => {
       if (path.endsWith('$')) {
         const regex = new RegExp(path);
         return regex.test(pathname);
       }
+      // Check if the pathname starts with the path
       return pathname.startsWith(path);
+    }) ||
+    // Also check the path without locale
+    pathWithoutLocale === hrefWithoutLocale ||
+    activePaths.some(path => {
+      const pathWithoutSlash = path.startsWith('/') ? path.substring(1) : path;
+      if (pathWithoutSlash.endsWith('$')) {
+        const regex = new RegExp(pathWithoutSlash);
+        return regex.test(pathWithoutLocale);
+      }
+      return pathWithoutLocale.startsWith(pathWithoutSlash);
     });
 
   return (

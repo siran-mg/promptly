@@ -46,7 +46,7 @@ export function DashboardNav() {
       title: t('dashboard.overview'),
       href: "/dashboard",
       icon: BarChart3,
-      activePaths: ["/dashboard$"]
+      activePaths: ["/dashboard", "/dashboard$"]
     },
     {
       title: t('dashboard.appointments'),
@@ -122,10 +122,18 @@ export function DashboardNav() {
 
   // Check if the current path matches the nav item
   const isActive = (href: string) => {
+    // Extract the path without the locale prefix for comparison
+    const pathWithoutLocale = pathname.split('/').slice(2).join('/');
+    const hrefWithoutLocale = href.startsWith('/') ? href.substring(1) : href;
+
+    // Special case for dashboard
     if (href === '/dashboard') {
-      return pathname === href;
+      return pathname.endsWith('/dashboard') ||
+             pathname.split('/').length === 3 && pathname.endsWith('dashboard') ||
+             pathWithoutLocale === '';
     }
-    return pathname.startsWith(href);
+
+    return pathname.startsWith(href) || pathWithoutLocale.startsWith(hrefWithoutLocale);
   };
 
   return (
