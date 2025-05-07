@@ -30,7 +30,7 @@ export function AppointmentTypeFormClient({
     if (onBack) {
       onBack();
     } else {
-      router.push("/dashboard/settings?tab=appointment-types");
+      router.push("/dashboard/appointment-types");
     }
   };
 
@@ -49,7 +49,7 @@ export function AppointmentTypeFormClient({
 
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${appointmentTypeId}&view=fields`)}
+            onClick={() => router.push(`/dashboard/appointment-types/${appointmentTypeId}/fields`)}
             className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
           >
             <FileText className="h-4 w-4" />

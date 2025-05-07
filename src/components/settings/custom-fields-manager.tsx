@@ -464,7 +464,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
         <Button
           variant="outline"
           className="mt-2 border-red-200 text-red-700 hover:bg-red-50"
-          onClick={() => router.push("/dashboard/settings?tab=appointment-types")}
+          onClick={() => router.push("/dashboard/appointment-types")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t('settings.appointmentTypes.backToTypes')}

@@ -6,7 +6,7 @@ import {
   CalendarClock, Home, Settings, Users,
   LogOut, User, Share, BarChart3,
   CalendarDays, Clock, ChevronRight,
-  Bell, LucideIcon
+  Bell, LucideIcon, Calendar
 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useEffect, useState } from "react";
@@ -53,6 +53,12 @@ export function DashboardNav() {
       href: "/dashboard/appointments",
       icon: CalendarClock,
       activePaths: ["/dashboard/appointments"]
+    },
+    {
+      title: t('settings.appointmentTypesMenu'),
+      href: "/dashboard/appointment-types",
+      icon: Calendar,
+      activePaths: ["/dashboard/appointment-types"]
     },
     {
       title: t('dashboard.notifications'),

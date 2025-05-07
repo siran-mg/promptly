@@ -51,7 +51,7 @@ export default async function DashboardPage({
           {t('manageAppointments')}
         </p>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 auto-rows-fr">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
           {/* Create Appointment Card */}
           <ActionCard
             iconName="Plus"
@@ -72,15 +72,6 @@ export default async function DashboardPage({
 
           {/* Share Booking Form Card */}
           <ShareActionCard />
-
-          {/* Customize Booking Form Card */}
-          <ActionCard
-            iconName="Palette"
-            title={t('quickActions.customizeBookingForm')}
-            description={t('quickActions.customizeBookingFormDescription')}
-            href="/dashboard/settings?tab=form"
-            iconColor="text-purple-600"
-          />
         </div>
       </div>
 

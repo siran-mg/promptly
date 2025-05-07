@@ -704,7 +704,7 @@ export function FormSettings() {
                       variant="outline"
                       size="sm"
                       className="w-full border-indigo-200 text-indigo-700 hover:bg-indigo-50"
-                      onClick={() => router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}&view=form`)}
+                      onClick={() => router.push(`/dashboard/appointment-types/${type.id}/form`)}
                     >
                       <Palette className="h-3.5 w-3.5 mr-2" />
                       {t('settings.formSettingsSection.customizeForm')}
@@ -721,7 +721,7 @@ export function FormSettings() {
                     </p>
                     <Button
                       variant="outline"
-                      onClick={() => router.push("/dashboard/settings?tab=appointment-types")}
+                      onClick={() => router.push("/dashboard/appointment-types")}
                       className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
                     >
                       {t('settings.formSettingsSection.manageAppointmentTypes')}

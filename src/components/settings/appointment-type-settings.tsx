@@ -52,7 +52,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
             description: "Could not load appointment type. Please try again.",
             variant: "destructive",
           });
-          router.push("/dashboard/settings?tab=appointment-typess");
+          router.push("/dashboard/appointment-types");
           return;
         }
 
@@ -85,7 +85,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
 
   // Handle customize form button
   const handleCustomizeForm = () => {
-    router.push(`/dashboard/settings?tab=appointment-typess/${typeId}/form`);
+    router.push(`/dashboard/appointment-types/${typeId}/form`);
     setIsShareDialogOpen(false);
   };
 
@@ -107,7 +107,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
       <div className="flex items-center justify-between">
         <Button
           variant="outline"
-          onClick={() => router.push("/dashboard/settings?tab=appointment-typess")}
+          onClick={() => router.push("/dashboard/appointment-types")}
           className="gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -116,7 +116,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/settings?tab=appointment-typess/${typeId}/edit`)}
+            onClick={() => router.push(`/dashboard/appointment-types/${typeId}/edit`)}
             className="gap-2"
           >
             <Edit className="h-4 w-4" />
@@ -166,7 +166,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
         <CardFooter className="flex justify-between">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/settings?tab=appointment-typess/${typeId}/form`)}
+            onClick={() => router.push(`/dashboard/appointment-types/${typeId}/form`)}
           >
             {t('settings.appointmentTypes.customizeForm')}
           </Button>
@@ -190,7 +190,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onDeleteSuccess={() => {
-          router.push("/dashboard/settings?tab=appointment-typess");
+          router.push("/dashboard/appointment-types");
         }}
       />
     </div>

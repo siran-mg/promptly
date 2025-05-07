@@ -620,7 +620,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                   <TableRow
                     key={type.id}
                     className="cursor-pointer hover:bg-indigo-50/30 group relative transition-colors"
-                    onClick={() => onSelectType ? onSelectType(type.id) : router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}`)}
+                    onClick={() => onSelectType ? onSelectType(type.id) : router.push(`/dashboard/appointment-types/${type.id}`)}
                     title={t('settings.appointmentTypes.clickToManage')}
                   >
                     <TableCell className="font-medium">
@@ -678,7 +678,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent row click event
-                            router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${type.id}&view=form`);
+                            router.push(`/dashboard/appointment-types/${type.id}/form`);
                           }}
                           className="h-8 w-8 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
                           title={t('settings.appointmentTypes.customizeFormSettings')}

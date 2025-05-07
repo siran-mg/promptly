@@ -27,7 +27,7 @@ export function AppointmentTypeFieldsClient({
     if (onBack) {
       onBack();
     } else {
-      router.push("/dashboard/settings?tab=appointment-types");
+      router.push("/dashboard/appointment-types");
     }
   };
 
@@ -46,7 +46,7 @@ export function AppointmentTypeFieldsClient({
 
           <PrimaryActionButton
             variant="default"
-            onClick={() => router.push(`/dashboard/settings?tab=appointment-types&appointmentTypeId=${appointmentTypeId}&view=form`)}
+            onClick={() => router.push(`/dashboard/appointment-types/${appointmentTypeId}/form`)}
             icon={Palette}
           >
             {t('settings.appointmentTypes.formCustomization')}
