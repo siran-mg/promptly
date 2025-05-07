@@ -106,8 +106,9 @@ export function DashboardOverview({ appointments }: DashboardOverviewProps) {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <AppointmentsByMonthChart data={monthlyChartData} />
         <AppointmentsByStatusChart data={statusData} />
-        <RecentAppointments appointments={recentAppointments} />
       </div>
+      
+      <RecentAppointments appointments={recentAppointments} />
     </div>
   );
 }
