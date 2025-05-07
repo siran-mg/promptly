@@ -1,0 +1,210 @@
+/* Custom CSS to override react-big-calendar day names */
+
+/* Month view - Hide the original day names */
+.rbc-month-view .rbc-header span {
+  display: none;
+}
+
+/* Month view - Add custom day names for English */
+html[lang="en"] .rbc-month-view .rbc-header:nth-child(1)::after {
+  content: "Sun";
+  display: block;
+}
+
+html[lang="en"] .rbc-month-view .rbc-header:nth-child(2)::after {
+  content: "Mon";
+  display: block;
+}
+
+html[lang="en"] .rbc-month-view .rbc-header:nth-child(3)::after {
+  content: "Tue";
+  display: block;
+}
+
+html[lang="en"] .rbc-month-view .rbc-header:nth-child(4)::after {
+  content: "Wed";
+  display: block;
+}
+
+html[lang="en"] .rbc-month-view .rbc-header:nth-child(5)::after {
+  content: "Thu";
+  display: block;
+}
+
+html[lang="en"] .rbc-month-view .rbc-header:nth-child(6)::after {
+  content: "Fri";
+  display: block;
+}
+
+html[lang="en"] .rbc-month-view .rbc-header:nth-child(7)::after {
+  content: "Sat";
+  display: block;
+}
+
+/* Month view - Add custom day names for French */
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(1)::after {
+  content: "Dim";
+  display: block;
+}
+
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(2)::after {
+  content: "Lun";
+  display: block;
+}
+
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(3)::after {
+  content: "Mar";
+  display: block;
+}
+
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(4)::after {
+  content: "Mer";
+  display: block;
+}
+
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(5)::after {
+  content: "Jeu";
+  display: block;
+}
+
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(6)::after {
+  content: "Ven";
+  display: block;
+}
+
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(7)::after {
+  content: "Sam";
+  display: block;
+}
+
+/* Week view - Hide the original day names */
+.rbc-time-view .rbc-header span {
+  display: none;
+}
+
+/* Week view - Add custom day names for English */
+html[lang="en"] .rbc-time-view .rbc-header:nth-child(1)::after {
+  content: "Sun";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="en"] .rbc-time-view .rbc-header:nth-child(2)::after {
+  content: "Mon";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="en"] .rbc-time-view .rbc-header:nth-child(3)::after {
+  content: "Tue";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="en"] .rbc-time-view .rbc-header:nth-child(4)::after {
+  content: "Wed";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="en"] .rbc-time-view .rbc-header:nth-child(5)::after {
+  content: "Thu";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="en"] .rbc-time-view .rbc-header:nth-child(6)::after {
+  content: "Fri";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="en"] .rbc-time-view .rbc-header:nth-child(7)::after {
+  content: "Sat";
+  display: block;
+  font-weight: bold;
+}
+
+/* Week view - Add custom day names for French */
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(1)::after {
+  content: "Dim";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(2)::after {
+  content: "Lun";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(3)::after {
+  content: "Mar";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(4)::after {
+  content: "Mer";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(5)::after {
+  content: "Jeu";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(6)::after {
+  content: "Ven";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(7)::after {
+  content: "Sam";
+  display: block;
+  font-weight: bold;
+}
+
+/* Add day numbers to week view headers */
+.rbc-time-view .rbc-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Style the date number that's already in the header */
+.rbc-time-view .rbc-header .rbc-date-cell {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+/* Style for the time gutter header */
+.rbc-time-header-gutter {
+  position: relative;
+}
+
+.rbc-time-header-gutter::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+}
+
+html[lang="en"] .rbc-time-header-gutter::after {
+  content: "Time";
+}
+
+html[lang="fr"] .rbc-time-header-gutter::after {
+  content: "Heure";
+}
+
+/* Style for the time gutter cells */
+.rbc-time-gutter .rbc-timeslot-group {
+  text-align: center;
+  font-weight: 500;
+}

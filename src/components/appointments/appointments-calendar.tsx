@@ -8,8 +8,9 @@ import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
+import fr from "date-fns/locale/fr";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Database } from "@/types/supabase";
 import { Plus, CalendarClock } from "lucide-react";
 import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
@@ -31,18 +32,8 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 // Add custom styles for the calendar
 import "@/styles/calendar.css";
 
-// Create a date localizer for the calendar
-const locales = {
-  "en-US": enUS,
-};
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-});
+// Import our custom overrides for day names
+import "./calendar-overrides.css";
 
 type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
   appointment_type?: {
@@ -84,6 +75,8 @@ interface CalendarEvent {
 
 export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps) {
   const router = useRouter();
+  const currentLocale = useLocale();
+  const t = useTranslations();
   const [view, setView] = useState<string>(Views.MONTH);
   const [date, setDate] = useState(new Date());
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -92,7 +85,29 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
-  const t = useTranslations();
+
+  // Set up locales for the calendar
+  const locales = {
+    "en": enUS,
+    "fr": fr,
+  };
+
+  // Create the localizer with the current locale
+  const currentDateFnsLocale = locales[currentLocale as "en" | "fr"] || enUS;
+
+  // Create a properly configured localizer that respects the current locale
+  const localizer = dateFnsLocalizer({
+    format,
+    parse,
+    startOfWeek: (date: Date) => {
+      return startOfWeek(date, { locale: currentDateFnsLocale });
+    },
+    getDay,
+    locales: {
+      // The key doesn't matter as long as we use the correct locale object
+      "current": currentDateFnsLocale,
+    },
+  });
 
   // Initialize calendar events from appointments
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -150,12 +165,20 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
 
   // Empty state is handled in the parent component
 
+  // We're using CSS to handle day name translations and date-fns for month names
+
   // Custom event component to show status and type
   const EventComponent = ({ event }: { event: CalendarEvent }) => (
     <div className="flex flex-col h-full">
       <div className="text-sm font-semibold text-white">{event.title}</div>
       <div className="text-xs mt-1 flex items-center gap-1 text-white/90">
-        <span className="font-medium">{format(event.start, "h:mm a")}</span>
+        <span className="font-medium">
+          {format(
+            event.start,
+            currentLocale === "fr" ? "HH:mm" : "h:mm a",
+            { locale: currentDateFnsLocale }
+          )}
+        </span>
         {event.typeColor && (
           <div className="flex items-center gap-1 ml-1">
             <div
@@ -180,9 +203,9 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
             event.status === "cancelled" ? "bg-red-500" :
             "bg-white"
           }`}></span>
-          {event.status === "scheduled" ? "Upcoming" :
-           event.status === "completed" ? "Completed" :
-           event.status === "cancelled" ? "Cancelled" :
+          {event.status === "scheduled" ? t('appointments.upcoming') :
+           event.status === "completed" ? t('appointments.completed') :
+           event.status === "cancelled" ? t('appointments.cancelled') :
            event.status}
         </div>
       </div>
@@ -215,6 +238,11 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
             onSelectEvent={handleSelectEvent}
             onSelectSlot={handleSelectSlot}
             selectable={true}
+            formats={{
+              // Custom time format
+              timeGutterFormat: (date: Date) =>
+                format(date, currentLocale === 'fr' ? 'HH:mm' : 'h:mm a', { locale: currentDateFnsLocale }),
+            }}
             components={{
               event: EventComponent,
               toolbar: (toolbarProps) => {
@@ -232,7 +260,16 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
                         {t('appointments.newAppointment.next')} <span className="ml-1">→</span>
                       </button>
                     </span>
-                    <span className="rbc-toolbar-label">{toolbarProps.label}</span>
+                    <span className="rbc-toolbar-label">
+                      {format(
+                        toolbarProps.date,
+                        view === 'month' ? 'MMMM yyyy' :
+                        view === 'week' ?
+                          (currentLocale === 'fr' ? "'Semaine du' d MMMM yyyy" : "'Week of' MMMM d, yyyy") :
+                        currentLocale === 'fr' ? 'EEEE d MMMM yyyy' : 'EEEE, MMMM d, yyyy',
+                        { locale: currentDateFnsLocale }
+                      )}
+                    </span>
                     <span className="rbc-btn-group">
                       {viewNames.map((name) => (
                         <button
@@ -241,7 +278,10 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
                           onClick={() => toolbarProps.onView(name)}
                           className={view === name ? 'rbc-active' : ''}
                         >
-                          {name.charAt(0).toUpperCase() + name.slice(1)}
+                          {name === 'month' ? t('appointments.month') :
+                           name === 'week' ? t('appointments.week') :
+                           name === 'day' ? t('appointments.day') :
+                           String(name).charAt(0).toUpperCase() + String(name).slice(1)}
                         </button>
                       ))}
                     </span>
@@ -304,7 +344,15 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
               {selectedSlot && (
                 <div className="bg-indigo-50 p-3 rounded-md border border-indigo-100 mt-2 text-center">
                   <span className="text-indigo-700 font-medium">
-                    {format(selectedSlot, "EEEE, MMMM d, yyyy")} {t('appointments.newAppointment.at')} {format(selectedSlot, "h:mm a")}
+                    {format(
+                      selectedSlot,
+                      currentLocale === "fr" ? "EEEE d MMMM yyyy" : "EEEE, MMMM d, yyyy",
+                      { locale: currentDateFnsLocale }
+                    )} {t('appointments.newAppointment.at')} {format(
+                      selectedSlot,
+                      currentLocale === "fr" ? "HH:mm" : "h:mm a",
+                      { locale: currentDateFnsLocale }
+                    )}
                   </span>
                 </div>
               )}

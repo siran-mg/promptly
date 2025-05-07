@@ -350,6 +350,32 @@
       "today": "Aujourd'hui",
       "prev": "Précédent",
       "next": "Suivant"
+    },
+    "month": "Mois",
+    "week": "Semaine",
+    "day": "Jour",
+    "dayNames": {
+      "monday": "Lun",
+      "tuesday": "Mar",
+      "wednesday": "Mer",
+      "thursday": "Jeu",
+      "friday": "Ven",
+      "saturday": "Sam",
+      "sunday": "Dim"
+    },
+    "monthNames": {
+      "january": "Janvier",
+      "february": "Février",
+      "march": "Mars",
+      "april": "Avril",
+      "may": "Mai",
+      "june": "Juin",
+      "july": "Juillet",
+      "august": "Août",
+      "september": "Septembre",
+      "october": "Octobre",
+      "november": "Novembre",
+      "december": "Décembre"
     }
   },
   "clients": {
