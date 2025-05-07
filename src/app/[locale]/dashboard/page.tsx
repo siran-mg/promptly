@@ -40,18 +40,18 @@ export default async function DashboardPage({
   return (
     <DashboardShell>
       {/* Hero Section with Quick Actions */}
-      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 -mx-6 px-6 py-8 mb-8 border-b">
-        <h1 className="text-2xl font-bold tracking-tight mb-1">
+      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 -mx-3 md:-mx-6 px-4 md:px-6 py-6 md:py-8 mb-6 md:mb-8 border-b">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight mb-1">
           <span className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-indigo-600" />
+            <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-indigo-600" />
             {t('welcomeBack')}
           </span>
         </h1>
-        <p className="text-muted-foreground mb-6">
+        <p className="text-muted-foreground text-sm md:text-base mb-5 md:mb-6">
           {t('manageAppointments')}
         </p>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
+        <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
           {/* Create Appointment Card */}
           <ActionCard
             iconName="Plus"

@@ -29,7 +29,10 @@ export function AppointmentsByMonthChart({ data }: AppointmentsByMonthChartProps
 
     // Set up dimensions
     const margin = { top: 20, right: 30, bottom: 40, left: 40 };
-    const width = 600 - margin.left - margin.right;
+
+    // Get container width for responsive sizing
+    const containerWidth = svgRef.current.parentElement?.clientWidth || 600;
+    const width = Math.min(600, containerWidth - margin.left - margin.right);
     const height = 300 - margin.top - margin.bottom;
 
     // Create SVG
@@ -123,18 +126,18 @@ export function AppointmentsByMonthChart({ data }: AppointmentsByMonthChartProps
   }, [data]);
 
   return (
-    <Card className="col-span-2">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="w-full">
+      <CardHeader className="pb-2 md:pb-6">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <TrendingUp className="h-5 w-5 text-indigo-600" />
           {t('dashboard.charts.monthlyTrends')}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs md:text-sm">
           {t('dashboard.charts.monthlyDescription')}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="w-full overflow-x-auto">
+      <CardContent className="pt-0 md:pt-2">
+        <div className="w-full overflow-x-auto pb-2">
           <svg ref={svgRef}></svg>
         </div>
       </CardContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+
 import Link from "next/link";
 import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -30,13 +30,13 @@ export function ActionCard({
   const cardContent = (
     <>
       <div className={cn(
-        "flex items-center justify-center mb-3 mt-1",
+        "flex items-center justify-center mb-2 sm:mb-3 mt-1",
         iconColor ? "" : variant === "default" ? "text-white" : "text-indigo-600"
       )}>
-        <IconComponent className={cn("h-7 w-7", iconColor)} />
+        <IconComponent className={cn("h-6 w-6 sm:h-7 sm:w-7", iconColor)} />
       </div>
-      <div className="text-center w-full px-3">
-        <div className="font-medium text-base leading-tight mb-1">{title}</div>
+      <div className="text-center w-full px-2 sm:px-3">
+        <div className="font-medium text-sm sm:text-base leading-tight mb-1">{title}</div>
         <div className={cn(
           "text-xs leading-tight",
           variant === "default" ? "text-white/90" : "text-muted-foreground"
@@ -48,7 +48,7 @@ export function ActionCard({
   );
 
   const cardClasses = cn(
-    "h-full flex flex-col items-center py-4 px-2 rounded-md transition-all duration-200",
+    "h-full flex flex-col items-center py-3 sm:py-4 px-2 rounded-md transition-all duration-200",
     variant === "default"
       ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md"
       : "bg-white hover:bg-gray-50 border shadow-sm"

@@ -16,7 +16,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
         <aside className="fixed top-0 z-30 hidden h-screen w-full shrink-0 overflow-y-auto border-r border-indigo-100 bg-white/80 backdrop-blur-sm md:sticky md:block">
           <DashboardNav />
         </aside>
-        <main className="flex w-full flex-col overflow-hidden p-4 md:py-8">
+        <main className="flex w-full flex-col overflow-hidden px-3 py-3 md:p-4 md:py-8">
           {children}
         </main>
       </div>

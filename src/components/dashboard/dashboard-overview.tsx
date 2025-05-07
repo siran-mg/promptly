@@ -5,7 +5,7 @@ import { AppointmentsByStatusChart } from "@/components/dashboard/appointments-b
 import { AppointmentsByMonthChart } from "@/components/dashboard/appointments-by-month-chart";
 import { RecentAppointments } from "@/components/dashboard/recent-appointments";
 import { Database } from "@/types/supabase";
-import { startOfMonth, parseISO, isFuture, isToday } from "date-fns";
+import { parseISO, isFuture, isToday } from "date-fns";
 import { useDateFormatter } from "@/hooks/use-date-formatter";
 
 type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
@@ -103,11 +103,15 @@ export function DashboardOverview({ appointments }: DashboardOverviewProps) {
         completionRate={completionRate}
       />
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <AppointmentsByMonthChart data={monthlyChartData} />
-        <AppointmentsByStatusChart data={statusData} />
+      <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="col-span-1 md:col-span-2 lg:col-span-2 overflow-x-auto">
+          <AppointmentsByMonthChart data={monthlyChartData} />
+        </div>
+        <div className="col-span-1">
+          <AppointmentsByStatusChart data={statusData} />
+        </div>
       </div>
-      
+
       <RecentAppointments appointments={recentAppointments} />
     </div>
   );

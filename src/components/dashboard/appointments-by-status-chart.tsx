@@ -28,9 +28,11 @@ export function AppointmentsByStatusChart({ data }: AppointmentsByStatusChartPro
     d3.select(svgRef.current).selectAll("*").remove();
 
     // Set up dimensions
-    const width = 300;
-    const height = 300;
-    const margin = 40;
+    // Make chart responsive based on container size
+    const containerWidth = svgRef.current.parentElement?.clientWidth || 300;
+    const width = Math.min(300, containerWidth);
+    const height = width; // Keep it square
+    const margin = width * 0.13; // Scale margin with width
     const radius = Math.min(width, height) / 2 - margin;
 
     // Create SVG
@@ -114,22 +116,28 @@ export function AppointmentsByStatusChart({ data }: AppointmentsByStatusChartPro
       .text(d => d.data.count > 0 ? translateStatus(d.data.status) : "");
 
     // Add legend
+    const legendSpacing = width < 200 ? 16 : 20; // Smaller spacing for small screens
+    const legendX = -width/2 + 20;
+    const legendY = height/2 - (data.length * legendSpacing) - 20;
+
     const legend = svg.selectAll(".legend")
       .data(data)
       .enter()
       .append("g")
       .attr("class", "legend")
-      .attr("transform", (d, i) => `translate(-${width/2 - 20}, ${height/2 - 120 + i * 20})`);
+      .attr("transform", (d, i) => `translate(${legendX}, ${legendY + i * legendSpacing})`);
 
     legend.append("rect")
       .attr("width", 12)
       .attr("height", 12)
       .attr("fill", d => color(d.status));
 
+    const fontSize = width < 200 ? "10px" : "12px";
+
     legend.append("text")
       .attr("x", 20)
       .attr("y", 10)
-      .attr("font-size", "12px")
+      .attr("font-size", fontSize)
       .text(d => `${translateStatus(d.status)} (${d.count})`);
 
     // Clean up tooltip on unmount
@@ -139,17 +147,17 @@ export function AppointmentsByStatusChart({ data }: AppointmentsByStatusChartPro
   }, [data]);
 
   return (
-    <Card className="col-span-1">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="w-full h-full">
+      <CardHeader className="pb-2 md:pb-6">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <PieChart className="h-5 w-5 text-indigo-600" />
           {t('dashboard.charts.appointmentStatus')}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs md:text-sm">
           {t('dashboard.charts.statusDescription')}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex justify-center">
+      <CardContent className="pt-0 md:pt-2 flex justify-center">
         <svg ref={svgRef}></svg>
       </CardContent>
     </Card>
