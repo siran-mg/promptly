@@ -771,7 +771,7 @@ export function ShareDialog({
                                   />
                                   {type.name}
                                   {token.default_type === type.id && (
-                                    <span className="ml-1">({t('settings.appointmentTypes.defaultType')})</span>
+                                    <span className="ml-1">({t('settings.appointmentTypes.defaultType.name')})</span>
                                   )}
                                 </div>
                               ))
