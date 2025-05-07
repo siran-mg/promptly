@@ -204,11 +204,11 @@
       "createAppointment": "Create Appointment",
       "addNewBooking": "Add a new booking to your schedule",
       "viewCalendar": "View Calendar",
-      "manageBookings": "See and manage all your bookings",
+      "manageBookings": "Manage all your bookings",
       "shareBookingForm": "Share Booking Form",
       "shareBookingFormDescription": "Let clients book appointments online",
-      "customizeBookingForm": "Customize Booking Form",
-      "customizeBookingFormDescription": "Customize the form clients see when booking appointments"
+      "customizeBookingForm": "Customize Form",
+      "customizeBookingFormDescription": "Modify how your booking form appears to clients"
     }
   },
   "appointments": {

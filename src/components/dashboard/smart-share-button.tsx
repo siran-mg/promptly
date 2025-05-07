@@ -74,15 +74,9 @@ export function SmartShareButton({
 
   return (
     <>
-      <Button
-        variant={variant}
-        size={size}
-        className={className}
-        onClick={handleClick}
-      >
-        <Share className={`h-5 w-5 ${!iconOnly ? "mr-2" : ""}`} />
-        {!iconOnly && "Share Booking Form"}
-      </Button>
+      <div onClick={handleClick} className={className}>
+        {/* The button is now just a div that triggers the dialog */}
+      </div>
 
       {/* Share dialog for customized forms */}
       <ShareDialog

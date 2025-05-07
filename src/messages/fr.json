@@ -202,13 +202,13 @@
     },
     "quickActions": {
       "createAppointment": "Créer un rendez-vous",
-      "addNewBooking": "Ajouter une nouvelle réservation à votre agenda",
+      "addNewBooking": "Ajouter une réservation à votre agenda",
       "viewCalendar": "Voir le calendrier",
-      "manageBookings": "Gérer toutes vos réservations",
-      "shareBookingForm": "Partager le formulaire de réservation",
-      "shareBookingFormDescription": "Permettre aux clients de réserver des rendez-vous en ligne",
-      "customizeBookingForm": "Personnaliser le formulaire de réservation",
-      "customizeBookingFormDescription": "Personnaliser le formulaire que les clients voient lors de la réservation d'un rendez-vous"
+      "manageBookings": "Gérer vos réservations",
+      "shareBookingForm": "Partager le formulaire",
+      "shareBookingFormDescription": "Permettre aux clients de réserver en ligne",
+      "customizeBookingForm": "Personnaliser le formulaire",
+      "customizeBookingFormDescription": "Modifier l'apparence du formulaire de réservation"
     }
   },
   "appointments": {
