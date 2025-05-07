@@ -7,8 +7,14 @@ import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { ClientsTable } from "@/components/clients/clients-table";
 import { AddClientButton } from "@/components/clients/add-client-button";
 import { Users, UserPlus } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export default async function ClientsPage() {
+export default async function ClientsPage({
+  params: { locale }
+}: {
+  params: { locale: string }
+}) {
+  const t = await getTranslations({ locale, namespace: "clients" });
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
@@ -66,10 +72,10 @@ export default async function ClientsPage() {
         heading={
           <span className="flex items-center gap-2">
             <Users className="h-6 w-6 text-indigo-600" />
-            Your Client Directory
+            {t("title")}
           </span>
         }
-        text="View, manage, and track all your client relationships in one place"
+        text={t("description")}
       >
         <AddClientButton />
       </DashboardHeader>

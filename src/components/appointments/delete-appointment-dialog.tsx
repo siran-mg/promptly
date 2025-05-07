@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { Database } from "@/types/supabase";
+import { useTranslations } from "next-intl";
 
 import {
   AlertDialog,
@@ -35,6 +36,7 @@ export function DeleteAppointmentDialog({
   const { toast } = useToast();
   const supabase = createClient();
   const [isDeleting, setIsDeleting] = useState(false);
+  const t = useTranslations();
 
   const handleDelete = async () => {
     if (!appointment) return;
@@ -63,8 +65,8 @@ export function DeleteAppointmentDialog({
       }
 
       toast({
-        title: "Appointment deleted",
-        description: "The appointment has been successfully deleted.",
+        title: t('appointments.deleteSuccess'),
+        description: t('appointments.deleteSuccessDescription'),
       });
 
       // Call the success callback to update the UI
@@ -72,8 +74,8 @@ export function DeleteAppointmentDialog({
     } catch (err: any) {
       console.error("Error deleting appointment:", err);
       toast({
-        title: "Error",
-        description: err?.message || "Could not delete appointment. Please try again.",
+        title: t('common.errorLabel'),
+        description: err?.message || t('appointments.deleteError'),
         variant: "destructive",
       });
     } finally {
@@ -86,9 +88,9 @@ export function DeleteAppointmentDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Appointment</AlertDialogTitle>
+          <AlertDialogTitle>{t('appointments.delete')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this appointment? This action cannot be undone.
+            {t('appointments.deleteConfirm')} {t('common.cannotBeUndone')}
             {appointment && (
               <div className="mt-2 p-3 bg-muted rounded-md">
                 <p className="font-medium">{appointment.client_name}</p>
@@ -112,10 +114,10 @@ export function DeleteAppointmentDialog({
             {isDeleting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Deleting...
+                {t('common.deleting')}
               </>
             ) : (
-              "Delete"
+              t('common.delete')
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -1,13 +1,19 @@
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { DynamicAppointmentForm } from "@/components/appointments/dynamic-appointment-form";
 
-export default async function NewAppointmentPage() {
+export default async function NewAppointmentPage({
+  params: { locale }
+}: {
+  params: { locale: string }
+}) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
+  const t = await getTranslations({ locale, namespace: "appointments" });
 
   const { data: { session } } = await supabase.auth.getSession();
 
@@ -37,8 +43,8 @@ export default async function NewAppointmentPage() {
   return (
     <DashboardShell>
       <DashboardHeader
-        heading="New Appointment"
-        text="Create a new appointment in your schedule."
+        heading={t("new")}
+        text={t("newDescription")}
       />
       <div className="mt-6">
         <DynamicAppointmentForm

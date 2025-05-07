@@ -162,6 +162,8 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome, {name}",
+    "welcomeBack": "Welcome back, 👋 Ready to streamline your schedule?",
+    "manageAppointments": "Everything you need to manage your appointments in one place",
     "overview": "Overview",
     "appointments": "Appointments",
     "clients": "Clients",
@@ -174,6 +176,7 @@
     "upcomingBookings": "Upcoming Bookings",
     "upcomingDescription": "Your next scheduled appointments",
     "viewCalendar": "View calendar",
+    "trackPerformance": "Track performance metrics and upcoming appointments",
     "noUpcomingAppointments": "No upcoming appointments.",
     "stats": {
       "totalAppointments": "Total Appointments",
@@ -196,6 +199,16 @@
       "monthlyTrends": "Monthly Booking Trends",
       "monthlyDescription": "See how your appointment volume changes over time",
       "appointments": "appointments"
+    },
+    "quickActions": {
+      "createAppointment": "Create Appointment",
+      "addNewBooking": "Add a new booking to your schedule",
+      "viewCalendar": "View Calendar",
+      "manageBookings": "See and manage all your bookings",
+      "shareBookingForm": "Share Booking Form",
+      "shareBookingFormDescription": "Let clients book appointments online",
+      "customizeBookingForm": "Customize Booking Form",
+      "customizeBookingFormDescription": "Customize the form clients see when booking appointments"
     }
   },
   "appointments": {
@@ -204,6 +217,8 @@
     "calendar": "Calendar",
     "list": "List",
     "new": "New Appointment",
+    "newDescription": "Create a new appointment in your schedule.",
+    "description": "View, manage, and track all your bookings in one place",
     "editAppointment": "Edit Appointment",
     "details": "Appointment Details",
     "date": "Date",
@@ -249,6 +264,8 @@
     "createSuccess": "Appointment created successfully",
     "updateSuccess": "Appointment updated successfully",
     "deleteSuccess": "Appointment deleted successfully",
+    "deleteSuccessDescription": "The appointment has been successfully deleted.",
+    "deleteError": "Could not delete appointment. Please try again.",
     "cancelSuccess": "Appointment cancelled successfully",
     "confirmSuccess": "Appointment confirmed successfully",
     "completeSuccess": "Appointment marked as completed",
@@ -322,10 +339,21 @@
       "unexpectedError": "An unexpected error occurred. Please try again.",
       "success": "Success",
       "successMessage": "Your appointment has been scheduled."
+    },
+    "newAppointment": {
+      "click": "Click any date to create a new appointment",
+      "title": "Schedule New Appointment",
+      "at": "at",
+      "description": "You'll be able to select the appointment type and enter client details on the next screen.",
+      "continue": "Continue to Details",
+      "today": "Today",
+      "prev": "Prev",
+      "next": "Next"
     }
   },
   "clients": {
     "title": "Clients",
+    "description": "View, manage, and track all your client relationships in one place",
     "new": "New Client",
     "editClient": "Edit Client",
     "details": "Client Details",
@@ -907,6 +935,7 @@
   },
   "notifications": {
     "title": "Notifications",
+    "description": "View and manage your notifications",
     "markAllAsRead": "Mark All as Read",
     "noNotifications": "No notifications",
     "newAppointment": "New Appointment",

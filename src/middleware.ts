@@ -6,6 +6,8 @@ import { locales, defaultLocale } from './config/locales';
 // Function to detect the preferred locale from the Accept-Language header
 function detectLocale(req: NextRequest): string {
   const acceptLanguage = req.headers.get('accept-language');
+  console.log('Accept-Language header:', acceptLanguage);
+
   if (!acceptLanguage) return defaultLocale;
 
   // Parse the Accept-Language header
@@ -17,13 +19,17 @@ function detectLocale(req: NextRequest): string {
     })
     .sort((a, b) => b.priority - a.priority);
 
+  console.log('Parsed preferred locales:', preferredLocales);
+
   // Find the first supported locale
   for (const { locale } of preferredLocales) {
     if (locales.includes(locale)) {
+      console.log('Found supported locale:', locale);
       return locale;
     }
   }
 
+  console.log('No supported locale found, using default:', defaultLocale);
   return defaultLocale;
 }
 
@@ -41,6 +47,10 @@ export async function middleware(req: NextRequest) {
   const hasLocalePrefix = segments.length > 1 && locales.includes(segments[1]);
   // Use the detected locale if no locale is specified in the URL
   const currentLocale = hasLocalePrefix ? segments[1] : detectLocale(req);
+
+  console.log('URL path:', req.nextUrl.pathname);
+  console.log('Has locale prefix:', hasLocalePrefix);
+  console.log('Current locale:', currentLocale);
 
   // If the pathname doesn't have a locale prefix, redirect to add it
   // Skip redirects for static files, API routes, and Next.js internal routes

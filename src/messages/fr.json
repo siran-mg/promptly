@@ -162,6 +162,8 @@
   "dashboard": {
     "title": "Tableau de bord",
     "welcome": "Bienvenue, {name}",
+    "welcomeBack": "Bienvenue, 👋 Prêt à simplifier votre agenda ?",
+    "manageAppointments": "Tout ce dont vous avez besoin pour gérer vos rendez-vous en un seul endroit",
     "overview": "Aperçu",
     "appointments": "Rendez-vous",
     "clients": "Clients",
@@ -174,6 +176,7 @@
     "upcomingBookings": "Rendez-vous à venir",
     "upcomingDescription": "Vos prochains rendez-vous programmés",
     "viewCalendar": "Voir le calendrier",
+    "trackPerformance": "Suivre les métriques de performance et les rendez-vous à venir",
     "noUpcomingAppointments": "Aucun rendez-vous à venir.",
     "stats": {
       "totalAppointments": "Total des rendez-vous",
@@ -196,6 +199,16 @@
       "monthlyTrends": "Tendances mensuelles des réservations",
       "monthlyDescription": "Voir comment le volume de vos rendez-vous évolue au fil du temps",
       "appointments": "rendez-vous"
+    },
+    "quickActions": {
+      "createAppointment": "Créer un rendez-vous",
+      "addNewBooking": "Ajouter une nouvelle réservation à votre agenda",
+      "viewCalendar": "Voir le calendrier",
+      "manageBookings": "Gérer toutes vos réservations",
+      "shareBookingForm": "Partager le formulaire de réservation",
+      "shareBookingFormDescription": "Permettre aux clients de réserver des rendez-vous en ligne",
+      "customizeBookingForm": "Personnaliser le formulaire de réservation",
+      "customizeBookingFormDescription": "Personnaliser le formulaire que les clients voient lors de la réservation d'un rendez-vous"
     }
   },
   "appointments": {
@@ -204,6 +217,8 @@
     "calendar": "Calendrier",
     "list": "Liste",
     "new": "Nouveau rendez-vous",
+    "newDescription": "Créer un nouveau rendez-vous dans votre agenda.",
+    "description": "Visualisez, gérez et suivez toutes vos réservations en un seul endroit",
     "editAppointment": "Modifier le rendez-vous",
     "details": "Détails du rendez-vous",
     "date": "Date",
@@ -249,6 +264,8 @@
     "createSuccess": "Rendez-vous créé avec succès",
     "updateSuccess": "Rendez-vous mis à jour avec succès",
     "deleteSuccess": "Rendez-vous supprimé avec succès",
+    "deleteSuccessDescription": "Le rendez-vous a été supprimé avec succès.",
+    "deleteError": "Impossible de supprimer le rendez-vous. Veuillez réessayer.",
     "cancelSuccess": "Rendez-vous annulé avec succès",
     "confirmSuccess": "Rendez-vous confirmé avec succès",
     "completeSuccess": "Rendez-vous marqué comme terminé",
@@ -322,10 +339,21 @@
       "unexpectedError": "Une erreur inattendue s'est produite. Veuillez réessayer.",
       "success": "Succès",
       "successMessage": "Votre rendez-vous a été planifié."
+    },
+    "newAppointment": {
+      "click": "Cliquez sur n'importe quelle date pour créer un nouveau rendez-vous",
+      "title": "Planifier un nouveau rendez-vous",
+      "at": "à",
+      "description": "Vous pourrez sélectionner le type de rendez-vous et entrer les détails du client à l'étape suivante.",
+      "continue": "Continuer vers les détails",
+      "today": "Aujourd'hui",
+      "prev": "Précédent",
+      "next": "Suivant"
     }
   },
   "clients": {
     "title": "Clients",
+    "description": "Visualisez, gérez et suivez toutes vos relations clients en un seul endroit",
     "new": "Nouveau client",
     "editClient": "Modifier le client",
     "details": "Détails du client",
@@ -411,6 +439,7 @@
   },
   "settings": {
     "title": "Paramètres",
+    "description": "Personnalisez votre profil et vos préférences de réservation",
     "profile": "Profil",
     "account": "Compte",
     "notifications": "Notifications",
@@ -906,6 +935,7 @@
   },
   "notifications": {
     "title": "Notifications",
+    "description": "Voir et gérer vos notifications",
     "markAllAsRead": "Marquer tout comme lu",
     "noNotifications": "Aucune notification",
     "newAppointment": "Nouveau rendez-vous",

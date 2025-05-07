@@ -9,12 +9,12 @@ import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Database } from "@/types/supabase";
 import { Plus, CalendarClock } from "lucide-react";
 import { DeleteAppointmentDialog } from "./delete-appointment-dialog";
 import { AppointmentDetailsDialog } from "./appointment-details-dialog";
 import { Button } from "@/components/ui/button";
-import { EmptyAppointmentsState } from "./empty-appointments-state";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { EmptyAppointmentsState } from "./empty-appointments-state";
 
 // Import the CSS for react-big-calendar
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -91,6 +92,7 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const t = useTranslations();
 
   // Initialize calendar events from appointments
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -195,7 +197,7 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
             <div className="w-4 h-4 rounded-full bg-indigo-600 flex items-center justify-center">
               <Plus className="h-3 w-3 text-white" />
             </div>
-            <span className="text-indigo-700 font-medium">Click any date to create a new appointment</span>
+            <span className="text-indigo-700 font-medium">{t('appointments.newAppointment.click')}</span>
           </div>
         </div>
         <div className="h-[700px] bg-white rounded-md overflow-hidden">
@@ -221,13 +223,13 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
                   <div className="rbc-toolbar">
                     <span className="rbc-btn-group">
                       <button type="button" onClick={() => toolbarProps.onNavigate('TODAY')}>
-                        Today
+                        {t('appointments.newAppointment.today')}
                       </button>
                       <button type="button" onClick={() => toolbarProps.onNavigate('PREV')}>
-                        <span className="mr-1">←</span> Prev
+                        <span className="mr-1">←</span> {t('appointments.newAppointment.prev')}
                       </button>
                       <button type="button" onClick={() => toolbarProps.onNavigate('NEXT')}>
-                        Next <span className="ml-1">→</span>
+                        {t('appointments.newAppointment.next')} <span className="ml-1">→</span>
                       </button>
                     </span>
                     <span className="rbc-toolbar-label">{toolbarProps.label}</span>
@@ -296,13 +298,13 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
               <div className="bg-indigo-100 p-2 rounded-full">
                 <CalendarClock className="h-5 w-5 text-indigo-600" />
               </div>
-              Schedule New Appointment
+              {t('appointments.newAppointment.title')}
             </DialogTitle>
             <DialogDescription className="pt-2">
               {selectedSlot && (
                 <div className="bg-indigo-50 p-3 rounded-md border border-indigo-100 mt-2 text-center">
                   <span className="text-indigo-700 font-medium">
-                    {format(selectedSlot, "EEEE, MMMM d, yyyy")} at {format(selectedSlot, "h:mm a")}
+                    {format(selectedSlot, "EEEE, MMMM d, yyyy")} {t('appointments.newAppointment.at')} {format(selectedSlot, "h:mm a")}
                   </span>
                 </div>
               )}
@@ -310,7 +312,7 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
           </DialogHeader>
           <div className="py-4">
             <p className="text-sm text-muted-foreground">
-              You'll be able to select the appointment type and enter client details on the next screen.
+              {t('appointments.newAppointment.description')}
             </p>
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
@@ -319,14 +321,14 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
               onClick={() => setIsCreateDialogOpen(false)}
               className="border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={handleCreateAppointment}
               className="gap-2 bg-indigo-600 hover:bg-indigo-700 transition-colors"
             >
               <Plus className="h-4 w-4" />
-              Continue to Details
+              {t('appointments.newAppointment.continue')}
             </Button>
           </DialogFooter>
         </DialogContent>

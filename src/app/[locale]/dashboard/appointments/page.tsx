@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/app/i18n";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
@@ -13,16 +15,18 @@ import {
   Calendar,
   CalendarClock
 } from "lucide-react";
-import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default async function AppointmentsPage({
+  params: { locale },
   searchParams
 }: {
+  params: { locale: string },
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
+  const t = await getTranslations({ locale, namespace: "appointments" });
 
   const { data: { session } } = await supabase.auth.getSession();
 
@@ -81,15 +85,15 @@ export default async function AppointmentsPage({
         heading={
           <span className="flex items-center gap-2">
             <CalendarClock className="h-6 w-6 text-indigo-600" />
-            Your Appointment Schedule
+            {t("title")}
           </span>
         }
-        text="View, manage, and track all your bookings in one place"
+        text={t("description")}
       >
         <Link href="/dashboard/appointments/new">
           <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 transition-colors">
             <Plus className="mr-2 h-4 w-4" />
-            Create New Booking
+            {t("new")}
           </Button>
         </Link>
       </DashboardHeader>
@@ -98,11 +102,11 @@ export default async function AppointmentsPage({
           <TabsList className="grid w-full grid-cols-2 mb-4 p-1">
             <TabsTrigger value="calendar" className="flex items-center gap-2 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">
               <Calendar className="h-4 w-4" />
-              Calendar View
+              {t("calendar")}
             </TabsTrigger>
             <TabsTrigger value="list" className="flex items-center gap-2 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">
               <List className="h-4 w-4" />
-              List View
+              {t("list")}
             </TabsTrigger>
           </TabsList>
           <TabsContent value="calendar" className="space-y-4">
