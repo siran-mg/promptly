@@ -374,35 +374,35 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
       <TabsList className="grid w-full grid-cols-2 p-1 bg-indigo-50/50 border-indigo-100">
         <TabsTrigger
           value="customize"
-          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-1.5 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
-          <Palette className="h-4 w-4" />
-          {t('settings.appointmentTypes.customizeForm')}
+          <Palette className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="truncate">{t('settings.appointmentTypes.customizeForm')}</span>
         </TabsTrigger>
         <TabsTrigger
           value="preview"
-          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-1.5 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
-          <Eye className="h-4 w-4" />
-          {t('settings.appointmentTypes.previewTab')}
+          <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="truncate">{t('settings.appointmentTypes.previewTab')}</span>
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="customize" className="mt-6">
         <Card className="border-indigo-100 overflow-hidden">
           <div className="h-1 bg-indigo-600"></div>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl flex items-center gap-2">
+          <CardHeader className="pb-4 px-4 sm:px-6">
+            <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
               <Palette className="h-5 w-5 text-indigo-600" />
               {t('settings.appointmentTypes.customizeForm')}
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription className="text-sm sm:text-base">
               {t('settings.appointmentTypes.formCustomizationDescription')}
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-8">
-              <div className="flex items-center p-4 bg-indigo-50/50 rounded-lg border border-indigo-100 gap-3">
+            <CardContent className="space-y-6 sm:space-y-8 px-4 sm:px-6">
+              <div className="flex items-center p-3 sm:p-4 bg-indigo-50/50 rounded-lg border border-indigo-100 gap-3">
                 <Switch
                   id="use-global-settings"
                   checked={useGlobalSettings}
@@ -437,11 +437,11 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                           value={formData.form_title}
                           onChange={handleChange}
                           placeholder={t('settings.appointmentTypes.defaultTitle')}
-                          className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
+                          className="pl-10 border-indigo-200 focus-visible:ring-indigo-500 text-sm h-9 sm:h-10"
                           required
                         />
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {t('settings.appointmentTypes.formTitleHelp')}
                       </p>
                     </div>
@@ -456,11 +456,11 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                           value={formData.form_description}
                           onChange={handleChange}
                           placeholder={t('settings.appointmentTypes.defaultDescription')}
-                          className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
+                          className="pl-10 border-indigo-200 focus-visible:ring-indigo-500 text-sm"
                           rows={3}
                         />
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {t('settings.appointmentTypes.formDescriptionHelp')}
                       </p>
                     </div>
@@ -474,8 +474,8 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
 
                     <div className="space-y-2">
                       <Label htmlFor="logo" className="text-sm font-medium">{t('settings.appointmentTypes.companyLogo')}</Label>
-                      <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
-                        <div className="flex items-center justify-center w-32 h-32 bg-white rounded-lg border-2 border-dashed border-indigo-200 overflow-hidden">
+                      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-3 sm:p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                        <div className="flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-lg border-2 border-dashed border-indigo-200 overflow-hidden">
                           {formData.logo_url ? (
                             <img
                               src={formData.logo_url}
@@ -484,26 +484,26 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                             />
                           ) : (
                             <div className="flex flex-col items-center justify-center text-center p-4">
-                              <Image className="w-8 h-8 text-indigo-300 mb-2" />
+                              <Image className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-300 mb-2" />
                               <p className="text-xs text-muted-foreground">{t('settings.appointmentTypes.noLogo')}</p>
                             </div>
                           )}
                         </div>
 
-                        <div className="flex-1 space-y-4">
-                          <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="flex-1 space-y-3 sm:space-y-4 w-full">
+                          <div className="flex flex-col gap-2 w-full">
                             <Label
                               htmlFor="logo_upload"
-                              className="flex items-center justify-center flex-1 h-10 px-4 py-2 text-sm font-medium text-indigo-700 bg-white border border-indigo-300 rounded-md shadow-sm hover:bg-indigo-50 cursor-pointer transition-colors"
+                              className="flex items-center justify-center w-full h-9 sm:h-10 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-indigo-700 bg-white border border-indigo-300 rounded-md shadow-sm hover:bg-indigo-50 cursor-pointer transition-colors"
                             >
-                              <Upload className="w-4 h-4 mr-2" />
+                              <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                               {isUploading ? t('settings.appointmentTypes.uploading') : t('settings.appointmentTypes.uploadLogo')}
                             </Label>
                             {formData.logo_url && (
                               <Button
                                 type="button"
                                 variant="outline"
-                                className="h-10 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                className="h-9 sm:h-10 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 text-xs sm:text-sm w-full"
                                 onClick={async () => {
                                   try {
                                     if (formData.logo_url) {
@@ -542,7 +542,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                                   }
                                 }}
                               >
-                                <Trash2 className="w-4 h-4 mr-2" />
+                                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                                 {t('settings.appointmentTypes.removeLogo')}
                               </Button>
                             )}
@@ -555,7 +555,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                             className="sr-only"
                             disabled={isUploading}
                           />
-                          <div className="text-sm space-y-1">
+                          <div className="text-xs sm:text-sm space-y-1">
                             <p className="font-medium">{t('settings.appointmentTypes.logoRequirements')}</p>
                             <ul className="text-xs text-muted-foreground space-y-1">
                               <li>• {t('settings.appointmentTypes.logoSize')}</li>
@@ -576,20 +576,20 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
 
                     <div className="space-y-2">
                       <Label htmlFor="accent_color" className="text-sm font-medium">{t('settings.appointmentTypes.accentColor')}</Label>
-                      <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                      <div className="flex flex-col sm:flex-row items-center gap-4 p-3 sm:p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
                         <div
-                          className="w-16 h-16 rounded-full border-4 border-white shadow-sm flex-shrink-0"
+                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 border-white shadow-sm flex-shrink-0"
                           style={{ backgroundColor: formData.accent_color }}
                         ></div>
-                        <div className="flex-1 space-y-4">
-                          <div className="flex items-center gap-4 w-full">
+                        <div className="flex-1 space-y-3 sm:space-y-4 w-full">
+                          <div className="flex items-center gap-2 sm:gap-4 w-full">
                             <Input
                               id="accent_color"
                               name="accent_color"
                               type="color"
                               value={formData.accent_color}
                               onChange={handleChange}
-                              className="w-16 h-10 p-1 cursor-pointer"
+                              className="w-12 sm:w-16 h-8 sm:h-10 p-1 cursor-pointer"
                             />
                             <div className="relative flex-1">
                               <Palette className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
@@ -600,11 +600,11 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                                 value={formData.accent_color}
                                 onChange={handleChange}
                                 placeholder="#6366f1"
-                                className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
+                                className="pl-10 border-indigo-200 focus-visible:ring-indigo-500 text-xs sm:text-sm h-8 sm:h-10"
                               />
                             </div>
                           </div>
-                          <div className="text-sm space-y-1">
+                          <div className="text-xs sm:text-sm space-y-1">
                             <p className="font-medium">{t('settings.appointmentTypes.colorUsage')}</p>
                             <ul className="text-xs text-muted-foreground space-y-1">
                               <li>• {t('settings.appointmentTypes.colorButtons')}</li>
@@ -620,19 +620,19 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
               )}
 
               {useGlobalSettings && globalSettings && (
-                <div className="bg-indigo-50/50 p-6 rounded-lg border border-indigo-100">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Check className="h-5 w-5 text-indigo-600" />
-                    <h4 className="font-medium text-indigo-700">{t('settings.appointmentTypes.usingGlobalSettings')}</h4>
+                <div className="bg-indigo-50/50 p-4 sm:p-6 rounded-lg border border-indigo-100">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
+                    <h4 className="font-medium text-sm sm:text-base text-indigo-700">{t('settings.appointmentTypes.usingGlobalSettings')}</h4>
                   </div>
 
-                  <div className="bg-white p-4 rounded-lg border border-indigo-100 mb-4">
+                  <div className="bg-white p-3 sm:p-4 rounded-lg border border-indigo-100 mb-3 sm:mb-4">
                     <div className="space-y-3">
                       <div className="flex items-start gap-2">
                         <Type className="h-4 w-4 text-indigo-600 mt-0.5" />
                         <div>
                           <p className="text-xs font-medium text-muted-foreground">Form Title</p>
-                          <p className="text-sm">{globalSettings.form_title || "Book an Appointment"}</p>
+                          <p className="text-xs sm:text-sm">{globalSettings.form_title || "Book an Appointment"}</p>
                         </div>
                       </div>
 
@@ -641,7 +641,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                           <FileText className="h-4 w-4 text-indigo-600 mt-0.5" />
                           <div>
                             <p className="text-xs font-medium text-muted-foreground">Form Description</p>
-                            <p className="text-sm">{globalSettings.form_description}</p>
+                            <p className="text-xs sm:text-sm">{globalSettings.form_description}</p>
                           </div>
                         </div>
                       )}
@@ -652,10 +652,10 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                           <p className="text-xs font-medium text-muted-foreground">Accent Color</p>
                           <div className="flex items-center gap-2">
                             <div
-                              className="w-4 h-4 rounded-full border border-gray-200"
+                              className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-gray-200"
                               style={{ backgroundColor: globalSettings.accent_color || "#6366f1" }}
                             ></div>
-                            <p className="text-sm">{globalSettings.accent_color || "#6366f1"}</p>
+                            <p className="text-xs sm:text-sm">{globalSettings.accent_color || "#6366f1"}</p>
                           </div>
                         </div>
                       </div>
@@ -666,7 +666,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                           <div>
                             <p className="text-xs font-medium text-muted-foreground">Logo</p>
                             <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 border rounded-md overflow-hidden bg-white">
+                              <div className="w-6 h-6 sm:w-8 sm:h-8 border rounded-md overflow-hidden bg-white">
                                 <img
                                   src={globalSettings.logo_url}
                                   alt="Global logo"
@@ -680,13 +680,13 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                     </div>
                   </div>
 
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {t('settings.appointmentTypes.customizeGlobalToggle')}
                   </p>
                 </div>
               )}
             </CardContent>
-            <CardFooter className="border-t bg-gray-50/50 py-4 flex justify-between">
+            <CardFooter className="border-t bg-gray-50/50 py-4 px-4 sm:px-6 flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
@@ -700,9 +700,9 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                     description: t('settings.appointmentTypes.colorsResetDescription'),
                   });
                 }}
-                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 w-full sm:w-auto text-xs sm:text-sm"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 {t('settings.appointmentTypes.resetToDefault')}
               </Button>
               <PrimaryActionButton
@@ -712,6 +712,7 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
                 loadingText={t('common.savingChanges')}
                 icon={Save}
                 variant="indigo"
+                className="w-full sm:w-auto"
               >
                 {t('settings.appointmentTypes.saveFormSettings')}
               </PrimaryActionButton>
@@ -723,17 +724,17 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
       <TabsContent value="preview" className="mt-6 space-y-6">
         <Card className="border-indigo-100 overflow-hidden">
           <div className="h-1 bg-indigo-600"></div>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl flex items-center gap-2">
+          <CardHeader className="pb-4 px-4 sm:px-6">
+            <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
               <Eye className="h-5 w-5 text-indigo-600" />
               {t('settings.appointmentTypes.formPreview')}
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription className="text-sm sm:text-base">
               {t('settings.appointmentTypes.previewDescription')}
             </CardDescription>
           </CardHeader>
-          <CardContent className="pb-8">
-            <div className="bg-indigo-50/30 p-6 rounded-lg border border-indigo-100">
+          <CardContent className="pb-6 sm:pb-8 px-4 sm:px-6">
+            <div className="bg-indigo-50/30 p-3 sm:p-6 rounded-lg border border-indigo-100">
               <FormPreview
                 formTitle={useGlobalSettings && globalSettings ? (globalSettings.form_title || "Book an Appointment") : formData.form_title}
                 formDescription={useGlobalSettings && globalSettings ? (globalSettings.form_description || "Fill out the form below to schedule your appointment.") : formData.form_description}
@@ -742,14 +743,14 @@ export function FormSettingsPerType({ appointmentTypeId, appointmentType }: Form
               />
             </div>
           </CardContent>
-          <CardFooter className="border-t bg-gray-50/50 py-4">
+          <CardFooter className="border-t bg-gray-50/50 py-4 px-4 sm:px-6">
             <div className="w-full flex flex-col gap-2">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 {t('settings.appointmentTypes.previewClientView')}
               </p>
-              <div className="flex items-center gap-2 text-sm">
+              <div className="flex items-center gap-2 text-xs sm:text-sm">
                 <div
-                  className="w-3 h-3 rounded-full"
+                  className="w-2 h-2 sm:w-3 sm:h-3 rounded-full"
                   style={{ backgroundColor: appointmentType?.color || '#6366f1' }}
                 ></div>
                 <span className="font-medium">{appointmentType?.name}</span>

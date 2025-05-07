@@ -104,20 +104,20 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <Button
           variant="outline"
           onClick={() => router.push("/dashboard/appointment-types")}
-          className="gap-2"
+          className="gap-2 w-full sm:w-auto"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Appointment Types
         </Button>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/appointment-types/${typeId}/edit`)}
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto"
           >
             <Edit className="h-4 w-4" />
             Edit
@@ -125,7 +125,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
           <Button
             variant="destructive"
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto"
           >
             <Trash2 className="h-4 w-4" />
             Delete
@@ -134,19 +134,19 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <div
-              className="w-6 h-6 rounded-full"
+              className="w-6 h-6 rounded-full flex-shrink-0"
               style={{ backgroundColor: appointmentType.color || '#6366f1' }}
             />
             <div>
-              <CardTitle>{appointmentType.name}</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">{appointmentType.name}</CardTitle>
               <CardDescription>{appointmentType.duration} minutes</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           <div className="space-y-4">
             <div>
               <h3 className="text-sm font-medium">Description</h3>
@@ -163,14 +163,18 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex flex-col sm:flex-row sm:justify-between gap-3 px-4 sm:px-6">
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/appointment-types/${typeId}/form`)}
+            className="w-full sm:w-auto"
           >
             {t('settings.appointmentTypes.customizeForm')}
           </Button>
-          <Button onClick={handleOpenShareDialog} className="gap-2">
+          <Button
+            onClick={handleOpenShareDialog}
+            className="gap-2 w-full sm:w-auto"
+          >
             <Share className="h-4 w-4" />
             {t('settings.formSettingsSection.shareBookingLink')}
           </Button>
