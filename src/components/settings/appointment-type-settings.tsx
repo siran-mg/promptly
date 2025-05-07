@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { Loader2, Share, ArrowLeft, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
+  const t = useTranslations();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -111,7 +113,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
           className="gap-2 w-full sm:w-auto"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Appointment Types
+          {t('settings.appointmentTypes.backToAppointmentTypes')}
         </Button>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button
@@ -120,7 +122,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
             className="gap-2 w-full sm:w-auto"
           >
             <Edit className="h-4 w-4" />
-            Edit
+            {t('common.edit')}
           </Button>
           <Button
             variant="destructive"
@@ -128,7 +130,7 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
             className="gap-2 w-full sm:w-auto"
           >
             <Trash2 className="h-4 w-4" />
-            Delete
+            {t('common.delete')}
           </Button>
         </div>
       </div>
@@ -142,23 +144,23 @@ export function AppointmentTypeSettings({ typeId }: { typeId: string }) {
             />
             <div>
               <CardTitle className="text-lg sm:text-xl">{appointmentType.name}</CardTitle>
-              <CardDescription>{appointmentType.duration} minutes</CardDescription>
+              <CardDescription>{appointmentType.duration} {t('common.minutes')}</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="px-4 sm:px-6">
           <div className="space-y-4">
             <div>
-              <h3 className="text-sm font-medium">Description</h3>
+              <h3 className="text-sm font-medium">{t('common.description')}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                {appointmentType.description ? appointmentType.description : "No description provided."}
+                {appointmentType.description ? appointmentType.description : t('settings.appointmentTypes.noDescription')}
               </p>
             </div>
 
             <div>
-              <h3 className="text-sm font-medium">Status</h3>
+              <h3 className="text-sm font-medium">{t('common.status')}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                {appointmentType.is_default ? "Default appointment type" : "Regular appointment type"}
+                {appointmentType.is_default ? t('settings.appointmentTypes.defaultType') : t('settings.appointmentTypes.regularType')}
               </p>
             </div>
           </div>
