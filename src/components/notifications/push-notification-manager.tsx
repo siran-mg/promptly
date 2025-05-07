@@ -260,8 +260,8 @@ export function PushNotificationManager() {
     return (
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></div>
-          <div className="text-sm text-muted-foreground">
+          <div className="h-4 w-4 sm:h-5 sm:w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></div>
+          <div className="text-xs sm:text-sm text-muted-foreground">
             {t('notifications.push.checking')}
           </div>
         </div>
@@ -271,10 +271,10 @@ export function PushNotificationManager() {
 
   if (!supported) {
     return (
-      <div className="rounded-lg border p-4 bg-amber-50 border-amber-200">
+      <div className="rounded-lg border p-3 sm:p-4 bg-amber-50 border-amber-200">
         <div className="flex items-center space-x-2">
-          <BellOff className="h-5 w-5 text-amber-500" />
-          <p className="text-sm text-amber-700">
+          <BellOff className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 flex-shrink-0" />
+          <p className="text-xs sm:text-sm text-amber-700">
             {t('notifications.push.notSupported')}
           </p>
         </div>
@@ -291,25 +291,25 @@ export function PushNotificationManager() {
           onCheckedChange={handleToggle}
           disabled={loading || permission === "denied"}
         />
-        <Label htmlFor="push-notifications" className="flex items-center gap-2">
+        <Label htmlFor="push-notifications" className="flex items-center gap-2 cursor-pointer">
           {enabled ? (
-            <Bell className="h-4 w-4 text-indigo-600" />
+            <Bell className="h-4 w-4 text-indigo-600 flex-shrink-0" />
           ) : (
-            <BellOff className="h-4 w-4 text-gray-500" />
+            <BellOff className="h-4 w-4 text-gray-500 flex-shrink-0" />
           )}
-          {t('notifications.push.title')}
+          <span className="text-sm">{t('notifications.push.title')}</span>
         </Label>
       </div>
 
       {permission === "denied" && (
-        <div className="rounded-lg border p-4 bg-amber-50 border-amber-200">
-          <p className="text-sm text-amber-700">
+        <div className="rounded-lg border p-3 sm:p-4 bg-amber-50 border-amber-200">
+          <p className="text-xs sm:text-sm text-amber-700">
             {t('notifications.push.permissionDenied')}
           </p>
         </div>
       )}
 
-      <p className="text-sm text-muted-foreground">
+      <p className="text-xs sm:text-sm text-muted-foreground">
         {enabled
           ? t('notifications.push.enabledInfo')
           : t('notifications.push.defaultInfo')}

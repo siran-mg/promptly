@@ -272,7 +272,7 @@ export function ProfileSettings() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-8">
           {/* Profile Avatar Section */}
-          <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b">
+          <div className="flex flex-col items-center gap-4 pb-6 border-b">
             {/* Hidden file input */}
             <input
               ref={fileInputRef}
@@ -288,7 +288,7 @@ export function ProfileSettings() {
               className="relative cursor-pointer group"
               onClick={handleAvatarClick}
             >
-              <Avatar className="h-24 w-24 border-2 border-indigo-100">
+              <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-2 border-indigo-100">
                 <AvatarImage src={formData.avatar_url || ""} alt={formData.full_name || user.email || ""} />
                 <AvatarFallback className="bg-indigo-100 text-indigo-700 text-xl">
                   {formData.full_name ? formData.full_name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
@@ -297,20 +297,20 @@ export function ProfileSettings() {
 
               {/* Overlay on hover */}
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                <Camera className="h-8 w-8 text-white" />
+                <Camera className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
 
               {/* Loading spinner */}
               {uploadingAvatar && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full">
-                  <Loader2 className="h-8 w-8 text-white animate-spin" />
+                  <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 text-white animate-spin" />
                 </div>
               )}
             </div>
 
-            <div className="space-y-2 text-center sm:text-left">
+            <div className="space-y-2 text-center">
               <h3 className="font-medium text-lg">{formData.full_name || "Your Name"}</h3>
-              <p className="text-muted-foreground">{user.email}</p>
+              <p className="text-muted-foreground text-sm truncate max-w-full">{user.email}</p>
               <Button
                 type="button"
                 variant="outline"
@@ -321,13 +321,13 @@ export function ProfileSettings() {
               >
                 {uploadingAvatar ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {t('common.uploading')}
+                    <Loader2 className="h-4 w-4 mr-2 flex-shrink-0 animate-spin" />
+                    <span className="truncate">{t('common.uploading')}</span>
                   </>
                 ) : (
                   <>
-                    <Upload className="h-4 w-4 mr-2" />
-                    {t('settings.profileSettings.updateAvatar')}
+                    <Upload className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">{t('settings.profileSettings.updateAvatar')}</span>
                   </>
                 )}
               </Button>
@@ -429,17 +429,17 @@ export function ProfileSettings() {
           <Button
             type="submit"
             disabled={saving}
-            className="bg-indigo-600 hover:bg-indigo-700 transition-colors gap-2"
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 transition-colors gap-2"
           >
             {saving ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                {t('settings.profileSettings.saving')}
+                <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" />
+                <span className="truncate">{t('settings.profileSettings.saving')}</span>
               </>
             ) : (
               <>
-                <Save className="h-4 w-4" />
-                {t('settings.profileSettings.saveChanges')}
+                <Save className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{t('settings.profileSettings.saveChanges')}</span>
               </>
             )}
           </Button>

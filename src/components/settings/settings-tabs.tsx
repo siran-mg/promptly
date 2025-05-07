@@ -45,27 +45,27 @@ export function SettingsTabs({ profileSettings, formSettings, notificationSettin
 
   return (
     <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-8 p-1 bg-indigo-50/50 border-indigo-100">
+      <TabsList className="grid w-full grid-cols-3 mb-4 sm:mb-8 p-1 bg-indigo-50/50 border-indigo-100 overflow-x-auto">
         <TabsTrigger
           value="profile"
-          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
-          <User className="h-4 w-4" />
-          {t('settings.profile')}
+          <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="truncate">{t('settings.profile')}</span>
         </TabsTrigger>
         <TabsTrigger
           value="form"
-          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
-          <Settings className="h-4 w-4" />
-          {t('settings.formSettingsMenu')}
+          <Settings className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="truncate">{t('settings.formSettingsMenu')}</span>
         </TabsTrigger>
         <TabsTrigger
           value="notifications"
-          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
-          <Bell className="h-4 w-4" />
-          {t('settings.notifications')}
+          <Bell className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="truncate">{t('settings.notifications')}</span>
         </TabsTrigger>
       </TabsList>
 
@@ -74,17 +74,19 @@ export function SettingsTabs({ profileSettings, formSettings, notificationSettin
       </TabsContent>
 
       <TabsContent value="form" className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 p-6 bg-indigo-50/50 rounded-lg border border-indigo-100">
+        <div className="flex flex-col gap-4 mb-6 p-4 sm:p-6 bg-indigo-50/50 rounded-lg border border-indigo-100">
           <div>
-            <h3 className="text-lg font-medium flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-medium flex items-center gap-2">
               <Share className="h-5 w-5 text-indigo-600" />
               {t('settings.formSettingsSection.shareForm')}
             </h3>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               {t('settings.formSettingsSection.shareFormDescription')}
             </p>
           </div>
-          {userId && <ShareFormButton userId={userId} className="indigo" />}
+          <div className="w-full sm:w-auto self-start">
+            {userId && <ShareFormButton userId={userId} className="indigo" />}
+          </div>
         </div>
 
         {formSettings}

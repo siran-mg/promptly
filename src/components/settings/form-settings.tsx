@@ -352,17 +352,17 @@ export function FormSettings() {
       <TabsList className="grid w-full grid-cols-2 p-1 bg-indigo-50/50 border-indigo-100">
         <TabsTrigger
           value="customize"
-          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
-          <Palette className="h-4 w-4" />
-          {t('settings.appointmentTypes.customizeForm')}
+          <Palette className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="truncate">{t('settings.appointmentTypes.customizeForm')}</span>
         </TabsTrigger>
         <TabsTrigger
           value="preview"
-          className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+          className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
         >
-          <Eye className="h-4 w-4" />
-          {t('settings.appointmentTypes.previewTab')}
+          <Eye className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <span className="truncate">{t('settings.appointmentTypes.previewTab')}</span>
         </TabsTrigger>
       </TabsList>
 
@@ -433,8 +433,8 @@ export function FormSettings() {
 
             <div className="space-y-2">
               <Label htmlFor="logo" className="text-sm font-medium">{t('settings.appointmentTypes.companyLogo')}</Label>
-              <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
-                <div className="flex items-center justify-center w-32 h-32 bg-white rounded-lg border-2 border-dashed border-indigo-200 overflow-hidden">
+              <div className="flex flex-col gap-4 p-3 sm:p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                <div className="flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 mx-auto bg-white rounded-lg border-2 border-dashed border-indigo-200 overflow-hidden">
                   {formData.logo_url ? (
                     <img
                       src={formData.logo_url}
@@ -443,20 +443,20 @@ export function FormSettings() {
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-center p-4">
-                      <Image className="w-8 h-8 text-indigo-300 mb-2" />
+                      <Image className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-300 mb-1 sm:mb-2" />
                       <p className="text-xs text-muted-foreground">{t('settings.appointmentTypes.noLogo')}</p>
                     </div>
                   )}
                 </div>
 
                 <div className="flex-1 space-y-4">
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex flex-col gap-2">
                     <Label
                       htmlFor="logo_upload"
                       className="flex items-center justify-center flex-1 h-10 px-4 py-2 text-sm font-medium text-indigo-700 bg-white border border-indigo-300 rounded-md shadow-sm hover:bg-indigo-50 cursor-pointer transition-colors"
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {isUploading ? t('common.uploading') : t('settings.appointmentTypes.uploadLogo')}
+                      <Upload className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">{isUploading ? t('common.uploading') : t('settings.appointmentTypes.uploadLogo')}</span>
                     </Label>
                     {formData.logo_url && (
                       <Button
@@ -501,8 +501,8 @@ export function FormSettings() {
                           }
                         }}
                       >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        {t('settings.appointmentTypes.removeLogo')}
+                        <Trash2 className="w-4 h-4 mr-2 flex-shrink-0" />
+                        <span className="truncate">{t('settings.appointmentTypes.removeLogo')}</span>
                       </Button>
                     )}
                   </div>
@@ -535,20 +535,22 @@ export function FormSettings() {
 
             <div className="space-y-2">
               <Label htmlFor="accent_color" className="text-sm font-medium">{t('settings.appointmentTypes.accentColor')}</Label>
-              <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
-                <div
-                  className="w-16 h-16 rounded-full border-4 border-white shadow-sm flex-shrink-0"
-                  style={{ backgroundColor: formData.accent_color }}
-                ></div>
+              <div className="flex flex-col gap-4 p-3 sm:p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                <div className="flex items-center justify-center">
+                  <div
+                    className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 border-white shadow-sm flex-shrink-0"
+                    style={{ backgroundColor: formData.accent_color }}
+                  ></div>
+                </div>
                 <div className="flex-1 space-y-4">
-                  <div className="flex items-center gap-4 w-full">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
                     <Input
                       id="accent_color"
                       name="accent_color"
                       type="color"
                       value={formData.accent_color}
                       onChange={handleChange}
-                      className="w-16 h-10 p-1 cursor-pointer"
+                      className="w-full sm:w-16 h-10 p-1 cursor-pointer"
                     />
                     <div className="relative flex-1">
                       <Palette className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
@@ -576,7 +578,7 @@ export function FormSettings() {
             </div>
           </div>
             </CardContent>
-            <CardFooter className="border-t bg-gray-50/50 py-4 flex justify-between">
+            <CardFooter className="border-t bg-gray-50/50 py-4 flex flex-col sm:flex-row gap-3 sm:justify-between">
               <Button
                 type="button"
                 variant="outline"
@@ -590,10 +592,10 @@ export function FormSettings() {
                     description: t('settings.appointmentTypes.colorsResetDescription'),
                   });
                 }}
-                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                className="w-full sm:w-auto border-indigo-200 text-indigo-700 hover:bg-indigo-50"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                {t('settings.appointmentTypes.resetToDefault')}
+                <RefreshCw className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="truncate">{t('settings.appointmentTypes.resetToDefault')}</span>
               </Button>
               <PrimaryActionButton
                 type="submit"
@@ -602,6 +604,7 @@ export function FormSettings() {
                 loadingText={t('common.savingChanges')}
                 icon={Save}
                 variant="indigo"
+                className="w-full sm:w-auto"
               >
                 {t('settings.appointmentTypes.saveFormSettings')}
               </PrimaryActionButton>
@@ -632,31 +635,32 @@ export function FormSettings() {
               />
             </div>
           </CardContent>
-          <CardFooter className="border-t bg-gray-50/50 py-4 flex flex-col sm:flex-row gap-4 justify-between">
-            <div className="space-y-1 w-full sm:w-auto">
+          <CardFooter className="border-t bg-gray-50/50 py-4 flex flex-col gap-4">
+            <div className="space-y-1">
               <h4 className="text-sm font-medium flex items-center gap-2">
-                <Link className="h-4 w-4 text-indigo-600" />
+                <Link className="h-4 w-4 text-indigo-600 flex-shrink-0" />
                 {t('settings.formSettingsSection.shareWithClients')}
               </h4>
               <p className="text-xs text-muted-foreground">
                 {t('settings.formSettingsSection.generateLinkDescription')}
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row gap-3">
               <PrimaryActionButton
                 onClick={handleOpenShareDialog}
                 icon={Share}
                 variant="indigo"
+                className="w-full sm:w-auto"
               >
                 {t('settings.formSettingsSection.shareBookingLink')}
               </PrimaryActionButton>
               <Button
                 variant="outline"
                 onClick={openFormInNewTab}
-                className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                className="w-full sm:w-auto gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
               >
-                <ExternalLink className="h-4 w-4" />
-                {t('settings.formSettingsSection.openInNewTab')}
+                <ExternalLink className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{t('settings.formSettingsSection.openInNewTab')}</span>
               </Button>
             </div>
           </CardFooter>
@@ -682,7 +686,7 @@ export function FormSettings() {
                 </p>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 {appointmentTypes.map((type) => (
                   <div
                     key={type.id}
@@ -693,8 +697,8 @@ export function FormSettings() {
                         className="w-3 h-3 rounded-full mt-1.5 flex-shrink-0"
                         style={{ backgroundColor: type.color || '#6366f1' }}
                       ></div>
-                      <div>
-                        <h5 className="font-medium">{type.name}</h5>
+                      <div className="min-w-0 flex-1">
+                        <h5 className="font-medium truncate">{type.name}</h5>
                         <p className="text-xs text-muted-foreground">
                           {type.duration} min • {type.is_default ? t('settings.formSettingsSection.defaultTypeLabel') : t('settings.formSettingsSection.customType')}
                         </p>
@@ -706,17 +710,17 @@ export function FormSettings() {
                       className="w-full border-indigo-200 text-indigo-700 hover:bg-indigo-50"
                       onClick={() => router.push(`/dashboard/appointment-types/${type.id}/form`)}
                     >
-                      <Palette className="h-3.5 w-3.5 mr-2" />
-                      {t('settings.formSettingsSection.customizeForm')}
+                      <Palette className="h-3.5 w-3.5 mr-2 flex-shrink-0" />
+                      <span className="truncate">{t('settings.formSettingsSection.customizeForm')}</span>
                     </Button>
                   </div>
                 ))}
 
                 {appointmentTypes.length === 0 && (
-                  <div className="col-span-2 flex flex-col items-center justify-center p-8 text-center bg-white rounded-lg border border-dashed border-indigo-200">
-                    <Calendar className="h-10 w-10 text-indigo-300 mb-2" />
+                  <div className="col-span-1 sm:col-span-2 flex flex-col items-center justify-center p-6 sm:p-8 text-center bg-white rounded-lg border border-dashed border-indigo-200">
+                    <Calendar className="h-8 w-8 sm:h-10 sm:w-10 text-indigo-300 mb-2" />
                     <h4 className="font-medium">{t('settings.formSettingsSection.noAppointmentTypes')}</h4>
-                    <p className="text-sm text-muted-foreground mb-4">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                       {t('settings.formSettingsSection.noAppointmentTypesDescription')}
                     </p>
                     <Button
