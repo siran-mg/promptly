@@ -77,7 +77,7 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
   const router = useRouter();
   const currentLocale = useLocale();
   const t = useTranslations();
-  const [view, setView] = useState<string>(Views.MONTH);
+  const [view, setView] = useState<string>(Views.WEEK);
   const [date, setDate] = useState(new Date());
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
@@ -242,6 +242,7 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
             onSelectEvent={handleSelectEvent}
             onSelectSlot={handleSelectSlot}
             selectable={true}
+            scrollToTime={new Date(new Date().setHours(new Date().getHours(), 0, 0, 0))}
             formats={{
               // Custom time format
               timeGutterFormat: (date: Date) =>
