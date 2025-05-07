@@ -475,7 +475,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div>
           <p className="text-sm text-indigo-600 font-medium">
             {t('settings.formSettingsSection.fieldsConfigured', {
@@ -493,6 +493,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
           onClick={handleAddNew}
           icon={Plus}
           variant="indigo"
+          className="w-full sm:w-auto mt-2 sm:mt-0"
         >
           {t('settings.formSettingsSection.addNewField')}
         </PrimaryActionButton>
@@ -501,36 +502,37 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
       {customFields.length === 0 ? (
         <Card className="border-indigo-100 overflow-hidden">
           <div className="h-1 bg-indigo-600"></div>
-          <CardContent className="flex flex-col items-center justify-center py-12 px-6 text-center">
-            <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
-              <FormInput className="h-8 w-8 text-indigo-600" />
+          <CardContent className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 text-center">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
+              <FormInput className="h-7 w-7 sm:h-8 sm:w-8 text-indigo-600" />
             </div>
-            <h3 className="text-lg font-medium mb-2">No custom fields yet</h3>
-            <p className="text-muted-foreground mb-6 max-w-md">
-              Custom fields allow you to collect specific information from clients when they book this appointment type
+            <h3 className="text-lg font-medium mb-2">{t('settings.formSettingsSection.customFields.noFieldsYet')}</h3>
+            <p className="text-muted-foreground mb-6 max-w-md text-sm sm:text-base">
+              {t('settings.formSettingsSection.customFields.noFieldsDescription')}
             </p>
             <PrimaryActionButton
               onClick={handleAddNew}
               icon={Plus}
               variant="indigo"
+              className="w-full sm:w-auto"
             >
-              Create Your First Custom Field
+              {t('settings.formSettingsSection.customFields.createFirstField')}
             </PrimaryActionButton>
           </CardContent>
         </Card>
       ) : (
         <Card className="border-indigo-100 overflow-hidden">
           <div className="h-1 bg-indigo-600"></div>
-          <CardHeader className="pb-0">
+          <CardHeader className="pb-0 px-4 sm:px-6">
             <CardTitle className="text-lg flex items-center gap-2">
               <FormInput className="h-5 w-5 text-indigo-600" />
-              Custom Fields
+              {t('settings.formSettingsSection.customFields.title')}
             </CardTitle>
             <CardDescription>
-              Fields will appear in this order on the booking form
+              {t('settings.formSettingsSection.customFields.orderDescription')}
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="space-y-3">
               {customFields.map((field, index) => {
                 // Get the appropriate icon based on field type
@@ -551,10 +553,10 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                 return (
                   <div
                     key={field.id}
-                    className="flex items-center justify-between p-4 border rounded-lg bg-white hover:bg-indigo-50/30 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg bg-white hover:bg-indigo-50/30 transition-colors gap-3 sm:gap-0"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex flex-col items-center">
+                      <div className="flex flex-row sm:flex-col items-center">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -563,7 +565,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                           className="h-6 w-6 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100"
                         >
                           <ArrowUp className="h-4 w-4" />
-                          <span className="sr-only">Move up</span>
+                          <span className="sr-only">{t('settings.formSettingsSection.customFields.moveUp')}</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -573,22 +575,22 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                           className="h-6 w-6 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100"
                         >
                           <ArrowDown className="h-4 w-4" />
-                          <span className="sr-only">Move down</span>
+                          <span className="sr-only">{t('settings.formSettingsSection.customFields.moveDown')}</span>
                         </Button>
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
                           <FieldIcon className="h-4 w-4 text-indigo-600" />
                         </div>
                         <div>
                           <div className="font-medium">{field.label}</div>
-                          <div className="text-sm text-muted-foreground flex items-center gap-2">
+                          <div className="text-xs sm:text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
                             <span className="capitalize">{field.type}</span>
                             {field.required && (
                               <span className="inline-flex items-center text-xs bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full">
                                 <Check className="h-3 w-3 mr-1" />
-                                Required
+                                {t('settings.formSettingsSection.customFields.required')}
                               </span>
                             )}
                           </div>
@@ -596,24 +598,24 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                       </div>
                     </div>
 
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 w-full sm:w-auto">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleEdit(field)}
-                        className="h-8 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                        className="h-8 border-indigo-200 text-indigo-700 hover:bg-indigo-50 flex-1 sm:flex-initial"
                       >
                         <Pencil className="h-4 w-4 mr-1" />
-                        Edit
+                        {t('common.editButton')}
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleDeleteClick(field)}
-                        className="h-8 border-red-200 text-red-600 hover:bg-red-50"
+                        className="h-8 border-red-200 text-red-600 hover:bg-red-50 flex-1 sm:flex-initial"
                       >
                         <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
+                        {t('common.deleteButton')}
                       </Button>
                     </div>
                   </div>
@@ -626,31 +628,31 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
 
       {/* Dialog for adding/editing custom fields */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl w-[95vw] p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
+            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
               {editingField ? (
                 <>
                   <Pencil className="h-5 w-5 text-indigo-600" />
-                  Edit Custom Field
+                  {t('settings.formSettingsSection.customFields.editField')}
                 </>
               ) : (
                 <>
                   <Plus className="h-5 w-5 text-indigo-600" />
-                  Add Custom Field
+                  {t('settings.formSettingsSection.customFields.addField')}
                 </>
               )}
             </DialogTitle>
-            <DialogDescription className="text-base">
+            <DialogDescription className="text-sm sm:text-base">
               {editingField
                 ? t('settings.formSettingsSection.customFields.updateDescription')
                 : t('settings.formSettingsSection.customFields.createDescription')}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
-            <div className="space-y-6 py-2">
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-5">
+            <div className="space-y-4 sm:space-y-6 py-2">
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+                <div className="space-y-4 sm:space-y-5">
                   <div className="space-y-2">
                     <Label htmlFor="label" className="text-sm font-medium">{t('settings.formSettingsSection.customFields.fieldLabel')}</Label>
                     <div className="relative">
@@ -661,7 +663,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         value={formData.label}
                         onChange={handleChange}
                         placeholder={t('settings.formSettingsSection.customFields.fieldLabelPlaceholder')}
-                        className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
+                        className="pl-10 border-indigo-200 focus-visible:ring-indigo-500 h-9 sm:h-10 text-sm"
                         required
                       />
                     </div>
@@ -676,7 +678,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                       value={formData.type}
                       onValueChange={(value) => handleSelectChange("type", value)}
                     >
-                      <SelectTrigger className="border-indigo-200 focus:ring-indigo-500">
+                      <SelectTrigger className="border-indigo-200 focus:ring-indigo-500 h-9 sm:h-10 text-sm">
                         <SelectValue placeholder={t('settings.formSettingsSection.customFields.fieldTypePlaceholder')} />
                       </SelectTrigger>
                       <SelectContent>
@@ -724,7 +726,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                           onChange={handleChange}
                           placeholder={t('settings.formSettingsSection.customFields.optionsPlaceholder')}
                           rows={4}
-                          className="pl-10 border-indigo-200 focus-visible:ring-indigo-500"
+                          className="pl-10 border-indigo-200 focus-visible:ring-indigo-500 text-sm"
                           required
                         />
                       </div>
@@ -742,7 +744,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                       value={formData.placeholder}
                       onChange={handleChange}
                       placeholder={t('settings.formSettingsSection.customFields.placeholderTextPlaceholder')}
-                      className="border-indigo-200 focus-visible:ring-indigo-500"
+                      className="border-indigo-200 focus-visible:ring-indigo-500 h-9 sm:h-10 text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
                       {t('settings.formSettingsSection.customFields.placeholderHelp')}
@@ -757,7 +759,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                       value={formData.default_value}
                       onChange={handleChange}
                       placeholder={t('settings.formSettingsSection.customFields.defaultValuePlaceholder')}
-                      className="border-indigo-200 focus-visible:ring-indigo-500"
+                      className="border-indigo-200 focus-visible:ring-indigo-500 h-9 sm:h-10 text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
                       {t('settings.formSettingsSection.customFields.defaultValueHelp')}
@@ -773,24 +775,24 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                     />
                     <div>
                       <Label htmlFor="required" className="text-sm font-medium">
-                        Required field
+                        {t('settings.formSettingsSection.customFields.requiredField')}
                       </Label>
                       <p className="text-xs text-muted-foreground">
-                        Clients must complete this field to submit the form
+                        {t('settings.formSettingsSection.customFields.requiredFieldHelp')}
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Preview section */}
-                <div className="border rounded-lg p-5 space-y-4 bg-indigo-50/30 border-indigo-100">
+                <div className="border rounded-lg p-3 sm:p-5 space-y-3 sm:space-y-4 bg-indigo-50/30 border-indigo-100">
                   <h4 className="text-sm font-medium flex items-center gap-2">
                     <Eye className="h-4 w-4 text-indigo-600" />
-                    Field Preview
+                    {t('settings.formSettingsSection.customFields.fieldPreview')}
                   </h4>
-                  <div className="border rounded-lg p-5 bg-white space-y-3 shadow-sm">
+                  <div className="border rounded-lg p-3 sm:p-5 bg-white space-y-3 shadow-sm">
                     <Label htmlFor="preview-field" className="text-sm font-medium">
-                      {formData.label || "Field Label"}
+                      {formData.label || t('settings.formSettingsSection.customFields.defaultLabel')}
                       {formData.required && <span className="text-destructive ml-1">*</span>}
                     </Label>
 
@@ -800,7 +802,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         placeholder={formData.placeholder || ""}
                         value={formData.default_value || ""}
                         readOnly
-                        className="border-indigo-200"
+                        className="border-indigo-200 h-9 sm:h-10 text-sm"
                       />
                     )}
 
@@ -811,7 +813,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         value={formData.default_value || ""}
                         readOnly
                         rows={3}
-                        className="border-indigo-200"
+                        className="border-indigo-200 text-sm"
                       />
                     )}
 
@@ -822,7 +824,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         placeholder={formData.placeholder || ""}
                         value={formData.default_value || ""}
                         readOnly
-                        className="border-indigo-200"
+                        className="border-indigo-200 h-9 sm:h-10 text-sm"
                       />
                     )}
 
@@ -833,7 +835,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         placeholder={formData.placeholder || ""}
                         value={formData.default_value || ""}
                         readOnly
-                        className="border-indigo-200"
+                        className="border-indigo-200 h-9 sm:h-10 text-sm"
                       />
                     )}
 
@@ -844,26 +846,26 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                         placeholder={formData.placeholder || ""}
                         value={formData.default_value || ""}
                         readOnly
-                        className="border-indigo-200"
+                        className="border-indigo-200 h-9 sm:h-10 text-sm"
                       />
                     )}
 
                     {formData.type === "select" && (
                       <Select defaultValue={formData.default_value || (formData.options ? formData.options.split("\n")[0]?.trim() : "preview-value")}>
-                        <SelectTrigger className="border-indigo-200">
-                          <SelectValue placeholder={formData.placeholder || "Select an option"} />
+                        <SelectTrigger className="border-indigo-200 h-9 sm:h-10 text-sm">
+                          <SelectValue placeholder={formData.placeholder || t('settings.formSettingsSection.customFields.selectOptionPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>
                           {formData.options && formData.options.trim() !== "" ?
                             formData.options.split("\n").filter(opt => opt.trim() !== "").map((option, index) => (
                               <SelectItem key={index} value={option.trim() || `option-${index}`}>
-                                {option.trim() || `Option ${index + 1}`}
+                                {option.trim() || `${t('settings.formSettingsSection.customFields.option')} ${index + 1}`}
                               </SelectItem>
                             ))
                           : [
-                              <SelectItem key="default-1" value="preview-option-1">Option 1</SelectItem>,
-                              <SelectItem key="default-2" value="preview-option-2">Option 2</SelectItem>,
-                              <SelectItem key="default-3" value="preview-option-3">Option 3</SelectItem>
+                              <SelectItem key="default-1" value="preview-option-1">{t('settings.formSettingsSection.customFields.option')} 1</SelectItem>,
+                              <SelectItem key="default-2" value="preview-option-2">{t('settings.formSettingsSection.customFields.option')} 2</SelectItem>,
+                              <SelectItem key="default-3" value="preview-option-3">{t('settings.formSettingsSection.customFields.option')} 3</SelectItem>
                             ]
                           }
                         </SelectContent>
@@ -874,7 +876,7 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                       <div className="flex items-center space-x-2">
                         <Checkbox id="preview-field" className="border-indigo-200 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600" />
                         <label htmlFor="preview-field" className="text-sm">
-                          {formData.placeholder || "Yes"}
+                          {formData.placeholder || t('settings.formSettingsSection.customFields.defaultCheckboxLabel')}
                         </label>
                       </div>
                     )}
@@ -882,23 +884,23 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                     {(formData.type === "date" || formData.type === "time") && (
                       <Input
                         id="preview-field"
-                        placeholder={formData.placeholder || formData.type === "date" ? "Select a date" : "Select a time"}
+                        placeholder={formData.placeholder || (formData.type === "date" ? t('settings.formSettingsSection.customFields.selectDatePlaceholder') : t('settings.formSettingsSection.customFields.selectTimePlaceholder'))}
                         value={formData.default_value || ""}
                         readOnly
-                        className="border-indigo-200"
+                        className="border-indigo-200 h-9 sm:h-10 text-sm"
                       />
                     )}
                   </div>
 
-                  <div className="bg-white p-4 rounded-lg border border-indigo-100">
+                  <div className="bg-white p-3 sm:p-4 rounded-lg border border-indigo-100">
                     <div className="flex items-start gap-2">
                       <div className="p-1 rounded-full bg-indigo-100">
                         <Check className="h-3 w-3 text-indigo-600" />
                       </div>
                       <div>
-                        <p className="text-xs font-medium">Client Experience</p>
+                        <p className="text-xs font-medium">{t('settings.formSettingsSection.customFields.clientExperience')}</p>
                         <p className="text-xs text-muted-foreground">
-                          This is how your custom field will appear to clients in the booking form
+                          {t('settings.formSettingsSection.customFields.clientExperienceDescription')}
                         </p>
                       </div>
                     </div>
@@ -906,25 +908,26 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
                 </div>
               </div>
             </div>
-            <DialogFooter className="pt-4 gap-2">
+            <DialogFooter className="pt-4 gap-2 flex-col sm:flex-row">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsDialogOpen(false)}
                 disabled={isSaving}
-                className="border-gray-200"
+                className="border-gray-200 w-full sm:w-auto"
               >
-                Cancel
+                {t('common.cancelButton')}
               </Button>
               <PrimaryActionButton
                 type="submit"
                 disabled={isSaving}
                 isLoading={isSaving}
-                loadingText="Saving..."
+                loadingText={t('common.saving')}
                 icon={editingField ? Pencil : Plus}
                 variant="indigo"
+                className="w-full sm:w-auto"
               >
-                {editingField ? "Update Field" : "Create Field"}
+                {editingField ? t('settings.formSettingsSection.customFields.updateField') : t('settings.formSettingsSection.customFields.createField')}
               </PrimaryActionButton>
             </DialogFooter>
           </form>
@@ -933,42 +936,42 @@ export function CustomFieldsManager({ appointmentTypeId }: CustomFieldsManagerPr
 
       {/* Confirmation dialog for deletion */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="w-[95vw] max-w-md p-4 sm:p-6">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-xl">
+            <AlertDialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <Trash2 className="h-5 w-5 text-red-600" />
-              Delete Custom Field
+              {t('settings.formSettingsSection.customFields.deleteField')}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-base">
-              Are you sure you want to delete this custom field?
+            <AlertDialogDescription className="text-sm sm:text-base">
+              {t('settings.formSettingsSection.customFields.deleteConfirmation')}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           {fieldToDelete && (
-            <div className="my-6 p-4 border border-red-100 bg-red-50/50 rounded-lg">
+            <div className="my-4 sm:my-6 p-3 sm:p-4 border border-red-100 bg-red-50/50 rounded-lg">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
                 <div>
-                  <p className="font-medium text-red-700">
-                    You're about to delete: <span className="font-bold">{fieldToDelete.label}</span>
+                  <p className="font-medium text-red-700 text-sm sm:text-base">
+                    {t('settings.formSettingsSection.customFields.deleteWarning')}: <span className="font-bold">{fieldToDelete.label}</span>
                   </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    This will permanently remove this field and any data collected through it. This action cannot be undone.
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                    {t('settings.formSettingsSection.customFields.deleteWarningDescription')}
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="border-gray-200">Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="gap-2 flex-col sm:flex-row mt-4">
+            <AlertDialogCancel className="border-gray-200 w-full sm:w-auto">{t('common.cancelButton')}</AlertDialogCancel>
             <Button
               onClick={handleDelete}
               variant="destructive"
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
             >
               <Trash2 className="h-4 w-4" />
-              Delete Field
+              {t('settings.formSettingsSection.customFields.deleteButton')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
