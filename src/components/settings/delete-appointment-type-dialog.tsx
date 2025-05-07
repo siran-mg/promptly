@@ -274,7 +274,7 @@ export function DeleteAppointmentTypeDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="w-[95vw] max-w-md p-4 sm:p-6">
         <AlertDialogHeader>
           <AlertDialogTitle>{t('common.areYouSure')}</AlertDialogTitle>
           <AlertDialogDescription>
@@ -283,12 +283,17 @@ export function DeleteAppointmentTypeDialog({
             {t('common.cannotBeUndone')}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>{t('common.cancelButton')}</AlertDialogCancel>
+        <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 mt-4">
+          <AlertDialogCancel
+            disabled={isDeleting}
+            className="w-full sm:w-auto"
+          >
+            {t('common.cancelButton')}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isDeleting}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 w-full sm:w-auto"
           >
             {isDeleting ? (
               <>

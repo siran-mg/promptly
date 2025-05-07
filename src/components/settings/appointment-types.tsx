@@ -543,7 +543,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 p-6 bg-indigo-50/50 rounded-lg border border-indigo-100">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 p-4 sm:p-6 bg-indigo-50/50 rounded-lg border border-indigo-100">
         <div>
           <h3 className="text-xl font-medium flex items-center gap-2">
             <Calendar className="h-5 w-5 text-indigo-600" />
@@ -557,6 +557,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
           onClick={handleAddNew}
           icon={Plus}
           variant="indigo"
+          className="w-full sm:w-auto"
         >
           {t('settings.appointmentTypes.addType')}
         </PrimaryActionButton>
@@ -565,17 +566,18 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       {appointmentTypes.length === 0 ? (
         <Card className="border-indigo-100 overflow-hidden">
           <div className="h-1 bg-indigo-600"></div>
-          <CardContent className="flex flex-col items-center justify-center py-12 px-6">
+          <CardContent className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6">
             <Calendar className="h-16 w-16 text-indigo-200 mb-4" />
-            <h3 className="text-lg font-medium mb-2">{t('settings.appointmentTypes.empty.title')}</h3>
+            <h3 className="text-lg font-medium mb-2 text-center">{t('settings.appointmentTypes.empty.title')}</h3>
             <p className="text-muted-foreground mb-6 text-center max-w-md">
               {t('settings.appointmentTypes.empty.description')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <PrimaryActionButton
                 onClick={handleAddNew}
                 icon={Plus}
                 variant="indigo"
+                className="w-full sm:w-auto"
               >
                 {t('settings.appointmentTypes.createCustomType')}
               </PrimaryActionButton>
@@ -585,7 +587,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                   const { data: { user } } = await supabase.auth.getUser();
                   if (user) createDefaultAppointmentType(user.id);
                 }}
-                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 gap-2"
+                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 gap-2 w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4" />
                 {t('settings.appointmentTypes.useStandardTemplate')}
@@ -596,7 +598,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
       ) : (
         <Card className="border-indigo-100 overflow-hidden">
           <div className="h-1 bg-indigo-600"></div>
-          <CardHeader className="pb-4">
+          <CardHeader className="pb-4 px-4 sm:px-6">
             <CardTitle className="text-xl flex items-center gap-2">
               <Settings className="h-5 w-5 text-indigo-600" />
               {t('settings.appointmentTypes.manage')}
@@ -606,128 +608,140 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader className="bg-indigo-50/50">
-                <TableRow>
-                  <TableHead className="font-medium">{t('settings.appointmentTypes.table.name')}</TableHead>
-                  <TableHead className="font-medium">{t('settings.appointmentTypes.table.duration')}</TableHead>
-                  <TableHead className="font-medium">{t('settings.appointmentTypes.table.default')}</TableHead>
-                  <TableHead className="text-right font-medium">{t('settings.appointmentTypes.table.actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {appointmentTypes.map((type) => (
-                  <TableRow
-                    key={type.id}
-                    className="cursor-pointer hover:bg-indigo-50/30 group relative transition-colors"
-                    onClick={() => onSelectType ? onSelectType(type.id) : router.push(`/dashboard/appointment-types/${type.id}`)}
-                    title={t('settings.appointmentTypes.clickToManage')}
-                  >
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-4 h-4 rounded-full border border-indigo-100 flex-shrink-0"
-                          style={{ backgroundColor: type.color || '#6366f1' }}
-                        ></div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center">
-                            <span>{type.name}</span>
-                            <span className="ml-2 text-xs text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              {t('settings.appointmentTypes.clickToManageShort')}
-                            </span>
-                          </div>
-                          {type.description && (
-                            <span className="text-xs text-muted-foreground truncate max-w-[200px]">
-                              {type.description}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-indigo-600" />
-                        {t('settings.appointmentTypes.durationDisplay', { minutes: type.duration })}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {type.is_default ? (
-                        <span className="flex items-center text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md text-sm">
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          {t('settings.appointmentTypes.defaultType')}
-                        </span>
-                      ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click event
-                            handleSetDefault(type);
-                          }}
-                          className="h-7 text-xs hover:bg-indigo-50 hover:text-indigo-700"
-                        >
-                          <Star className="h-3 w-3 mr-1" />
-                          {t('settings.appointmentTypes.setAsDefault')}
-                        </Button>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click event
-                            router.push(`/dashboard/appointment-types/${type.id}/form`);
-                          }}
-                          className="h-8 w-8 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
-                          title={t('settings.appointmentTypes.customizeFormSettings')}
-                        >
-                          <FileText className="h-4 w-4" />
-                          <span className="sr-only">{t('settings.appointmentTypes.formSettings')}</span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click event
-                            handleEdit(type);
-                          }}
-                          className="h-8 w-8 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
-                          title={t('settings.appointmentTypes.editTypeTitle')}
-                        >
-                          <Pencil className="h-4 w-4" />
-                          <span className="sr-only">{t('common.editButton')}</span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click event
-                            handleDeleteClick(type);
-                          }}
-                          className={`h-8 w-8 p-0 ${type.is_default
-                            ? 'text-gray-400 cursor-not-allowed'
-                            : 'text-red-500 hover:text-red-700 hover:bg-red-50'}`}
-                          disabled={type.is_default}
-                          title={type.is_default ? t('settings.appointmentTypes.cannotDeleteDefault') : t('settings.appointmentTypes.deleteType')}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">{t('common.deleteButton')}</span>
-                        </Button>
-                      </div>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-indigo-50/50">
+                  <TableRow>
+                    <TableHead className="font-medium">{t('settings.appointmentTypes.table.name')}</TableHead>
+                    <TableHead className="font-medium hidden sm:table-cell">{t('settings.appointmentTypes.table.duration')}</TableHead>
+                    <TableHead className="font-medium hidden sm:table-cell">{t('settings.appointmentTypes.table.default')}</TableHead>
+                    <TableHead className="text-right font-medium">{t('settings.appointmentTypes.table.actions')}</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {appointmentTypes.map((type) => (
+                    <TableRow
+                      key={type.id}
+                      className="cursor-pointer hover:bg-indigo-50/30 group relative transition-colors"
+                      onClick={() => onSelectType ? onSelectType(type.id) : router.push(`/dashboard/appointment-types/${type.id}`)}
+                      title={t('settings.appointmentTypes.clickToManage')}
+                    >
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-4 h-4 rounded-full border border-indigo-100 flex-shrink-0"
+                            style={{ backgroundColor: type.color || '#6366f1' }}
+                          ></div>
+                          <div className="flex flex-col">
+                            <div className="flex items-center">
+                              <span>{type.name}</span>
+                              <span className="ml-2 text-xs text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden sm:inline">
+                                {t('settings.appointmentTypes.clickToManageShort')}
+                              </span>
+                            </div>
+                            {type.description && (
+                              <span className="text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[200px]">
+                                {type.description}
+                              </span>
+                            )}
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1 sm:hidden">
+                              <Clock className="h-3 w-3 text-indigo-600" />
+                              {t('settings.appointmentTypes.durationDisplay', { minutes: type.duration })}
+                              {type.is_default && (
+                                <span className="flex items-center text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded text-xs ml-1">
+                                  <CheckCircle className="h-3 w-3 mr-0.5" />
+                                  {t('settings.appointmentTypes.defaultType')}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-indigo-600" />
+                          {t('settings.appointmentTypes.durationDisplay', { minutes: type.duration })}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {type.is_default ? (
+                          <span className="flex items-center text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md text-sm">
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            {t('settings.appointmentTypes.defaultType')}
+                          </span>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent row click event
+                              handleSetDefault(type);
+                            }}
+                            className="h-7 text-xs hover:bg-indigo-50 hover:text-indigo-700"
+                          >
+                            <Star className="h-3 w-3 mr-1" />
+                            {t('settings.appointmentTypes.setAsDefault')}
+                          </Button>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end space-x-1 sm:space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent row click event
+                              router.push(`/dashboard/appointment-types/${type.id}/form`);
+                            }}
+                            className="h-8 w-8 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
+                            title={t('settings.appointmentTypes.customizeFormSettings')}
+                          >
+                            <FileText className="h-4 w-4" />
+                            <span className="sr-only">{t('settings.appointmentTypes.formSettings')}</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent row click event
+                              handleEdit(type);
+                            }}
+                            className="h-8 w-8 p-0 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
+                            title={t('settings.appointmentTypes.editTypeTitle')}
+                          >
+                            <Pencil className="h-4 w-4" />
+                            <span className="sr-only">{t('common.editButton')}</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent row click event
+                              handleDeleteClick(type);
+                            }}
+                            className={`h-8 w-8 p-0 ${type.is_default
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-red-500 hover:text-red-700 hover:bg-red-50'}`}
+                            disabled={type.is_default}
+                            title={type.is_default ? t('settings.appointmentTypes.cannotDeleteDefault') : t('settings.appointmentTypes.deleteType')}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">{t('common.deleteButton')}</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Dialog for adding/editing appointment types */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl w-[95vw] p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
               {editingType ? (
@@ -826,20 +840,20 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
 
                   <div className="space-y-2">
                     <Label htmlFor="color" className="text-sm font-medium">{t('settings.appointmentTypes.form.color')}</Label>
-                    <div className="flex items-center gap-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                    <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
                       <div
-                        className="w-12 h-12 rounded-full border-4 border-white shadow-sm flex-shrink-0"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-white shadow-sm flex-shrink-0"
                         style={{ backgroundColor: formData.color }}
                       ></div>
                       <div className="flex-1 space-y-4">
-                        <div className="flex items-center gap-4 w-full">
+                        <div className="flex items-center gap-2 sm:gap-4 w-full">
                           <Input
                             id="color"
                             name="color"
                             type="color"
                             value={formData.color}
                             onChange={handleChange}
-                            className="w-16 h-10 p-1 cursor-pointer"
+                            className="w-12 sm:w-16 h-8 sm:h-10 p-1 cursor-pointer"
                           />
                           <div className="relative flex-1">
                             <Palette className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-600" />
@@ -861,7 +875,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-2 pt-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                  <div className="flex items-center space-x-2 pt-3 p-3 sm:pt-4 sm:p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
@@ -891,15 +905,15 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                       {t('settings.appointmentTypes.preview.title')}
                     </h4>
                   </div>
-                  <div className="p-6 space-y-6">
-                    <div className="border rounded-lg p-4 bg-white shadow-sm">
-                      <div className="flex items-center gap-4">
+                  <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                    <div className="border rounded-lg p-3 sm:p-4 bg-white shadow-sm">
+                      <div className="flex items-center gap-3 sm:gap-4">
                         <div
-                          className="w-10 h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0"
                           style={{ backgroundColor: formData.color }}
                         ></div>
                         <div>
-                          <div className="font-medium text-lg">{formData.name || t('settings.appointmentTypes.preview.defaultName')}</div>
+                          <div className="font-medium text-base sm:text-lg">{formData.name || t('settings.appointmentTypes.preview.defaultName')}</div>
                           {formData.description && (
                             <div className="text-sm text-muted-foreground">{formData.description}</div>
                           )}
@@ -928,13 +942,13 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                 </div>
               </div>
             </div>
-            <DialogFooter className="pt-6 border-t mt-6">
+            <DialogFooter className="pt-4 sm:pt-6 border-t mt-4 sm:mt-6 flex-col sm:flex-row gap-2 sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsDialogOpen(false)}
                 disabled={isSaving}
-                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 w-full sm:w-auto"
               >
                 {t('common.cancelButton')}
               </Button>
@@ -944,6 +958,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                 isLoading={isSaving}
                 loadingText={t('common.saving')}
                 variant="indigo"
+                className="w-full sm:w-auto"
               >
                 {editingType ? t('settings.appointmentTypes.updateButton') : t('settings.appointmentTypes.createButton')}
               </PrimaryActionButton>
@@ -968,7 +983,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
 
       {/* Dialog for reassigning appointments */}
       <Dialog open={isReassignDialogOpen} onOpenChange={setIsReassignDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl w-[95vw] p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t('settings.appointmentTypes.reassign.title')}</DialogTitle>
             <DialogDescription>
@@ -977,14 +992,14 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
           </DialogHeader>
 
           <div className="space-y-4 my-4">
-            <div className="bg-destructive/10 p-4 rounded-md border border-destructive">
+            <div className="bg-destructive/10 p-3 sm:p-4 rounded-md border border-destructive">
               <h4 className="font-medium text-destructive mb-2">{t('settings.appointmentTypes.reassign.appointmentsUsing')}</h4>
-              <div className="max-h-48 overflow-y-auto">
+              <div className="max-h-36 sm:max-h-48 overflow-y-auto">
                 <ul className="space-y-2">
                   {appointmentsUsingType.map(appointment => (
                     <li key={appointment.id} className="text-sm border-b pb-2">
                       <div className="font-medium">{appointment.title || t('settings.appointmentTypes.untitledAppointment')}</div>
-                      <div className="text-muted-foreground">
+                      <div className="text-muted-foreground text-xs sm:text-sm">
                         {new Date(appointment.scheduled_for).toLocaleString()} •
                         {appointment.client_name || t('settings.appointmentTypes.noClientName')}
                       </div>
@@ -1016,7 +1031,7 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
             <Button
               variant="outline"
               onClick={() => {
@@ -1025,12 +1040,14 @@ export function AppointmentTypes({ onSelectType }: AppointmentTypesProps) {
                 setReassignTargetTypeId("");
               }}
               disabled={isReassigning}
+              className="w-full sm:w-auto"
             >
               {t('common.cancelButton')}
             </Button>
             <Button
               onClick={handleReassignAndDelete}
               disabled={!reassignTargetTypeId || isReassigning}
+              className="w-full sm:w-auto"
             >
               {isReassigning ? (
                 <>
