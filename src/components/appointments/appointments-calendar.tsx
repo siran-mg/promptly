@@ -100,7 +100,11 @@ export function AppointmentsCalendar({ appointments }: AppointmentsCalendarProps
     format,
     parse,
     startOfWeek: (date: Date) => {
-      return startOfWeek(date, { locale: currentDateFnsLocale });
+      // For French locale, explicitly set weekStartsOn to 1 (Monday)
+      return startOfWeek(date, {
+        locale: currentDateFnsLocale,
+        weekStartsOn: currentLocale === 'fr' ? 1 : 0 // 0 for Sunday (default), 1 for Monday
+      });
     },
     getDay,
     locales: {

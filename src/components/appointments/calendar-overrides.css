@@ -43,37 +43,37 @@ html[lang="en"] .rbc-month-view .rbc-header:nth-child(7)::after {
 
 /* Month view - Add custom day names for French */
 html[lang="fr"] .rbc-month-view .rbc-header:nth-child(1)::after {
-  content: "Dim";
-  display: block;
-}
-
-html[lang="fr"] .rbc-month-view .rbc-header:nth-child(2)::after {
   content: "Lun";
   display: block;
 }
 
-html[lang="fr"] .rbc-month-view .rbc-header:nth-child(3)::after {
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(2)::after {
   content: "Mar";
   display: block;
 }
 
-html[lang="fr"] .rbc-month-view .rbc-header:nth-child(4)::after {
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(3)::after {
   content: "Mer";
   display: block;
 }
 
-html[lang="fr"] .rbc-month-view .rbc-header:nth-child(5)::after {
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(4)::after {
   content: "Jeu";
   display: block;
 }
 
-html[lang="fr"] .rbc-month-view .rbc-header:nth-child(6)::after {
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(5)::after {
   content: "Ven";
   display: block;
 }
 
-html[lang="fr"] .rbc-month-view .rbc-header:nth-child(7)::after {
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(6)::after {
   content: "Sam";
+  display: block;
+}
+
+html[lang="fr"] .rbc-month-view .rbc-header:nth-child(7)::after {
+  content: "Dim";
   display: block;
 }
 
@@ -127,43 +127,43 @@ html[lang="en"] .rbc-time-view .rbc-header:nth-child(7)::after {
 
 /* Week view - Add custom day names for French */
 html[lang="fr"] .rbc-time-view .rbc-header:nth-child(1)::after {
-  content: "Dim";
-  display: block;
-  font-weight: bold;
-}
-
-html[lang="fr"] .rbc-time-view .rbc-header:nth-child(2)::after {
   content: "Lun";
   display: block;
   font-weight: bold;
 }
 
-html[lang="fr"] .rbc-time-view .rbc-header:nth-child(3)::after {
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(2)::after {
   content: "Mar";
   display: block;
   font-weight: bold;
 }
 
-html[lang="fr"] .rbc-time-view .rbc-header:nth-child(4)::after {
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(3)::after {
   content: "Mer";
   display: block;
   font-weight: bold;
 }
 
-html[lang="fr"] .rbc-time-view .rbc-header:nth-child(5)::after {
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(4)::after {
   content: "Jeu";
   display: block;
   font-weight: bold;
 }
 
-html[lang="fr"] .rbc-time-view .rbc-header:nth-child(6)::after {
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(5)::after {
   content: "Ven";
   display: block;
   font-weight: bold;
 }
 
-html[lang="fr"] .rbc-time-view .rbc-header:nth-child(7)::after {
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(6)::after {
   content: "Sam";
+  display: block;
+  font-weight: bold;
+}
+
+html[lang="fr"] .rbc-time-view .rbc-header:nth-child(7)::after {
+  content: "Dim";
   display: block;
   font-weight: bold;
 }
