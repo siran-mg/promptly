@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
+import { NavigationLink } from "@/components/ui/navigation-link";
 
 interface NavItemWithBadgeProps {
   href: string;
@@ -57,7 +57,7 @@ export function NavItemWithBadge({
     });
 
   return (
-    <Link
+    <NavigationLink
       href={href}
       className={cn(
         "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
@@ -81,6 +81,6 @@ export function NavItemWithBadge({
       {isActive && (!badgeCount || badgeCount === 0) && (
         <div className="ml-auto w-1.5 h-5 rounded-full bg-indigo-600"></div>
       )}
-    </Link>
+    </NavigationLink>
   );
 }

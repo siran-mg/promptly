@@ -20,6 +20,7 @@ import { NavItemWithBadge } from "@/components/ui/nav-item-with-badge";
 import { useNotifications } from "@/contexts/notifications-context";
 import LanguageSwitcher from "@/components/language-switcher";
 import { useTranslations } from "next-intl";
+import { NavigationLink } from "@/components/ui/navigation-link";
 
 interface NavItem {
   title: string;
@@ -175,7 +176,7 @@ export function DashboardNav() {
             const Icon = item.icon as LucideIcon;
 
             return (
-              <Link
+              <NavigationLink
                 key={item.href}
                 href={item.href}
                 className={cn(
@@ -195,7 +196,7 @@ export function DashboardNav() {
                 {active && (
                   <div className="ml-auto w-1.5 h-5 rounded-full bg-indigo-600"></div>
                 )}
-              </Link>
+              </NavigationLink>
             );
           })}
         </div>
@@ -211,7 +212,7 @@ export function DashboardNav() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
+                <NavigationLink
                   href="/dashboard/appointments/new"
                   className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-indigo-50/50 hover:text-indigo-600 transition-colors"
                 >
@@ -219,7 +220,7 @@ export function DashboardNav() {
                     <CalendarDays className="h-5 w-5" />
                   </div>
                   <span>{t('dashboard.newAppointment')}</span>
-                </Link>
+                </NavigationLink>
               </TooltipTrigger>
               <TooltipContent side="right">
                 <p>{t('dashboard.createNewAppointment')}</p>
@@ -230,7 +231,7 @@ export function DashboardNav() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
+                <NavigationLink
                   href="/dashboard/settings?tab=form"
                   className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-indigo-50/50 hover:text-indigo-600 transition-colors"
                 >
@@ -238,7 +239,7 @@ export function DashboardNav() {
                     <Share className="h-5 w-5" />
                   </div>
                   <span>{t('dashboard.shareBookingForm')}</span>
-                </Link>
+                </NavigationLink>
               </TooltipTrigger>
               <TooltipContent side="right">
                 <p>{t('dashboard.shareBookingFormDescription')}</p>
@@ -272,10 +273,10 @@ export function DashboardNav() {
             className="flex-1 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
             asChild
           >
-            <Link href="/dashboard/settings?tab=profile">
+            <NavigationLink href="/dashboard/settings?tab=profile">
               <User className="h-4 w-4 mr-1" />
               {t('common.profile')}
-            </Link>
+            </NavigationLink>
           </Button>
 
           <LogoutButton

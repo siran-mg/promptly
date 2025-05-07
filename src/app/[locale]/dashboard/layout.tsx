@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
 import { NotificationsProviderWrapper } from "@/components/providers/notifications-provider-wrapper";
+import { DashboardWrapper } from "@/components/dashboard/dashboard-wrapper";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -20,7 +21,9 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
 
   return (
     <NotificationsProviderWrapper>
-      {children}
+      <DashboardWrapper>
+        {children}
+      </DashboardWrapper>
     </NotificationsProviderWrapper>
   );
 }
