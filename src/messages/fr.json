@@ -572,7 +572,11 @@
         "scheduleAnother": "N'hésitez pas à planifier un autre rendez-vous à un moment différent.",
         "bookAnother": "Réserver un autre rendez-vous",
         "toConfirm": "Pour confirmer ce rendez-vous, visitez :",
-        "toReject": "Pour rejeter ce rendez-vous, visitez :"
+        "toReject": "Pour rejeter ce rendez-vous, visitez :",
+        "adminGreeting": "Une nouvelle demande de rendez-vous a été effectuée et nécessite votre confirmation.",
+        "clientGreeting": "Bonjour {clientName},",
+        "adminFooter": "Cet email a été envoyé depuis {companyName}. Si vous n'attendiez pas cet email, veuillez l'ignorer.",
+        "clientFooter": "Cet email a été envoyé depuis {companyName}. Si vous n'attendiez pas cet email, veuillez nous contacter."
       }
     },
     "general": {

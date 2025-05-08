@@ -117,10 +117,12 @@ export function getAdminConfirmationRequestTemplate(data: EmailTemplateData) {
   const companyName = branding?.companyName || 'Promptly';
 
   // Default greeting
-  const greeting = customText?.greeting || 'A new appointment has been requested and requires your confirmation.';
+  const greeting = customText?.greeting || translations.adminGreeting;
 
   // Default footer
-  const footer = customText?.footer || `This email was sent from ${companyName}. If you did not expect this email, please ignore it.`;
+  const footer = customText?.footer || replacePlaceholders(translations.adminFooter, {
+    companyName
+  });
 
   // Subject line
   const subjectTemplate = customText?.subject || `${translations.newAppointmentRequest}: {clientName}`;
@@ -326,13 +328,15 @@ export function getClientConfirmationTemplate(data: EmailTemplateData) {
   const companyName = branding?.companyName || 'Promptly';
 
   // Default greeting
-  const greetingTemplate = customText?.greeting || `Hello {clientName},`;
+  const greetingTemplate = customText?.greeting || translations.clientGreeting;
   const greeting = replacePlaceholders(greetingTemplate, {
     clientName: appointment.client_name
   });
 
   // Default footer
-  const footer = customText?.footer || `This email was sent from ${companyName}. If you did not expect this email, please contact us.`;
+  const footer = customText?.footer || replacePlaceholders(translations.clientFooter, {
+    companyName
+  });
 
   // Subject line
   const subject = customText?.subject || translations.appointmentConfirmation;
@@ -515,13 +519,15 @@ export function getClientRejectionTemplate(data: EmailTemplateData) {
   const companyName = branding?.companyName || 'Promptly';
 
   // Default greeting
-  const greetingTemplate = customText?.greeting || `Hello {clientName},`;
+  const greetingTemplate = customText?.greeting || translations.clientGreeting;
   const greeting = replacePlaceholders(greetingTemplate, {
     clientName: appointment.client_name
   });
 
   // Default footer
-  const footer = customText?.footer || `This email was sent from ${companyName}. If you did not expect this email, please contact us.`;
+  const footer = customText?.footer || replacePlaceholders(translations.clientFooter, {
+    companyName
+  });
 
   // Subject line
   const subject = customText?.subject || translations.appointmentUpdate;

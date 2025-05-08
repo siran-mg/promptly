@@ -570,7 +570,11 @@
         "scheduleAnother": "Please feel free to schedule another appointment at a different time.",
         "bookAnother": "Book Another Appointment",
         "toConfirm": "To confirm this appointment, visit:",
-        "toReject": "To reject this appointment, visit:"
+        "toReject": "To reject this appointment, visit:",
+        "adminGreeting": "A new appointment has been requested and requires your confirmation.",
+        "clientGreeting": "Hello {clientName},",
+        "adminFooter": "This email was sent from {companyName}. If you did not expect this email, please ignore it.",
+        "clientFooter": "This email was sent from {companyName}. If you did not expect this email, please contact us."
       }
     },
     "general": {
