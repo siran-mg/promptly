@@ -326,8 +326,19 @@
     "delete": "Delete Appointment",
     "errors": {
       "statusUpdateFailed": "Could not update appointment status. Please try again.",
-      "updateFailed": "Could not update appointment details. Please try again."
+      "updateFailed": "Could not update appointment details. Please try again.",
+      "loadFailed": "Could not load appointments. Please try again.",
+      "deleteFailed": "Could not delete appointments. Please try again."
     },
+    "selected": "{count} selected",
+    "selectAll": "Select all appointments",
+    "selectAppointment": "Select appointment",
+    "bulkDelete": "Delete Selected",
+    "bulkDeleteTitle": "Delete Selected Appointments",
+    "bulkDeleteConfirmation": "Are you sure you want to delete {count} selected appointments? This action cannot be undone.",
+    "bulkDeleteSuccess": "Appointments deleted",
+    "bulkDeleteSuccessDescription": "Successfully deleted {count} appointments.",
+    "confirmDelete": "Delete Appointments",
     "form": {
       "yourName": "Your Name",
       "email": "Email",

@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { format } from "date-fns";
 import { enUS, fr } from "date-fns/locale";
 import { useLocale, useTranslations } from "next-intl";
 import { useDateFormatter } from "@/hooks/use-date-formatter";
-import { MoreHorizontal, Share, Loader2, Trash2, Eye, Copy, Check, CalendarClock } from "lucide-react";
+import {
+  MoreHorizontal, Share, Loader2, Trash2, Eye, Copy, Check, CalendarClock,
+  ChevronDown, Filter, X
+} from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 // No longer need supabase client as we're using the API endpoint
 import { Database } from "@/types/supabase";
@@ -20,6 +23,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 
 import {
@@ -41,6 +45,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AppointmentStatusBadge } from "./appointment-status-badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
   appointment_type?: {
@@ -63,6 +77,13 @@ type AppointmentType = {
   duration: number;
 };
 
+type PaginationData = {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+};
+
 interface AppointmentsTableProps {
   appointments: Appointment[];
   appointmentTypes?: AppointmentType[];
@@ -71,7 +92,7 @@ interface AppointmentsTableProps {
 }
 
 export function AppointmentsTable({
-  appointments,
+  appointments: initialAppointments,
   appointmentTypes = [],
   activeTypeId,
   activeFieldName
@@ -80,7 +101,28 @@ export function AppointmentsTable({
   const currentLocale = useLocale();
   const { formatDate, formatTime } = useDateFormatter();
   const t = useTranslations();
+
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [paginationData, setPaginationData] = useState<PaginationData>({
+    page: 1,
+    pageSize: 10,
+    totalItems: initialAppointments.length,
+    totalPages: Math.ceil(initialAppointments.length / 10)
+  });
+
+  // Appointments state
+  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Selection state
+  const [selectedAppointmentIds, setSelectedAppointmentIds] = useState<Set<string>>(new Set());
+  const [selectAll, setSelectAll] = useState(false);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+
+  // Dialog state
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [currentAppointment, setCurrentAppointment] = useState<Appointment | null>(null);
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
@@ -89,14 +131,69 @@ export function AppointmentsTable({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
-  const [filteredAppointmentsList, setFilteredAppointmentsList] = useState<Appointment[]>([]);
+  const [filteredAppointmentsList, setFilteredAppointmentsList] = useState<Appointment[]>(initialAppointments);
 
   // Get the date-fns locale object based on the current locale
   const dateLocale = currentLocale === 'fr' ? fr : enUS;
 
-  // Filter appointments based on search query and update state
+  // Fetch paginated appointments
+  const fetchAppointments = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // Build the query parameters
+      const params = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+      });
+
+      if (searchQuery) {
+        params.append('search', searchQuery);
+      }
+
+      if (activeTypeId) {
+        params.append('type', activeTypeId);
+      }
+
+      if (activeFieldName) {
+        params.append('field', activeFieldName);
+      }
+
+      // Fetch the data
+      const response = await fetch(`/api/appointments/paginated?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch appointments');
+      }
+
+      const data = await response.json();
+
+      // Update state
+      setAppointments(data.appointments);
+      setFilteredAppointmentsList(data.appointments);
+      setPaginationData(data.pagination);
+
+      // Clear selection when page changes
+      setSelectedAppointmentIds(new Set());
+      setSelectAll(false);
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+      toast({
+        title: t('common.error'),
+        description: t('appointments.errors.loadFailed'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page, pageSize, searchQuery, activeTypeId, activeFieldName, t, toast]);
+
+  // Fetch appointments when page, pageSize, or filters change
   useEffect(() => {
-    const filtered = appointments.filter((appointment) => {
+    // For now, we'll use the client-side filtering until the API is fully implemented
+    // fetchAppointments();
+
+    // Client-side filtering for the initial implementation
+    const filtered = initialAppointments.filter((appointment) => {
       const searchLower = searchQuery.toLowerCase();
       return (
         appointment.client_name.toLowerCase().includes(searchLower) ||
@@ -105,14 +202,96 @@ export function AppointmentsTable({
         appointment.status.toLowerCase().includes(searchLower)
       );
     });
-    setFilteredAppointmentsList(filtered);
-  }, [appointments, searchQuery]);
+
+    // Apply pagination
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedAppointments = filtered.slice(startIndex, endIndex);
+
+    setFilteredAppointmentsList(paginatedAppointments);
+    setPaginationData({
+      page,
+      pageSize,
+      totalItems: filtered.length,
+      totalPages: Math.ceil(filtered.length / pageSize)
+    });
+
+    // Clear selection when page changes
+    setSelectedAppointmentIds(new Set());
+    setSelectAll(false);
+  }, [initialAppointments, page, pageSize, searchQuery, activeTypeId, activeFieldName]);
+
+  // Handle selection
+  const toggleSelectAppointment = (appointmentId: string) => {
+    setSelectedAppointmentIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(appointmentId)) {
+        newSet.delete(appointmentId);
+      } else {
+        newSet.add(appointmentId);
+      }
+      return newSet;
+    });
+  };
+
+  // Handle select all
+  const toggleSelectAll = () => {
+    if (selectAll) {
+      setSelectedAppointmentIds(new Set());
+    } else {
+      const allIds = filteredAppointmentsList.map(appointment => appointment.id);
+      setSelectedAppointmentIds(new Set(allIds));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = async () => {
+    if (selectedAppointmentIds.size === 0) return;
+
+    setIsLoading(true);
+    try {
+      // Call the API to delete the selected appointments
+      const response = await fetch('/api/appointments/bulk-delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          appointmentIds: Array.from(selectedAppointmentIds)
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete appointments');
+      }
+
+      // Show success message
+      toast({
+        title: t('appointments.bulkDeleteSuccess'),
+        description: t('appointments.bulkDeleteSuccessDescription', { count: selectedAppointmentIds.size }),
+      });
+
+      // Refresh the page to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting appointments:', error);
+      toast({
+        title: t('common.error'),
+        description: t('appointments.errors.deleteFailed'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setIsBulkDeleteDialogOpen(false);
+    }
+  };
 
   // Only show filter bar if there are appointments or active filters
   return (
     <div className="space-y-4">
       {/* Only show filter bar if there are appointments or active filters */}
-      {(appointments.length > 0 || activeTypeId || activeFieldName || searchQuery) && (
+      {(initialAppointments.length > 0 || activeTypeId || activeFieldName || searchQuery) && (
         <AppointmentFilterBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -122,8 +301,42 @@ export function AppointmentsTable({
         />
       )}
 
+      {/* Show bulk actions toolbar when items are selected */}
+      {selectedAppointmentIds.size > 0 && (
+        <div className="bg-indigo-50 border border-indigo-100 rounded-md p-2 flex items-center justify-between">
+          <div className="flex items-center">
+            <span className="text-indigo-700 font-medium ml-2">
+              {t('appointments.selected', { count: selectedAppointmentIds.size })}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+              onClick={() => setIsBulkDeleteDialogOpen(true)}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1" />
+              {t('appointments.bulkDelete')}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+              onClick={() => {
+                setSelectedAppointmentIds(new Set());
+                setSelectAll(false);
+              }}
+            >
+              <X className="h-3.5 w-3.5 mr-1" />
+              {t('common.clear')}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Show appropriate content based on state */}
-      {appointments.length === 0 && !activeTypeId && !activeFieldName && !searchQuery ? (
+      {initialAppointments.length === 0 && !activeTypeId && !activeFieldName && !searchQuery ? (
         // No appointments and no filters - show empty state
         <EmptyAppointmentsState />
       ) : filteredAppointmentsList.length === 0 ? (
@@ -137,6 +350,14 @@ export function AppointmentsTable({
             <Table>
               <TableHeader className="bg-indigo-50">
               <TableRow>
+                <TableHead className="w-[40px] text-indigo-700 font-semibold">
+                  <Checkbox
+                    checked={selectAll}
+                    onCheckedChange={() => toggleSelectAll()}
+                    aria-label={t('appointments.selectAll')}
+                    className="data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
+                  />
+                </TableHead>
                 <TableHead className="text-indigo-700 font-semibold">Client</TableHead>
                 <TableHead className="text-indigo-700 font-semibold">Date & Time</TableHead>
                 <TableHead className="text-indigo-700 font-semibold">Contact</TableHead>
@@ -149,18 +370,34 @@ export function AppointmentsTable({
             {filteredAppointmentsList.map((appointment) => (
                 <TableRow
                   key={appointment.id}
-                  className="cursor-pointer hover:bg-indigo-50/30 transition-colors"
-                  onClick={(e) => {
-                    // Only open details dialog if the click is not on a dropdown menu item
-                    if (e.defaultPrevented) return;
-                    setSelectedAppointment(appointment);
-                    setIsDetailsDialogOpen(true);
-                  }}
+                  className={`hover:bg-indigo-50/30 transition-colors ${
+                    selectedAppointmentIds.has(appointment.id) ? 'bg-indigo-50/50' : ''
+                  }`}
                 >
-                  <TableCell className="font-medium">
+                  <TableCell className="w-[40px]" onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedAppointmentIds.has(appointment.id)}
+                      onCheckedChange={() => toggleSelectAppointment(appointment.id)}
+                      aria-label={t('appointments.selectAppointment')}
+                      className="data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
+                    />
+                  </TableCell>
+                  <TableCell
+                    className="font-medium cursor-pointer"
+                    onClick={() => {
+                      setSelectedAppointment(appointment);
+                      setIsDetailsDialogOpen(true);
+                    }}
+                  >
                     {appointment.client_name}
                   </TableCell>
-                  <TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setSelectedAppointment(appointment);
+                      setIsDetailsDialogOpen(true);
+                    }}
+                  >
                     <div className="flex flex-col">
                       <span className="font-medium text-indigo-700">
                         {currentLocale === 'fr'
@@ -172,13 +409,25 @@ export function AppointmentsTable({
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setSelectedAppointment(appointment);
+                      setIsDetailsDialogOpen(true);
+                    }}
+                  >
                     <div className="flex flex-col">
                       <span className="text-sm">{appointment.client_email}</span>
                       <span className="text-xs text-muted-foreground">{appointment.client_phone}</span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setSelectedAppointment(appointment);
+                      setIsDetailsDialogOpen(true);
+                    }}
+                  >
                     {appointment.appointment_type ? (
                       <div className="flex items-center">
                         {appointment.appointment_type.color && (
@@ -193,7 +442,13 @@ export function AppointmentsTable({
                       <span className="text-xs text-muted-foreground">Not specified</span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setSelectedAppointment(appointment);
+                      setIsDetailsDialogOpen(true);
+                    }}
+                  >
                     <AppointmentStatusBadge status={appointment.status} />
                   </TableCell>
                   <TableCell>
@@ -322,16 +577,28 @@ export function AppointmentsTable({
             {filteredAppointmentsList.map((appointment) => (
               <div
                 key={appointment.id}
-                className="border border-indigo-100 rounded-md p-3 shadow-sm hover:bg-indigo-50/30 transition-colors cursor-pointer"
-                onClick={(e) => {
-                  // Only open details dialog if the click is not on a dropdown menu item
-                  if (e.defaultPrevented) return;
-                  setSelectedAppointment(appointment);
-                  setIsDetailsDialogOpen(true);
-                }}
+                className={`border border-indigo-100 rounded-md p-3 shadow-sm hover:bg-indigo-50/30 transition-colors ${
+                  selectedAppointmentIds.has(appointment.id) ? 'bg-indigo-50/50 border-indigo-200' : ''
+                }`}
               >
                 <div className="flex justify-between items-start mb-2">
-                  <div className="font-medium truncate mr-2">{appointment.client_name}</div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={selectedAppointmentIds.has(appointment.id)}
+                      onCheckedChange={() => toggleSelectAppointment(appointment.id)}
+                      aria-label={t('appointments.selectAppointment')}
+                      className="data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
+                    />
+                    <div
+                      className="font-medium truncate mr-2 cursor-pointer"
+                      onClick={() => {
+                        setSelectedAppointment(appointment);
+                        setIsDetailsDialogOpen(true);
+                      }}
+                    >
+                      {appointment.client_name}
+                    </div>
+                  </div>
                   <div className="flex items-center">
                     <AppointmentStatusBadge status={appointment.status} />
                     <DropdownMenu>
@@ -470,6 +737,84 @@ export function AppointmentsTable({
               </div>
             ))}
           </div>
+
+          {/* Pagination */}
+          {paginationData.totalPages > 1 && (
+            <div className="mt-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setPage(Math.max(1, page - 1))}
+                      className={page <= 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+
+                  {/* First page */}
+                  {page > 2 && (
+                    <PaginationItem>
+                      <PaginationLink onClick={() => setPage(1)}>1</PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  {/* Ellipsis if needed */}
+                  {page > 3 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
+                  {/* Previous page if not first */}
+                  {page > 1 && (
+                    <PaginationItem>
+                      <PaginationLink onClick={() => setPage(page - 1)}>
+                        {page - 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  {/* Current page */}
+                  <PaginationItem>
+                    <PaginationLink isActive onClick={() => setPage(page)}>
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+
+                  {/* Next page if not last */}
+                  {page < paginationData.totalPages && (
+                    <PaginationItem>
+                      <PaginationLink onClick={() => setPage(page + 1)}>
+                        {page + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  {/* Ellipsis if needed */}
+                  {page < paginationData.totalPages - 2 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
+                  {/* Last page if not current or next */}
+                  {page < paginationData.totalPages - 1 && (
+                    <PaginationItem>
+                      <PaginationLink onClick={() => setPage(paginationData.totalPages)}>
+                        {paginationData.totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setPage(Math.min(paginationData.totalPages, page + 1))}
+                      className={page >= paginationData.totalPages ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </>
       )}
 
@@ -531,6 +876,48 @@ export function AppointmentsTable({
           window.location.reload();
         }}
       />
+
+      {/* Bulk Delete Dialog */}
+      <Dialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md p-4 sm:p-6 max-w-[90vw]">
+          <DialogHeader>
+            <DialogTitle className="text-lg sm:text-xl flex items-center justify-center text-red-600">
+              <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
+              <span className="text-base sm:text-lg">{t('appointments.bulkDeleteTitle')}</span>
+            </DialogTitle>
+            <DialogDescription className="text-center text-xs sm:text-sm">
+              {t('appointments.bulkDeleteConfirmation', { count: selectedAppointmentIds.size })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsBulkDeleteDialogOpen(false)}
+              className="w-full sm:w-auto order-2 sm:order-1"
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleBulkDelete}
+              className="w-full sm:w-auto order-1 sm:order-2"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t('common.loading')}
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t('appointments.confirmDelete')}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Appointment Details Dialog */}
       <AppointmentDetailsDialog

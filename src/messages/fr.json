@@ -105,6 +105,7 @@
     "noResults": "Aucun résultat trouvé",
     "noData": "Aucune donnée disponible",
     "notProvided": "Non fourni",
+    "clear": "Effacer",
     "all": "Tous",
     "today": "Aujourd'hui",
     "tomorrow": "Demain",
@@ -326,8 +327,19 @@
     "delete": "Supprimer le rendez-vous",
     "errors": {
       "statusUpdateFailed": "Impossible de mettre à jour le statut du rendez-vous. Veuillez réessayer.",
-      "updateFailed": "Impossible de mettre à jour les détails du rendez-vous. Veuillez réessayer."
+      "updateFailed": "Impossible de mettre à jour les détails du rendez-vous. Veuillez réessayer.",
+      "loadFailed": "Impossible de charger les rendez-vous. Veuillez réessayer.",
+      "deleteFailed": "Impossible de supprimer les rendez-vous. Veuillez réessayer."
     },
+    "selected": "{count} sélectionné(s)",
+    "selectAll": "Sélectionner tous les rendez-vous",
+    "selectAppointment": "Sélectionner le rendez-vous",
+    "bulkDelete": "Supprimer la sélection",
+    "bulkDeleteTitle": "Supprimer les rendez-vous sélectionnés",
+    "bulkDeleteConfirmation": "Êtes-vous sûr de vouloir supprimer les {count} rendez-vous sélectionnés ? Cette action ne peut pas être annulée.",
+    "bulkDeleteSuccess": "Rendez-vous supprimés",
+    "bulkDeleteSuccessDescription": "{count} rendez-vous ont été supprimés avec succès.",
+    "confirmDelete": "Supprimer les rendez-vous",
     "form": {
       "yourName": "Votre nom",
       "email": "Email",
