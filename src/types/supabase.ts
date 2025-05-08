@@ -459,6 +459,40 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      },
+      sms_subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          enabled: boolean
+          phone_number: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          enabled?: boolean
+          phone_number?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          enabled?: boolean
+          phone_number?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

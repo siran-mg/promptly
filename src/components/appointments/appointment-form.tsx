@@ -340,6 +340,30 @@ export function AppointmentForm({
               console.error("Error sending push notification:", pushError);
               // Continue anyway as the main appointment and notification were created
             }
+
+            // Send SMS notification if enabled
+            try {
+              console.log("Sending SMS notification for new appointment");
+
+              const smsMessage = `New appointment booked: ${formData.clientName} booked a ${appointmentTypeName} for ${format(appointmentDate, "MMM d, yyyy 'at' h:mm a")}`;
+
+              const smsResponse = await fetch('/api/sms/send', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  userId,
+                  message: smsMessage
+                }),
+              });
+
+              const smsResult = await smsResponse.json();
+              console.log("SMS notification result:", smsResult);
+            } catch (smsError) {
+              console.error("Error sending SMS notification:", smsError);
+              // Continue anyway as the main appointment and notification were created
+            }
           }
         } catch (notifError) {
           console.error("Error creating notification:", notifError);

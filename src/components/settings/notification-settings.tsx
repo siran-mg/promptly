@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, BellRing } from "lucide-react";
+import { Bell, BellRing, MessageSquare } from "lucide-react";
 import { PushNotificationManager } from "@/components/notifications/push-notification-manager";
+import { SmsNotificationManager } from "@/components/notifications/sms-notification-manager";
 import { useTranslations } from "next-intl";
 
 export function NotificationSettings() {
@@ -22,6 +23,21 @@ export function NotificationSettings() {
         </CardHeader>
         <CardContent>
           <PushNotificationManager />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-indigo-600" />
+            {t('settings.notificationSettings.sms')}
+          </CardTitle>
+          <CardDescription>
+            {t('settings.notificationSettings.smsDescription')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SmsNotificationManager />
         </CardContent>
       </Card>
 

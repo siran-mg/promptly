@@ -541,7 +541,6 @@
       "title": "Paramètres de notification",
       "email": "Notifications par email",
       "push": "Notifications push",
-      "sms": "Notifications par SMS",
       "newAppointment": "Nouveau rendez-vous",
       "appointmentReminder": "Rappel de rendez-vous",
       "appointmentCancellation": "Annulation de rendez-vous",
@@ -550,10 +549,27 @@
       "newsletterUpdates": "Mises à jour de la newsletter",
       "updateSuccess": "Paramètres de notification mis à jour avec succès",
       "pushNotifications": "Notifications Push",
-      "pushNotificationsDescription": "Recevez des notifications sur votre appareil lorsque vous obtenez de nouveaux rendez-vous (activé par défaut). Remarque : Les boutons d'action peuvent ne pas apparaître sur tous les navigateurs et appareils.",
+      "pushNotificationsDescription": "Recevez des notifications sur votre appareil lorsque vous obtenez de nouveaux rendez-vous (activé par défaut). Remarque : les boutons d'action peuvent ne pas apparaître sur tous les navigateurs et appareils.",
+      "sms": "Notifications par SMS",
+      "smsDescription": "Recevez des notifications SMS sur votre téléphone lorsque vous obtenez de nouveaux rendez-vous. Des frais de messagerie standard peuvent s'appliquer.",
       "preferences": "Préférences de notification",
       "preferencesDescription": "Choisissez les notifications que vous souhaitez recevoir",
-      "comingSoon": "Plus de préférences de notification seront disponibles dans une future mise à jour."
+      "comingSoon": "Plus de préférences de notification seront disponibles dans une future mise à jour.",
+      "errors": {
+        "loadFailed": "Impossible de charger les paramètres de notification. Veuillez réessayer.",
+        "saveFailed": "Impossible d'enregistrer les paramètres de notification. Veuillez réessayer."
+      },
+      "smsSettings": {
+        "title": "Notifications SMS",
+        "phoneNumber": "Numéro de téléphone",
+        "phoneHelp": "Entrez votre numéro de téléphone au format international (par exemple, +33 6 12 34 56 78)",
+        "phoneRequired": "Le numéro de téléphone est requis pour activer les notifications SMS",
+        "invalidPhone": "Veuillez entrer un numéro de téléphone valide",
+        "settingsSaved": "Paramètres de notification SMS enregistrés",
+        "enabled": "Notifications SMS activées",
+        "disabled": "Notifications SMS désactivées",
+        "comingSoon": "Les préférences de notification SMS seront bientôt disponibles"
+      }
     },
     "appointmentTypeSettings": {
       "title": "Types de rendez-vous",
