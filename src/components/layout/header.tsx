@@ -34,11 +34,13 @@ export function Header() {
   }, [supabase]);
 
   return (
-    <header className="border-b">
+    <header className="sticky top-0 z-40 w-full border-b border-indigo-100 dark:border-gray-800 bg-white/80 backdrop-blur-sm dark:bg-gray-950/80">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
-          <CalendarClock className="h-6 w-6" />
-          <Link href="/" className="text-xl font-bold">
+          <div className="p-1.5 bg-indigo-100 rounded-md dark:bg-indigo-900/30">
+            <CalendarClock className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+          </div>
+          <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
             {t('common.appName')}
           </Link>
         </div>
@@ -49,17 +51,23 @@ export function Header() {
             isAuthenticated ? (
               <>
                 <Link href="/dashboard">
-                  <Button variant="ghost">{t('common.dashboard')}</Button>
+                  <Button variant="ghost" className="text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 dark:text-gray-300 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/30">
+                    {t('common.dashboard')}
+                  </Button>
                 </Link>
-                <LogoutButton />
+                <LogoutButton className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm" />
               </>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost">{t('auth.login')}</Button>
+                  <Button variant="ghost" className="text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 dark:text-gray-300 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/30">
+                    {t('auth.login')}
+                  </Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="bg-indigo-600 hover:bg-indigo-700">{t('auth.signup')}</Button>
+                  <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm hover:shadow-md transition-all duration-200">
+                    {t('auth.signup')}
+                  </Button>
                 </Link>
               </>
             )
