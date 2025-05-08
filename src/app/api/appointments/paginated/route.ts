@@ -86,10 +86,13 @@ export async function GET(request: Request) {
     query = query.range(offset, offset + pageSize - 1);
 
     // Execute both queries
-    const [{ data: appointments, error }, { count, error: countError }] = await Promise.all([
+    const [appointmentsResult, countResult] = await Promise.all([
       query,
-      countQuery.count()
+      countQuery
     ]);
+
+    const { data: appointments, error } = appointmentsResult;
+    const { count, error: countError } = { count: countResult.count ?? 0, error: countResult.error };
 
     if (error || countError) {
       console.error("Error fetching appointments:", error || countError);
