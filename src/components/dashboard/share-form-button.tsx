@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase";
 import { ShareDialog } from "@/components/share/share-dialog";
 import { useRouter } from "next/navigation";
 import { PrimaryActionButton } from "@/components/ui/primary-action-button";
+import { useTranslations } from "next-intl";
 
 interface ShareFormButtonProps {
   userId: string;
@@ -17,6 +18,7 @@ export function ShareFormButton({ userId, className }: ShareFormButtonProps) {
   const supabase = createClient();
   const [isOpen, setIsOpen] = useState(false);
   const [appointmentTypes, setAppointmentTypes] = useState<any[]>([]);
+  const t = useTranslations();
 
   // Fetch appointment types when the dialog opens
   useEffect(() => {
@@ -57,7 +59,7 @@ export function ShareFormButton({ userId, className }: ShareFormButtonProps) {
         variant={className?.includes('indigo') ? 'indigo' : 'default'}
         className={className || ''}
       >
-        Share Booking Form
+        {t('dashboard.quickActions.shareBookingForm')}
       </PrimaryActionButton>
 
       <ShareDialog
