@@ -19,6 +19,7 @@ interface TimePickerProps {
   className?: string;
   availableSlots?: string[]; // New prop for available slots
   disabledSlots?: string[]; // New prop for disabled slots
+  duration?: number; // Duration in minutes
 }
 
 export function TimePicker({
@@ -26,7 +27,8 @@ export function TimePicker({
   onChange,
   className,
   availableSlots,
-  disabledSlots = []
+  disabledSlots = [],
+  duration = 60 // Default duration is 60 minutes
 }: TimePickerProps) {
   const [inputValue, setInputValue] = useState(value);
   const t = useTranslations();
@@ -63,10 +65,38 @@ export function TimePicker({
 
   // Check if a time slot is disabled
   const isDisabled = (time: string) => {
+    // If we have available slots, check if this time is available
     if (availableSlots) {
       return !availableSlots.includes(time);
     }
-    return disabledSlots.includes(time);
+
+    // Check if this time slot is directly disabled
+    if (disabledSlots.includes(time)) {
+      return true;
+    }
+
+    // Check if this time slot would overlap with a disabled slot based on duration
+    // For example, if we select 9:00 and duration is 60 minutes, we need to check if 9:30 is disabled
+    if (duration > 30) {
+      const [hours, minutes] = time.split(":").map(Number);
+      const startTime = new Date();
+      startTime.setHours(hours, minutes, 0, 0);
+
+      // Check each 30-minute increment within the duration
+      for (let i = 30; i < duration; i += 30) {
+        const nextTime = new Date(startTime);
+        nextTime.setMinutes(nextTime.getMinutes() + i);
+
+        const nextTimeStr = `${nextTime.getHours().toString().padStart(2, "0")}:${nextTime.getMinutes().toString().padStart(2, "0")}`;
+
+        // If any of the time slots within the duration is disabled, the starting time should be disabled
+        if (disabledSlots.includes(nextTimeStr)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

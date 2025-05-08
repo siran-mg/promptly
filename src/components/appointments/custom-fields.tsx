@@ -42,6 +42,7 @@ export function CustomFields({
 }: CustomFieldsProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [fields, setFields] = useState<CustomField[]>([]);
+  const [appointmentTypeDuration, setAppointmentTypeDuration] = useState<number>(60);
   const supabase = createClient();
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export function CustomFields({
 
       setIsLoading(true);
       try {
+        // Fetch custom fields
         const { data, error } = await supabase
           .from("appointment_custom_fields")
           .select("*")
@@ -66,6 +68,19 @@ export function CustomFields({
         }
 
         setFields(data || []);
+
+        // Fetch appointment type to get duration
+        const { data: typeData, error: typeError } = await supabase
+          .from("appointment_types")
+          .select("duration")
+          .eq("id", appointmentTypeId)
+          .single();
+
+        if (typeError) {
+          console.error("Error fetching appointment type duration:", typeError);
+        } else if (typeData) {
+          setAppointmentTypeDuration(typeData.duration);
+        }
       } catch (err) {
         console.error("Error in fetchCustomFields:", err);
       } finally {
@@ -175,7 +190,6 @@ export function CustomFields({
                   mode="single"
                   selected={values[field.id] ? new Date(values[field.id]) : undefined}
                   onSelect={(date) => onChange(field.id, date ? date.toISOString() : "")}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -185,6 +199,7 @@ export function CustomFields({
             <TimePicker
               value={values[field.id] || ""}
               onChange={(time) => onChange(field.id, time)}
+              duration={appointmentTypeDuration}
             />
           )}
 

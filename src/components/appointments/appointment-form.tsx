@@ -236,11 +236,39 @@ export function AppointmentForm({
   };
 
   // Fetch appointment type details when the type changes
-  useEffect(() => {
-    if (!formData.appointmentTypeId) return;
+  const [appointmentTypeDuration, setAppointmentTypeDuration] = useState<number>(60);
 
-    // You could fetch additional details about the appointment type here if needed
-  }, [formData.appointmentTypeId]);
+  useEffect(() => {
+    if (!formData.appointmentTypeId) {
+      setAppointmentTypeDuration(60); // Reset to default duration
+      return;
+    }
+
+    // Fetch appointment type details to get the duration
+    const fetchAppointmentTypeDetails = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("appointment_types")
+          .select("duration")
+          .eq("id", formData.appointmentTypeId)
+          .single();
+
+        if (error) {
+          console.error('Error fetching appointment type details:', error);
+          return;
+        }
+
+        if (data) {
+          console.log('Fetched appointment type duration:', data.duration);
+          setAppointmentTypeDuration(data.duration);
+        }
+      } catch (err) {
+        console.error('Error in fetchAppointmentTypeDetails:', err);
+      }
+    };
+
+    fetchAppointmentTypeDetails();
+  }, [formData.appointmentTypeId, supabase]);
 
   const handleCustomFieldChange = (fieldId: string, value: string) => {
     setCustomFieldValues(prev => ({
@@ -510,6 +538,7 @@ export function AppointmentForm({
                 value={formData.time}
                 onChange={handleTimeChange}
                 disabledSlots={disabledTimeSlots}
+                duration={appointmentTypeDuration}
               />
             </div>
           </div>

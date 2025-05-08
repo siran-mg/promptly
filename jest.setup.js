@@ -26,3 +26,10 @@ jest.mock('next/navigation', () => ({
   usePathname: () => '/',
   useSearchParams: () => new URLSearchParams(),
 }));
+
+// Mock next-intl
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key) => key,
+  useLocale: () => 'en',
+  NextIntlClientProvider: ({ children }) => children,
+}));
