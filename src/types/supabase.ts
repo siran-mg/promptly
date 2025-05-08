@@ -459,6 +459,64 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      },
+      email_settings: {
+        Row: {
+          id: string
+          user_id: string
+          admin_confirmation_subject: string | null
+          admin_confirmation_greeting: string | null
+          admin_confirmation_footer: string | null
+          client_confirmation_subject: string | null
+          client_confirmation_greeting: string | null
+          client_confirmation_footer: string | null
+          client_rejection_subject: string | null
+          client_rejection_greeting: string | null
+          client_rejection_footer: string | null
+          send_client_emails: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          admin_confirmation_subject?: string | null
+          admin_confirmation_greeting?: string | null
+          admin_confirmation_footer?: string | null
+          client_confirmation_subject?: string | null
+          client_confirmation_greeting?: string | null
+          client_confirmation_footer?: string | null
+          client_rejection_subject?: string | null
+          client_rejection_greeting?: string | null
+          client_rejection_footer?: string | null
+          send_client_emails?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          admin_confirmation_subject?: string | null
+          admin_confirmation_greeting?: string | null
+          admin_confirmation_footer?: string | null
+          client_confirmation_subject?: string | null
+          client_confirmation_greeting?: string | null
+          client_confirmation_footer?: string | null
+          client_rejection_subject?: string | null
+          client_rejection_greeting?: string | null
+          client_rejection_footer?: string | null
+          send_client_emails?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_settings_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

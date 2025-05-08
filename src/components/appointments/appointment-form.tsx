@@ -430,6 +430,48 @@ export function AppointmentForm({
         }
       }
 
+      // Send admin email notification
+      try {
+        console.log("Sending admin email notification for appointment:", data.id);
+
+        const emailResponse = await fetch('/api/appointments/send-admin-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            appointmentId: data.id,
+          }),
+        });
+
+        const emailResult = await emailResponse.json();
+        console.log("Admin email notification result:", emailResult);
+
+        if (emailResult.previewUrl) {
+          // For development, show a toast with the preview URL
+          toast({
+            title: t('appointments.form.adminEmailSent'),
+            description: (
+              <div>
+                {t('appointments.form.adminEmailPreview')}
+                <a
+                  href={emailResult.previewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-blue-500"
+                >
+                  {t('appointments.form.viewEmail')}
+                </a>
+              </div>
+            ),
+            duration: 10000, // Show for 10 seconds
+          });
+        }
+      } catch (emailError) {
+        console.error("Error sending admin email notification:", emailError);
+        // Continue anyway as the main appointment was created
+      }
+
       // Reset form
       setFormData({
         clientName: "",

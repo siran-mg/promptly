@@ -10,10 +10,11 @@ import { FormSettings } from "@/components/settings/form-settings";
 import { ProfileSettings } from "@/components/settings/profile-settings";
 import { NotificationSettings } from "@/components/settings/notification-settings";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
+import EmailSettings from "@/components/settings/email-settings";
 import { Sliders } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Settings | Coachly",
+  title: "Settings | Promptly",
   description: "Manage your account settings and preferences",
 };
 
@@ -48,6 +49,7 @@ export default async function SettingsPage({
           profileSettings={<ProfileSettings />}
           formSettings={<FormSettings />}
           notificationSettings={<NotificationSettings />}
+          emailSettings={<EmailSettings locale={locale} />}
         />
       </div>
     </DashboardShell>

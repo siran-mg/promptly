@@ -81,9 +81,11 @@ export default function BookingForm() {
       };
 
       // Insert the appointment into the database
-      const { error: insertError } = await supabase
+      const { data: appointmentResult, error: insertError } = await supabase
         .from('appointments')
-        .insert(appointmentData);
+        .insert(appointmentData)
+        .select()
+        .single();
 
       if (insertError) {
         console.error('Error inserting appointment:', insertError);
@@ -93,6 +95,48 @@ export default function BookingForm() {
           variant: 'destructive',
         });
         return;
+      }
+
+      // Send admin email notification
+      try {
+        console.log("Sending admin email notification for appointment:", appointmentResult.id);
+
+        const emailResponse = await fetch('/api/appointments/send-admin-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            appointmentId: appointmentResult.id,
+          }),
+        });
+
+        const emailResult = await emailResponse.json();
+        console.log("Admin email notification result:", emailResult);
+
+        if (emailResult.previewUrl) {
+          // For development, show a toast with the preview URL
+          toast({
+            title: 'Admin Email Sent',
+            description: (
+              <div>
+                Email preview available at{' '}
+                <a
+                  href={emailResult.previewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-blue-500"
+                >
+                  View Email
+                </a>
+              </div>
+            ),
+            duration: 10000, // Show for 10 seconds
+          });
+        }
+      } catch (emailError) {
+        console.error("Error sending admin email notification:", emailError);
+        // Continue anyway as the main appointment was created
       }
 
       toast({
