@@ -17,11 +17,20 @@ interface TimePickerProps {
   value: string;
   onChange: (time: string) => void;
   className?: string;
+  availableSlots?: string[]; // New prop for available slots
+  disabledSlots?: string[]; // New prop for disabled slots
 }
 
-export function TimePicker({ value, onChange, className }: TimePickerProps) {
+export function TimePicker({
+  value,
+  onChange,
+  className,
+  availableSlots,
+  disabledSlots = []
+}: TimePickerProps) {
   const [inputValue, setInputValue] = useState(value);
   const t = useTranslations();
+  const [timeSlots, setTimeSlots] = useState<string[]>([]);
 
   // Generate time slots from 00:00 to 23:30 in 30-minute increments
   const generateTimeSlots = () => {
@@ -36,10 +45,13 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
     return slots;
   };
 
-  const timeSlots = generateTimeSlots();
+  // Initialize time slots
+  React.useEffect(() => {
+    setTimeSlots(generateTimeSlots());
+  }, []);
 
   // Filter time slots based on input value
-  const filteredTimeSlots = timeSlots.filter(time => 
+  const filteredTimeSlots = timeSlots.filter(time =>
     time.toLowerCase().includes(inputValue.toLowerCase())
   );
 
@@ -48,6 +60,14 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
     const [hours, minutes] = time.split(":").map(Number);
     return (hours >= 9 && hours < 17) || (hours === 17 && minutes === 30);
   });
+
+  // Check if a time slot is disabled
+  const isDisabled = (time: string) => {
+    if (availableSlots) {
+      return !availableSlots.includes(time);
+    }
+    return disabledSlots.includes(time);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -96,7 +116,11 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
                 variant={time === value ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleTimeSelect(time)}
-                className="w-full"
+                className={cn(
+                  "w-full",
+                  isDisabled(time) && "opacity-50 cursor-not-allowed line-through"
+                )}
+                disabled={isDisabled(time)}
               >
                 {time}
               </Button>
@@ -115,7 +139,11 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
                       variant={time === value ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleTimeSelect(time)}
-                      className="w-full"
+                      className={cn(
+                        "w-full",
+                        isDisabled(time) && "opacity-50 cursor-not-allowed line-through"
+                      )}
+                      disabled={isDisabled(time)}
                     >
                       {time}
                     </Button>

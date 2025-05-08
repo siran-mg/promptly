@@ -342,7 +342,10 @@
       "error": "Erreur",
       "createError": "Impossible de créer le rendez-vous. Veuillez réessayer.",
       "unexpectedError": "Une erreur inattendue s'est produite. Veuillez réessayer.",
+      "errorCreatingAppointment": "Impossible de créer le rendez-vous. Veuillez réessayer.",
+      "errorFetchingTimeSlots": "Impossible de récupérer les créneaux horaires disponibles. Veuillez réessayer.",
       "success": "Succès",
+      "successDescription": "Votre rendez-vous a été planifié avec succès.",
       "successMessage": "Votre rendez-vous a été planifié."
     },
     "newAppointment": {

@@ -342,7 +342,10 @@
       "error": "Error",
       "createError": "Could not create appointment. Please try again.",
       "unexpectedError": "An unexpected error occurred. Please try again.",
+      "errorCreatingAppointment": "Could not create appointment. Please try again.",
+      "errorFetchingTimeSlots": "Could not fetch available time slots. Please try again.",
       "success": "Success",
+      "successDescription": "Your appointment has been scheduled successfully.",
       "successMessage": "Your appointment has been scheduled."
     },
     "newAppointment": {

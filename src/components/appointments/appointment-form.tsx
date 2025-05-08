@@ -66,6 +66,9 @@ export function AppointmentForm({
     appointmentTypeId: "",
   });
 
+  const [disabledTimeSlots, setDisabledTimeSlots] = useState<string[]>([]);
+  const [isLoadingTimeSlots, setIsLoadingTimeSlots] = useState(false);
+
   // Check if user has any appointment types
   useEffect(() => {
     const checkAppointmentTypes = async () => {
@@ -136,6 +139,13 @@ export function AppointmentForm({
     }
   }, [defaultTypeId, userId, supabase]);
 
+  // Fetch available time slots when the date changes
+  useEffect(() => {
+    if (formData.date) {
+      fetchAvailableTimeSlots(formData.date);
+    }
+  }, [formData.date]);
+
   // Check for client information in URL parameters
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -173,11 +183,56 @@ export function AppointmentForm({
         console.log('Updating form data with date:', date);
         return { ...prev, date };
       });
+
+      // Fetch available time slots for the selected date
+      fetchAvailableTimeSlots(date);
     }
   };
 
   const handleTimeChange = (time: string) => {
     setFormData((prev) => ({ ...prev, time }));
+  };
+
+  // Fetch available time slots for the selected date
+  const fetchAvailableTimeSlots = async (date: Date) => {
+    setIsLoadingTimeSlots(true);
+    try {
+      const dateStr = format(date, "yyyy-MM-dd");
+      const response = await fetch(`/api/appointments/available-slots?date=${dateStr}&userId=${userId}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch available time slots');
+      }
+
+      const data = await response.json();
+
+      // Create a list of disabled slots (all slots that are not available)
+      const allSlots = generateTimeSlots();
+      const disabled = allSlots.filter(slot => !data.availableSlots.includes(slot));
+      setDisabledTimeSlots(disabled);
+    } catch (error) {
+      console.error('Error fetching available time slots:', error);
+      toast({
+        title: t('appointments.form.error'),
+        description: t('appointments.form.errorFetchingTimeSlots'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingTimeSlots(false);
+    }
+  };
+
+  // Generate time slots from 00:00 to 23:30 in 30-minute increments
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const formattedHour = hour.toString().padStart(2, "0");
+        const formattedMinute = minute.toString().padStart(2, "0");
+        slots.push(`${formattedHour}:${formattedMinute}`);
+      }
+    }
+    return slots;
   };
 
   // Fetch appointment type details when the type changes
@@ -454,6 +509,7 @@ export function AppointmentForm({
               <TimePicker
                 value={formData.time}
                 onChange={handleTimeChange}
+                disabledSlots={disabledTimeSlots}
               />
             </div>
           </div>
