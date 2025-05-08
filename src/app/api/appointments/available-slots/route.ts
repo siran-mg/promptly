@@ -19,7 +19,7 @@ export async function GET(request: Request) {
 
     // Parse the date parameter
     const selectedDate = new Date(date);
-    
+
     // Create start and end of day for the selected date
     const dayStart = startOfDay(selectedDate);
     const dayEnd = endOfDay(selectedDate);
@@ -47,8 +47,12 @@ export async function GET(request: Request) {
     // Extract booked time slots
     const bookedSlots = appointments.map(appointment => {
       const appointmentDate = new Date(appointment.date);
-      const duration = appointment.appointment_type?.duration || 60; // Default to 60 minutes if no duration specified
-      
+
+      // Use a type assertion to handle the appointment_type
+      // This tells TypeScript to trust us about the shape of the data
+      const appointmentType = appointment.appointment_type as unknown as { duration?: number };
+      const duration = appointmentType?.duration || 60; // Default to 60 minutes if no duration specified
+
       return {
         time: format(appointmentDate, 'HH:mm'),
         duration: duration
@@ -61,10 +65,10 @@ export async function GET(request: Request) {
     // Filter out booked slots
     const availableSlots = filterAvailableSlots(allTimeSlots, bookedSlots);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       date: format(selectedDate, 'yyyy-MM-dd'),
       bookedSlots,
-      availableSlots 
+      availableSlots
     });
   } catch (error) {
     console.error('Error in available slots API:', error);
@@ -95,14 +99,14 @@ function filterAvailableSlots(allSlots: string[], bookedSlots: { time: string, d
     return !bookedSlots.some(bookedSlot => {
       const slotTime = parse(slot, 'HH:mm', new Date());
       const bookedTime = parse(bookedSlot.time, 'HH:mm', new Date());
-      
+
       // Calculate end time of the booked slot
       const bookedEndTime = addMinutes(bookedTime, bookedSlot.duration);
-      
+
       // Check if the current slot is within the booked slot's time range
       // or if the current slot + 30 minutes overlaps with the booked slot
       const slotEndTime = addMinutes(slotTime, 30);
-      
+
       return (
         (slotTime >= bookedTime && slotTime < bookedEndTime) || // Slot starts during a booking
         (slotEndTime > bookedTime && slotEndTime <= bookedEndTime) || // Slot ends during a booking
