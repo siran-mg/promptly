@@ -44,10 +44,64 @@ function getDateLocale(locale: string = 'en') {
 }
 
 /**
+ * Replace placeholders in a string with actual values
+ * @param text The text containing placeholders like {placeholderName}
+ * @param replacements An object with keys matching the placeholder names and values to replace them with
+ * @returns The text with placeholders replaced by their values
+ */
+function replacePlaceholders(text: string, replacements: Record<string, string>): string {
+  return Object.entries(replacements).reduce((result, [key, value]) => {
+    return result.replace(new RegExp(`{${key}}`, 'g'), value || '');
+  }, text);
+}
+
+/**
  * Generate the admin confirmation request email template
  */
 export function getAdminConfirmationRequestTemplate(data: EmailTemplateData) {
   const { appointment, baseUrl, locale = 'en', customText, branding } = data;
+
+  // Import translations
+  let translations: any = {
+    newAppointmentRequest: "New Appointment Request",
+    appointmentDetails: "Appointment Details",
+    client: "Client",
+    email: "Email",
+    phone: "Phone",
+    date: "Date",
+    time: "Time",
+    type: "Type",
+    notes: "Notes",
+    notProvided: "Not provided",
+    none: "None",
+    standardAppointment: "Standard Appointment",
+    confirmAppointment: "Confirm Appointment",
+    rejectAppointment: "Reject Appointment",
+    toConfirm: "To confirm this appointment, visit:",
+    toReject: "To reject this appointment, visit:"
+  };
+
+  // Use French translations if locale is French
+  if (locale.startsWith('fr')) {
+    translations = {
+      newAppointmentRequest: "Nouvelle demande de rendez-vous",
+      appointmentDetails: "Détails du rendez-vous",
+      client: "Client",
+      email: "Email",
+      phone: "Téléphone",
+      date: "Date",
+      time: "Heure",
+      type: "Type",
+      notes: "Notes",
+      notProvided: "Non fourni",
+      none: "Aucune",
+      standardAppointment: "Rendez-vous standard",
+      confirmAppointment: "Confirmer le rendez-vous",
+      rejectAppointment: "Rejeter le rendez-vous",
+      toConfirm: "Pour confirmer ce rendez-vous, visitez :",
+      toReject: "Pour rejeter ce rendez-vous, visitez :"
+    };
+  }
 
   // Format the appointment date
   const appointmentDate = new Date(appointment.date);
@@ -69,24 +123,27 @@ export function getAdminConfirmationRequestTemplate(data: EmailTemplateData) {
   const footer = customText?.footer || `This email was sent from ${companyName}. If you did not expect this email, please ignore it.`;
 
   // Subject line
-  const subject = customText?.subject || `New Appointment Request: ${appointment.client_name}`;
+  const subjectTemplate = customText?.subject || `${translations.newAppointmentRequest}: {clientName}`;
+  const subject = replacePlaceholders(subjectTemplate, {
+    clientName: appointment.client_name
+  });
 
   // Plain text version
   const text = `
-    New Appointment Request
+    ${translations.newAppointmentRequest}
 
     ${greeting}
 
-    Client: ${appointment.client_name}
-    Email: ${appointment.client_email}
-    Phone: ${appointment.client_phone || 'Not provided'}
-    Date: ${formattedDate}
-    Time: ${formattedTime}
-    Type: ${appointment.appointment_type?.name || 'Standard Appointment'}
-    Notes: ${appointment.notes || 'None'}
+    ${translations.client}: ${appointment.client_name}
+    ${translations.email}: ${appointment.client_email}
+    ${translations.phone}: ${appointment.client_phone || translations.notProvided}
+    ${translations.date}: ${formattedDate}
+    ${translations.time}: ${formattedTime}
+    ${translations.type}: ${appointment.appointment_type?.name || translations.standardAppointment}
+    ${translations.notes}: ${appointment.notes || translations.none}
 
-    To confirm this appointment, visit: ${confirmUrl}
-    To reject this appointment, visit: ${rejectUrl}
+    ${translations.toConfirm} ${confirmUrl}
+    ${translations.toReject} ${rejectUrl}
 
     ${footer}
   `;
@@ -98,7 +155,7 @@ export function getAdminConfirmationRequestTemplate(data: EmailTemplateData) {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>New Appointment Request</title>
+      <title>${translations.newAppointmentRequest}</title>
       <style>
         body {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -189,28 +246,28 @@ export function getAdminConfirmationRequestTemplate(data: EmailTemplateData) {
       <div class="container">
         <div class="header">
           ${branding?.logoUrl ? `<img src="${branding.logoUrl}" alt="${companyName}" class="logo">` : ''}
-          <h1>New Appointment Request</h1>
+          <h1>${translations.newAppointmentRequest}</h1>
         </div>
 
         <div class="content">
           <p>${greeting}</p>
 
-          <h2>Appointment Details:</h2>
+          <h2>${translations.appointmentDetails}:</h2>
           <div class="appointment-details">
             <ul>
-              <li><strong>Client:</strong> ${appointment.client_name}</li>
-              <li><strong>Email:</strong> ${appointment.client_email}</li>
-              <li><strong>Phone:</strong> ${appointment.client_phone || 'Not provided'}</li>
-              <li><strong>Date:</strong> ${formattedDate}</li>
-              <li><strong>Time:</strong> ${formattedTime}</li>
-              <li><strong>Type:</strong> ${appointment.appointment_type?.name || 'Standard Appointment'}</li>
-              <li><strong>Notes:</strong> ${appointment.notes || 'None'}</li>
+              <li><strong>${translations.client}:</strong> ${appointment.client_name}</li>
+              <li><strong>${translations.email}:</strong> ${appointment.client_email}</li>
+              <li><strong>${translations.phone}:</strong> ${appointment.client_phone || translations.notProvided}</li>
+              <li><strong>${translations.date}:</strong> ${formattedDate}</li>
+              <li><strong>${translations.time}:</strong> ${formattedTime}</li>
+              <li><strong>${translations.type}:</strong> ${appointment.appointment_type?.name || translations.standardAppointment}</li>
+              <li><strong>${translations.notes}:</strong> ${appointment.notes || translations.none}</li>
             </ul>
           </div>
 
           <div class="actions">
-            <a href="${confirmUrl}" class="button confirm-button" style="background-color: #4CAF50;">Confirm Appointment</a>
-            <a href="${rejectUrl}" class="button reject-button" style="background-color: #f44336;">Reject Appointment</a>
+            <a href="${confirmUrl}" class="button confirm-button" style="background-color: #4CAF50;">${translations.confirmAppointment}</a>
+            <a href="${rejectUrl}" class="button reject-button" style="background-color: #f44336;">${translations.rejectAppointment}</a>
           </div>
         </div>
 
@@ -231,6 +288,34 @@ export function getAdminConfirmationRequestTemplate(data: EmailTemplateData) {
 export function getClientConfirmationTemplate(data: EmailTemplateData) {
   const { appointment, locale = 'en', customText, branding } = data;
 
+  // Import translations
+  let translations: any = {
+    appointmentConfirmation: "Appointment Confirmation",
+    appointmentDetails: "Appointment Details",
+    date: "Date",
+    time: "Time",
+    type: "Type",
+    standardAppointment: "Standard Appointment",
+    confirmed: "confirmed",
+    appointmentConfirmed: "Your appointment has been confirmed.",
+    rescheduleOrCancel: "If you need to reschedule or cancel, please contact us."
+  };
+
+  // Use French translations if locale is French
+  if (locale.startsWith('fr')) {
+    translations = {
+      appointmentConfirmation: "Confirmation de rendez-vous",
+      appointmentDetails: "Détails du rendez-vous",
+      date: "Date",
+      time: "Heure",
+      type: "Type",
+      standardAppointment: "Rendez-vous standard",
+      confirmed: "confirmé",
+      appointmentConfirmed: "Votre rendez-vous a été confirmé.",
+      rescheduleOrCancel: "Si vous avez besoin de reprogrammer ou d'annuler, veuillez nous contacter."
+    };
+  }
+
   // Format the appointment date
   const appointmentDate = new Date(appointment.date);
   const dateLocale = getDateLocale(locale);
@@ -241,28 +326,31 @@ export function getClientConfirmationTemplate(data: EmailTemplateData) {
   const companyName = branding?.companyName || 'Promptly';
 
   // Default greeting
-  const greeting = customText?.greeting || `Hello ${appointment.client_name},`;
+  const greetingTemplate = customText?.greeting || `Hello {clientName},`;
+  const greeting = replacePlaceholders(greetingTemplate, {
+    clientName: appointment.client_name
+  });
 
   // Default footer
   const footer = customText?.footer || `This email was sent from ${companyName}. If you did not expect this email, please contact us.`;
 
   // Subject line
-  const subject = customText?.subject || 'Your Appointment Has Been Confirmed';
+  const subject = customText?.subject || translations.appointmentConfirmation;
 
   // Plain text version
   const text = `
-    Appointment Confirmation
+    ${translations.appointmentConfirmation}
 
     ${greeting}
 
-    Your appointment has been confirmed.
+    ${translations.appointmentConfirmed}
 
-    Appointment Details:
-    Date: ${formattedDate}
-    Time: ${formattedTime}
-    Type: ${appointment.appointment_type?.name || 'Standard Appointment'}
+    ${translations.appointmentDetails}:
+    ${translations.date}: ${formattedDate}
+    ${translations.time}: ${formattedTime}
+    ${translations.type}: ${appointment.appointment_type?.name || translations.standardAppointment}
 
-    If you need to reschedule or cancel, please contact us.
+    ${translations.rescheduleOrCancel}
 
     ${footer}
   `;
@@ -274,7 +362,7 @@ export function getClientConfirmationTemplate(data: EmailTemplateData) {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Appointment Confirmation</title>
+      <title>${translations.appointmentConfirmation}</title>
       <style>
         body {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -350,24 +438,24 @@ export function getClientConfirmationTemplate(data: EmailTemplateData) {
       <div class="container">
         <div class="header">
           ${branding?.logoUrl ? `<img src="${branding.logoUrl}" alt="${companyName}" class="logo">` : ''}
-          <h1>Appointment Confirmation</h1>
+          <h1>${translations.appointmentConfirmation}</h1>
         </div>
 
         <div class="content">
           <p>${greeting}</p>
 
-          <p>Your appointment has been <span class="status-confirmed">confirmed</span>.</p>
+          <p>${translations.appointmentConfirmed.replace('confirmed', `<span class="status-confirmed">${translations.confirmed}</span>`)}</p>
 
-          <h2>Appointment Details:</h2>
+          <h2>${translations.appointmentDetails}:</h2>
           <div class="appointment-details">
             <ul>
-              <li><strong>Date:</strong> ${formattedDate}</li>
-              <li><strong>Time:</strong> ${formattedTime}</li>
-              <li><strong>Type:</strong> ${appointment.appointment_type?.name || 'Standard Appointment'}</li>
+              <li><strong>${translations.date}:</strong> ${formattedDate}</li>
+              <li><strong>${translations.time}:</strong> ${formattedTime}</li>
+              <li><strong>${translations.type}:</strong> ${appointment.appointment_type?.name || translations.standardAppointment}</li>
             </ul>
           </div>
 
-          <p>If you need to reschedule or cancel, please contact us.</p>
+          <p>${translations.rescheduleOrCancel}</p>
         </div>
 
         <div class="footer">
@@ -387,6 +475,36 @@ export function getClientConfirmationTemplate(data: EmailTemplateData) {
 export function getClientRejectionTemplate(data: EmailTemplateData) {
   const { appointment, baseUrl, locale = 'en', customText, branding } = data;
 
+  // Import translations
+  let translations: any = {
+    appointmentUpdate: "Appointment Update",
+    appointmentDetails: "Appointment Details",
+    date: "Date",
+    time: "Time",
+    type: "Type",
+    standardAppointment: "Standard Appointment",
+    rejected: "accommodated",
+    appointmentRejected: "We regret to inform you that your appointment request could not be accommodated at this time.",
+    scheduleAnother: "Please feel free to schedule another appointment at a different time.",
+    bookAnother: "Book Another Appointment"
+  };
+
+  // Use French translations if locale is French
+  if (locale.startsWith('fr')) {
+    translations = {
+      appointmentUpdate: "Mise à jour du rendez-vous",
+      appointmentDetails: "Détails du rendez-vous",
+      date: "Date",
+      time: "Heure",
+      type: "Type",
+      standardAppointment: "Rendez-vous standard",
+      rejected: "acceptée",
+      appointmentRejected: "Nous regrettons de vous informer que votre demande de rendez-vous n'a pas pu être acceptée pour le moment.",
+      scheduleAnother: "N'hésitez pas à planifier un autre rendez-vous à un moment différent.",
+      bookAnother: "Réserver un autre rendez-vous"
+    };
+  }
+
   // Format the appointment date
   const appointmentDate = new Date(appointment.date);
   const dateLocale = getDateLocale(locale);
@@ -397,28 +515,31 @@ export function getClientRejectionTemplate(data: EmailTemplateData) {
   const companyName = branding?.companyName || 'Promptly';
 
   // Default greeting
-  const greeting = customText?.greeting || `Hello ${appointment.client_name},`;
+  const greetingTemplate = customText?.greeting || `Hello {clientName},`;
+  const greeting = replacePlaceholders(greetingTemplate, {
+    clientName: appointment.client_name
+  });
 
   // Default footer
   const footer = customText?.footer || `This email was sent from ${companyName}. If you did not expect this email, please contact us.`;
 
   // Subject line
-  const subject = customText?.subject || 'Your Appointment Request Could Not Be Accommodated';
+  const subject = customText?.subject || translations.appointmentUpdate;
 
   // Plain text version
   const text = `
-    Appointment Update
+    ${translations.appointmentUpdate}
 
     ${greeting}
 
-    We regret to inform you that your appointment request could not be accommodated at this time.
+    ${translations.appointmentRejected}
 
-    Appointment Details:
-    Date: ${formattedDate}
-    Time: ${formattedTime}
-    Type: ${appointment.appointment_type?.name || 'Standard Appointment'}
+    ${translations.appointmentDetails}:
+    ${translations.date}: ${formattedDate}
+    ${translations.time}: ${formattedTime}
+    ${translations.type}: ${appointment.appointment_type?.name || translations.standardAppointment}
 
-    Please feel free to schedule another appointment at a different time.
+    ${translations.scheduleAnother}
 
     ${footer}
   `;
@@ -516,27 +637,27 @@ export function getClientRejectionTemplate(data: EmailTemplateData) {
       <div class="container">
         <div class="header">
           ${branding?.logoUrl ? `<img src="${branding.logoUrl}" alt="${companyName}" class="logo">` : ''}
-          <h1>Appointment Update</h1>
+          <h1>${translations.appointmentUpdate}</h1>
         </div>
 
         <div class="content">
           <p>${greeting}</p>
 
-          <p>We regret to inform you that your appointment request could not be <span class="status-rejected">accommodated</span> at this time.</p>
+          <p>${translations.appointmentRejected.replace('accommodated', `<span class="status-rejected">${translations.rejected}</span>`)}</p>
 
-          <h2>Appointment Details:</h2>
+          <h2>${translations.appointmentDetails}:</h2>
           <div class="appointment-details">
             <ul>
-              <li><strong>Date:</strong> ${formattedDate}</li>
-              <li><strong>Time:</strong> ${formattedTime}</li>
-              <li><strong>Type:</strong> ${appointment.appointment_type?.name || 'Standard Appointment'}</li>
+              <li><strong>${translations.date}:</strong> ${formattedDate}</li>
+              <li><strong>${translations.time}:</strong> ${formattedTime}</li>
+              <li><strong>${translations.type}:</strong> ${appointment.appointment_type?.name || translations.standardAppointment}</li>
             </ul>
           </div>
 
-          <p>Please feel free to schedule another appointment at a different time.</p>
+          <p>${translations.scheduleAnother}</p>
 
           <div style="text-align: center; margin-top: 20px;">
-            <a href="${baseUrl}/book" class="cta-button" style="background-color: ${branding?.accentColor || '#6366f1'};">Book Another Appointment</a>
+            <a href="${baseUrl}/book" class="cta-button" style="background-color: ${branding?.accentColor || '#6366f1'};">${translations.bookAnother}</a>
           </div>
         </div>
 

@@ -260,7 +260,7 @@ export default function EmailSettings({ locale }: EmailSettingsProps) {
                       name="admin_confirmation_subject"
                       value={settings.admin_confirmation_subject || ''}
                       onChange={handleChange}
-                      placeholder={t("adminConfirmationSubjectPlaceholder")}
+                      placeholder={t("adminConfirmationSubjectPlaceholder", { clientName: "{name}" })}
                     />
                   </div>
                   <div className="space-y-2">
@@ -312,7 +312,7 @@ export default function EmailSettings({ locale }: EmailSettingsProps) {
                       name="client_confirmation_greeting"
                       value={settings.client_confirmation_greeting || ''}
                       onChange={handleChange}
-                      placeholder={t("clientConfirmationGreetingPlaceholder")}
+                      placeholder={t("clientConfirmationGreetingPlaceholder", { clientName: "{name}" })}
                     />
                   </div>
                   <div className="space-y-2">
@@ -354,7 +354,7 @@ export default function EmailSettings({ locale }: EmailSettingsProps) {
                       name="client_rejection_greeting"
                       value={settings.client_rejection_greeting || ''}
                       onChange={handleChange}
-                      placeholder={t("clientRejectionGreetingPlaceholder")}
+                      placeholder={t("clientRejectionGreetingPlaceholder", { clientName: "{name}" })}
                     />
                   </div>
                   <div className="space-y-2">
