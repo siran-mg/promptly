@@ -200,6 +200,17 @@
       "loading": "Sending...",
       "success": "A reset link has been sent to your email if it exists in our system.",
       "error": "An error occurred. Please try again."
+    },
+    "resetPassword": {
+      "title": "Reset your password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Reset password",
+      "loading": "Resetting...",
+      "success": "Password reset successfully",
+      "error": "An error occurred. Please try again.",
+      "passwordTooShort": "Password must be at least 8 characters long",
+      "passwordsDoNotMatch": "Passwords do not match"
     }
   },
   "footer": {
