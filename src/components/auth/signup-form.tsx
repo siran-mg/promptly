@@ -35,6 +35,21 @@ type SignupFormValues = {
   confirmPassword: string;
 };
 
+// Helper to translate known Supabase error messages
+function translateSupabaseError(message: string, tAuth: any): string {
+  // Add more mappings as needed
+  const errorMap: Record<string, string> = {
+    'User already registered': tAuth('errors.userAlreadyRegistered'),
+    'Invalid login credentials': tAuth('errors.invalidCredentials'),
+    'Email rate limit exceeded': tAuth('errors.emailRateLimitExceeded'),
+    // Add more mappings as needed
+  };
+  // If the message matches a known error, return the translation
+  if (message in errorMap) return errorMap[message];
+  // Fallback to a generic error
+  return tAuth('errors.unexpectedError');
+}
+
 export function SignupForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +85,7 @@ export function SignupForm() {
       });
 
       if (signUpError) {
-        setError(signUpError.message);
+        setError(translateSupabaseError(signUpError.message, tAuth));
         return;
       }
 

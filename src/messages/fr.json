@@ -1,33 +1,32 @@
 {
   "home": {
     "hero": {
-      "title": "Rendez-vous et rappels simplifiés",
-      "description": "Acceptez des rendez-vous et envoyez automatiquement des confirmations et des rappels par e-mail et SMS — sans aucune intégration de calendrier requise.",
-      "getStarted": "Commencer",
-      "appointmentConfirmation": "Confirmation de rendez-vous",
-      "appointmentDate": "Jeudi 12 octobre 2023 à 10h00",
-      "emailSent": "E-mail de confirmation envoyé",
-      "reminderScheduled": "Rappel programmé pour 24h avant"
+      "title": "Bienvenue dans votre nouvelle expérience de planification",
+      "description": "Gérez vos rendez-vous sans effort avec notre plateforme intuitive.",
+      "getStarted": "Commencez dès aujourd'hui",
+      "appointmentConfirmation": "Votre rendez-vous est confirmé !",
+      "appointmentDate": "Prévu pour le {date}",
+      "emailSent": "Email de confirmation envoyé.",
+      "reminderScheduled": "Rappel programmé pour votre rendez-vous."
     },
     "features": {
-      "title": "Fonctionnalités clés",
-      "description": "Tout ce dont vous avez besoin pour gérer les rendez-vous et tenir vos clients informés",
+      "badge": "Découvrez nos fonctionnalités",
+      "title": "Simplifiez votre planification",
+      "subtitle": "Explorez les fonctionnalités puissantes conçues pour simplifier votre vie.",
       "booking": {
         "title": "Réservation facile",
-        "description": "Formulaire de réservation simple pour que les clients planifient des rendez-vous"
+        "description": "Réservez des rendez-vous en quelques clics."
       },
-      "email": {
-        "title": "Confirmations par e-mail",
-        "description": "Confirmations automatiques par e-mail envoyées aux clients"
-      },
-      "sms": {
-        "title": "Rappels par SMS",
-        "description": "Rappels automatisés par SMS avant les rendez-vous"
+      "learnMore": "En savoir plus",
+      "reminders": {
+        "title": "Ne manquez jamais un rappel",
+        "description": "Restez au top de votre emploi du temps avec des rappels opportuns."
       }
     },
     "cta": {
-      "title": "Prêt à commencer ?",
-      "description": "Inscrivez-vous aujourd'hui et commencez à gérer vos rendez-vous en toute simplicité.",
+      "badge": "Rejoignez-nous",
+      "title": "Prêt à transformer votre planification ?",
+      "description": "Inscrivez-vous maintenant et prenez le contrôle de vos rendez-vous.",
       "getStarted": "Commencer"
     }
   },
@@ -1064,7 +1063,6 @@
         "typeNotFound": "Type de rendez-vous introuvable",
         "typeNotFoundDescription": "Le type de rendez-vous que vous essayez de gérer a peut-être été supprimé ou n'existe pas"
       },
-
       "textArea": "Zone de texte",
       "dropdown": "Liste déroulante",
       "checkbox": "Case à cocher",

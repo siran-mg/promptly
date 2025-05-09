@@ -1,33 +1,32 @@
 {
   "home": {
     "hero": {
-      "title": "Appointments & Reminders Made Simple",
-      "description": "Accept appointments and automatically send confirmation and reminders via email and SMS — with zero calendar integrations required.",
-      "getStarted": "Get Started",
-      "appointmentConfirmation": "Appointment Confirmation",
-      "appointmentDate": "Thursday, October 12, 2023 at 10:00 AM",
-      "emailSent": "Confirmation email sent",
-      "reminderScheduled": "Reminder scheduled for 24h before"
+      "title": "Welcome to Your New Scheduling Experience",
+      "description": "Effortlessly manage your appointments with our intuitive platform.",
+      "getStarted": "Get Started Today",
+      "appointmentConfirmation": "Your appointment is confirmed!",
+      "appointmentDate": "Scheduled for {date}",
+      "emailSent": "Confirmation email sent.",
+      "reminderScheduled": "Reminder set for your appointment."
     },
     "features": {
-      "title": "Key Features",
-      "description": "Everything you need to manage appointments and keep your clients informed",
+      "badge": "Discover Our Features",
+      "title": "Streamline Your Scheduling",
+      "subtitle": "Explore the powerful features designed to simplify your life.",
       "booking": {
         "title": "Easy Booking",
-        "description": "Simple booking form for clients to schedule appointments"
+        "description": "Book appointments with just a few clicks."
       },
-      "email": {
-        "title": "Email Confirmations",
-        "description": "Automatic email confirmations sent to clients"
-      },
-      "sms": {
-        "title": "SMS Reminders",
-        "description": "Automated SMS reminders before appointments"
+      "learnMore": "Learn More",
+      "reminders": {
+        "title": "Never Miss a Reminder",
+        "description": "Stay on top of your schedule with timely reminders."
       }
     },
     "cta": {
-      "title": "Ready to Get Started?",
-      "description": "Sign up today and start managing your appointments with ease.",
+      "badge": "Join Us",
+      "title": "Ready to Transform Your Scheduling?",
+      "description": "Sign up now and take control of your appointments.",
       "getStarted": "Get Started"
     }
   },
