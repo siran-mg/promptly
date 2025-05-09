@@ -116,6 +116,35 @@
     "nextMonth": "Next Month",
     "custom": "Custom"
   },
+  "api": {
+    "errors": {
+      "unauthorized": "Unauthorized",
+      "authRequired": "Authentication required",
+      "internalServerError": "Internal server error",
+      "userIdRequired": "User ID is required",
+      "tokenIdRequired": "Token ID and User ID are required",
+      "failedFetchShareTokens": "Failed to fetch share tokens",
+      "updateShareTokenFailed": "Could not update share token. Please try again.",
+      "createShareTokenFailed": "Could not create share token. Please try again.",
+      "deleteShareTokenFailed": "Could not delete share token. Please try again.",
+      "tokenNotFound": "Token not found or you do not have permission to delete it.",
+      "subscriptionNotFound": "Subscription not found",
+      "invalidAppointmentIds": "Invalid or missing appointmentIds",
+      "failedVerifyAppointments": "Failed to verify appointments",
+      "unauthorizedAppointmentAccess": "Unauthorized access to one or more appointments",
+      "failedDeleteAppointments": "Failed to delete appointments",
+      "invalidPageParams": "Invalid page or pageSize parameters",
+      "failedFetchAppointments": "Failed to fetch appointments",
+      "actionAndIdRequired": "Action and appointment ID are required",
+      "invalidAction": "Invalid action. Must be \"confirm\" or \"reject\""
+    }
+  },
+  "validation": {
+    "nameMinLength": "Name must be at least 2 characters",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match"
+  },
   "auth": {
     "login": "Login",
     "signup": "Sign Up",
@@ -163,6 +192,24 @@
       "confirmPassword": "Confirm Password",
       "signupButton": "Sign up",
       "creatingAccount": "Creating account..."
+    }
+  },
+  "footer": {
+    "description": "Schedule appointments and send automated reminders via email and SMS — with zero calendar integrations required.",
+    "resources": {
+      "title": "Resources",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    },
+    "company": {
+      "title": "Company",
+      "contact": "Contact",
+      "about": "About"
+    },
+    "copyright": "All rights reserved.",
+    "social": {
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn"
     }
   },
   "dashboard": {

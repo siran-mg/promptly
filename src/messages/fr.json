@@ -31,6 +31,53 @@
       "getStarted": "Commencer"
     }
   },
+  "api": {
+    "errors": {
+      "unauthorized": "Non autorisé",
+      "authRequired": "Authentification requise",
+      "internalServerError": "Erreur interne du serveur",
+      "userIdRequired": "L'ID utilisateur est requis",
+      "tokenIdRequired": "L'ID du jeton et l'ID utilisateur sont requis",
+      "failedFetchShareTokens": "Échec de la récupération des jetons de partage",
+      "updateShareTokenFailed": "Impossible de mettre à jour le jeton de partage. Veuillez réessayer.",
+      "createShareTokenFailed": "Impossible de créer un jeton de partage. Veuillez réessayer.",
+      "deleteShareTokenFailed": "Impossible de supprimer le jeton de partage. Veuillez réessayer.",
+      "tokenNotFound": "Jeton introuvable ou vous n'avez pas la permission de le supprimer.",
+      "subscriptionNotFound": "Abonnement introuvable",
+      "invalidAppointmentIds": "IDs de rendez-vous invalides ou manquants",
+      "failedVerifyAppointments": "Échec de la vérification des rendez-vous",
+      "unauthorizedAppointmentAccess": "Accès non autorisé à un ou plusieurs rendez-vous",
+      "failedDeleteAppointments": "Échec de la suppression des rendez-vous",
+      "invalidPageParams": "Paramètres de page ou taille de page invalides",
+      "failedFetchAppointments": "Échec de la récupération des rendez-vous",
+      "actionAndIdRequired": "L'action et l'ID du rendez-vous sont requis",
+      "invalidAction": "Action invalide. Doit être \"confirm\" ou \"reject\""
+    }
+  },
+  "validation": {
+    "nameMinLength": "Le nom doit comporter au moins 2 caractères",
+    "invalidEmail": "Veuillez entrer une adresse e-mail valide",
+    "passwordMinLength": "Le mot de passe doit comporter au moins 8 caractères",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas"
+  },
+  "footer": {
+    "description": "Planifiez des rendez-vous et envoyez automatiquement des rappels par e-mail et SMS — sans aucune intégration de calendrier requise.",
+    "resources": {
+      "title": "Ressources",
+      "terms": "Conditions",
+      "privacy": "Confidentialité"
+    },
+    "company": {
+      "title": "Entreprise",
+      "contact": "Contact",
+      "about": "À propos"
+    },
+    "copyright": "Tous droits réservés.",
+    "social": {
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn"
+    }
+  },
   "common": {
     "appName": "Promptly",
     "loading": "Chargement...",

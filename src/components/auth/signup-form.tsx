@@ -14,17 +14,26 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase";
 
-const signupSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+// Create a function that returns the schema with translations
+const createSignupSchema = (tValidation: any) => {
+  return z.object({
+    name: z.string().min(2, { message: tValidation('nameMinLength') }),
+    email: z.string().email({ message: tValidation('invalidEmail') }),
+    password: z.string().min(8, { message: tValidation('passwordMinLength') }),
+    confirmPassword: z.string(),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: tValidation('passwordsDoNotMatch'),
+    path: ["confirmPassword"],
+  });
+};
 
-type SignupFormValues = z.infer<typeof signupSchema>;
+// Define the form values type directly
+type SignupFormValues = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 export function SignupForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,14 +41,15 @@ export function SignupForm() {
   const router = useRouter();
   const locale = useLocale();
   const supabase = createClient();
-  const t = useTranslations("auth");
+  const tAuth = useTranslations("auth");
+  const tValidation = useTranslations("validation");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<SignupFormValues>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(createSignupSchema(tValidation)),
   });
 
   const onSubmit = async (data: SignupFormValues) => {
@@ -72,7 +82,7 @@ export function SignupForm() {
       router.refresh();
     } catch (error) {
       console.error("Error signing up:", error);
-      setError("An unexpected error occurred. Please try again.");
+      setError(tAuth('errors.unexpectedError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -88,25 +98,25 @@ export function SignupForm() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="name">{t('signupForm.name')}</Label>
+            <Label htmlFor="name">{tAuth('signupForm.name')}</Label>
             <Input id="name" {...register("name")} />
             {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">{t('signupForm.email')}</Label>
+            <Label htmlFor="email">{tAuth('signupForm.email')}</Label>
             <Input id="email" type="email" {...register("email")} />
             {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">{t('signupForm.password')}</Label>
+            <Label htmlFor="password">{tAuth('signupForm.password')}</Label>
             <Input id="password" type="password" {...register("password")} />
             {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">{t('signupForm.confirmPassword')}</Label>
+            <Label htmlFor="confirmPassword">{tAuth('signupForm.confirmPassword')}</Label>
             <Input id="confirmPassword" type="password" {...register("confirmPassword")} />
             {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
           </div>
@@ -120,10 +130,10 @@ export function SignupForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t('signupForm.creatingAccount')}
+                {tAuth('signupForm.creatingAccount')}
               </>
             ) : (
-              t('signupForm.signupButton')
+              tAuth('signupForm.signupButton')
             )}
           </Button>
         </CardFooter>
