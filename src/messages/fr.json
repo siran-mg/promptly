@@ -210,6 +210,15 @@
       "confirmPassword": "Confirmer le mot de passe",
       "signupButton": "S'inscrire",
       "creatingAccount": "Création du compte en cours..."
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié ?",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "Entrez votre e-mail",
+      "submit": "Envoyer le lien de réinitialisation",
+      "loading": "Envoi en cours...",
+      "success": "Un lien de réinitialisation a été envoyé à votre adresse e-mail si elle existe dans notre système.",
+      "error": "Une erreur est survenue. Veuillez réessayer."
     }
   },
   "dashboard": {
@@ -781,7 +790,7 @@
       },
       "defaultUpdated": {
         "title": "Par défaut mis à jour",
-        "description": "\"{name}\" est maintenant votre type de rendez-vous par défaut."
+        "description": "\"name\" est maintenant votre type de rendez-vous par défaut."
       },
       "deleted": {
         "title": "Type de rendez-vous supprimé",
@@ -793,7 +802,7 @@
       },
       "reassigned": {
         "title": "Rendez-vous réassignés",
-        "description": "{count} rendez-vous réassignés à \"{name}\" et le type d'origine a été supprimé."
+        "description": "{count} rendez-vous réassignés à \"name\" et le type d'origine a été supprimé."
       },
       "editType": "Modifier le type de rendez-vous",
       "editDefaultType": "Modifier le type de rendez-vous par défaut",
@@ -817,13 +826,13 @@
       "appointmentsFoundDescription": "Ce type de rendez-vous est utilisé par {count} rendez-vous. Veuillez les réassigner d'abord.",
       "backToTypes": "Retour aux types de rendez-vous",
       "manageCustomFields": "Gérer les champs personnalisés",
-      "customFieldsFor": "Champs personnalisés pour {name}",
+      "customFieldsFor": "Champs personnalisés pour name",
       "customFieldsDescription": "Créez et gérez des champs personnalisés que les clients rempliront lors de la réservation de ce type de rendez-vous",
       "useGlobalSettings": "Utiliser les paramètres de formulaire globaux",
       "useGlobalSettingsDescription": "Lorsque cette option est activée, ce type de rendez-vous utilisera les mêmes paramètres de formulaire que votre formulaire global",
       "usingGlobalSettings": "Utilisation des paramètres de formulaire globaux",
       "customizeGlobalToggle": "Pour personnaliser le formulaire de ce type de rendez-vous séparément, désactivez l'option \"Utiliser les paramètres de formulaire globaux\" ci-dessus",
-      "formSettingsFor": "Paramètres du formulaire pour {name}",
+      "formSettingsFor": "Paramètres du formulaire pour name",
       "formSettingsDescription": "Personnalisez l'apparence du formulaire de réservation pour ce type de rendez-vous",
       "previewAndShare": "Aperçu et partage",
       "formCustomization": "Personnalisation du formulaire",

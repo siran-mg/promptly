@@ -1,0 +1,7 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When handling pages/components, all hardcoded texts should be translated in en and fr
+For new pages/components, texts should be translated

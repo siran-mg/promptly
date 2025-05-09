@@ -191,6 +191,15 @@
       "confirmPassword": "Confirm Password",
       "signupButton": "Sign up",
       "creatingAccount": "Creating account..."
+    },
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "Enter your email",
+      "submit": "Send reset link",
+      "loading": "Sending...",
+      "success": "A reset link has been sent to your email if it exists in our system.",
+      "error": "An error occurred. Please try again."
     }
   },
   "footer": {
