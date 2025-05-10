@@ -60,7 +60,7 @@
     "passwordsDoNotMatch": "Les mots de passe ne correspondent pas"
   },
   "footer": {
-    "description": "Planifiez des rendez-vous et envoyez automatiquement des rappels par e-mail et SMS — sans aucune intégration de calendrier requise.",
+    "description": "Planifiez des rendez-vous et envoyez automatiquement des rappels par e-mail — sans aucune intégration de calendrier requise.",
     "resources": {
       "title": "Ressources",
       "terms": "Conditions",
