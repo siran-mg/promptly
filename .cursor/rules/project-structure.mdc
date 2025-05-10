@@ -1,0 +1,38 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Project Structure Guidelines
+
+## Next.js App Router Structure
+
+This project follows Next.js 13+ App Router conventions with additional considerations for internationalization.
+
+### Directory Structure
+- `src/app/[locale]` - Main application routes with locale parameter
+- `src/components` - Reusable UI components
+- `src/lib` - Utility functions and configurations
+- `src/components/ui` - Shared UI components
+- `src/components/layout` - Layout components (header, footer, etc.)
+
+### Authentication
+Authentication is handled through Supabase:
+- Auth components are located in `src/app/[locale]/auth/*`
+- Supabase client configuration in `src/lib/supabase`
+
+### Component Guidelines
+1. Use TypeScript for all components
+2. Implement proper error handling
+3. Follow the established component structure:
+   - Props interface definition
+   - Component logic
+   - Return JSX with proper typing
+
+### Example Implementation
+The reset password page [src/app/[locale]/auth/reset-password/page.tsx](mdc:src/app/[locale]/auth/reset-password/page.tsx) follows these guidelines:
+- Located in the correct auth directory
+- Uses TypeScript
+- Implements proper error handling
+- Uses shared UI components
+- Follows the layout structure

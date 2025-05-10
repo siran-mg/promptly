@@ -1,0 +1,28 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Translation Requirements
+
+## Multilingual Support Guidelines
+
+All text content in the application must be available in both English (en) and French (fr).
+
+### Translation Implementation Rules
+1. No hardcoded text strings in components or pages
+2. All text must use the translation system via `useTranslations` hook
+3. Translation keys must be organized hierarchically
+4. All new components must have corresponding translation entries
+
+### Translation Files Structure
+- Translations should be stored in locale files
+- Each feature should have its own translation namespace
+- Translation keys should follow the pattern: `feature.section.key`
+
+### Example
+The reset password page [src/app/[locale]/auth/reset-password/page.tsx](mdc:src/app/[locale]/auth/reset-password/page.tsx) demonstrates proper translation implementation:
+- Uses `useTranslations` hook
+- All UI text is translated
+- Organized under "auth.resetPassword" namespace
+- Includes error messages and form labels

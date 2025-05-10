@@ -1,0 +1,34 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Testing Requirements
+
+## View and Functionality Testing
+
+All features in the project must be tested for both:
+1. View/UI components
+2. Functionality/Logic
+
+### View Testing Requirements
+- Test component rendering
+- Test UI states (loading, error, success)
+- Test responsive design
+- Test accessibility
+- Test user interactions
+
+### Functionality Testing Requirements
+- Test business logic
+- Test data flow
+- Test error handling
+- Test edge cases
+- Test integration with external services (e.g. Supabase)
+
+### Example
+The reset password page [src/app/[locale]/auth/reset-password/page.tsx](mdc:src/app/[locale]/auth/reset-password/page.tsx) should have tests for:
+- Form rendering
+- Password validation
+- Error messages display
+- Success state
+- Integration with Supabase auth
